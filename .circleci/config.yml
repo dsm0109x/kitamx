@@ -76,10 +76,13 @@ jobs:
       - run:
           name: Deploy to production server
           command: |
-            # Crear archivo de clave SSH desde variable de entorno
+            # Crear archivo de clave SSH desde variable de entorno (base64 encoded)
             mkdir -p ~/.ssh
-            echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+            echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/deploy_key
             chmod 600 ~/.ssh/deploy_key
+
+            # Verificar que la clave se creó correctamente
+            ssh-keygen -l -f ~/.ssh/deploy_key || (echo "❌ Invalid SSH key format" && exit 1)
 
             # Conectar usando la clave específica
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no kita@159.203.124.1 \

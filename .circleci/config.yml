@@ -77,18 +77,22 @@ jobs:
           name: Deploy to production server
           command: |
             # Crear archivo de clave SSH desde variable de entorno
-            # La variable debe tener \n literales que se convierten a saltos de línea
+            # La variable tiene \n literales que convertimos a saltos de línea reales
             mkdir -p ~/.ssh
-            echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+            echo "$SSH_PRIVATE_KEY" | sed 's/\\n/\n/g' > ~/.ssh/deploy_key
             chmod 600 ~/.ssh/deploy_key
 
             # Verificar que la clave se creó correctamente
             if ! ssh-keygen -l -f ~/.ssh/deploy_key 2>/dev/null; then
               echo "❌ Invalid SSH key format. Debugging info:"
               echo "Key file size: $(wc -c < ~/.ssh/deploy_key) bytes"
+              echo "Number of lines: $(wc -l < ~/.ssh/deploy_key)"
               echo "First line: $(head -n1 ~/.ssh/deploy_key)"
+              echo "Last line: $(tail -n1 ~/.ssh/deploy_key)"
               exit 1
             fi
+
+            echo "✅ SSH key validated successfully"
 
             # Conectar usando la clave específica
             ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no kita@159.203.124.1 \

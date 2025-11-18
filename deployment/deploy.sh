@@ -14,7 +14,7 @@ echo "============================================"
 echo ""
 
 # Variables
-PROJECT_DIR="/srv/kita"
+PROJECT_DIR="/home/kita/kita"
 VENV_DIR="$PROJECT_DIR/venv"
 BRANCH="production"
 

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if payment_link %}{{ payment_link.title }}{% else %}Pago{% endif %} - {{ tenant.business_name }}</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Pago seguro{% if payment_link %} de ${{ payment_link.amount }} MXN{% endif %} para {{ tenant.business_name }}">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    <!-- Toastify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    {% load static %}
+    <!-- SPLIT SCREEN EDITORIAL CSS -->
+    <link rel="stylesheet" href="{% static 'css/public-payments-landing-style.css' %}?v=4.1">
+</head>
+<body class="payment-page">
+
+    {% if payment_link %}
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="payment-split-container">
+
+        <!-- LEFT PANEL - INFO STICKY (Navy-50) -->
+        <div class="left-panel-sticky">
+
+            <!-- Kita Branding -->
+            <div class="panel-section" style="margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" style="height: 32px; width: auto;">
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-black);">Kita</div>
+                </div>
+                <div style="font-size: 0.6875rem; color: var(--color-gray-500);">
+                    <i class="iconoir-lock"></i> Pago Seguro
+                </div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Status Badge (si aplica) -->
+            {% if payment_link.status == 'expired' or error_type == 'expired' %}
+            <div class="panel-section" style="background: rgba(245, 158, 11, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #f59e0b;">
+                <div style="font-size: 0.875rem; color: #92400e; font-weight: 600;">
+                    ⚠️ Link expirado el {{ payment_link.expires_at|date:"d/m/Y" }}
+                </div>
+            </div>
+            {% elif payment_link.status == 'paid' %}
+            <div class="panel-section status-badge-success" style="background: rgba(21, 128, 61, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #15803d;">
+                <div style="font-size: 0.875rem; color: #14532d; font-weight: 600;">
+                    ✓ Pago completado
+                </div>
+            </div>
+            {% elif payment_link.status == 'cancelled' or error_type == 'cancelled' %}
+            <div class="panel-section" style="background: rgba(107, 114, 128, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #6b7280;">
+                <div style="font-size: 0.875rem; color: #374151; font-weight: 600;">
+                    × Link cancelado
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Merchant Info -->
+            <div class="panel-section">
+                <div class="panel-label">{% if payment_link.status == 'paid' %}PAGADO A{% else %}PAGO A{% endif %}</div>
+                <div class="merchant-name-large">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc-large">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Amount HERO - Editorial -->
+            <div class="panel-section amount-editorial">
+                <div class="panel-label">{% if payment_link.status == 'paid' %}MONTO PAGADO{% else %}TOTAL A PAGAR{% endif %}</div>
+                <div class="amount-hero-editorial">${{ payment_link.amount }}</div>
+                <span class="currency-editorial">{{ payment_link.currency }}</span>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Metadata -->
+            <div class="panel-section metadata-editorial">
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-clock"></i>
+                    Válido hasta: <strong>{{ payment_link.expires_at|date:"d/m/Y H:i" }}</strong>
+                </div>
+                {% if payment_link.customer_name %}
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-user"></i>
+                    Para: <strong>{{ payment_link.customer_name }}</strong>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Trust Badge -->
+            <div class="trust-badge-editorial">
+                <i class="iconoir-shield-check"></i>
+                <span>Procesado por Mercado Pago Oficial</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL - ACTION (White) -->
+        <div class="right-panel-action">
+
+            {% if payment_link.status == 'active' %}
+                <!-- DETALLES -->
+                <div class="right-panel-section">
+                    <div class="section-title-editorial">DETALLES</div>
+                    <h1 class="payment-title-editorial">{{ payment_link.title }}</h1>
+                    {% if payment_link.description %}
+                    <p class="payment-description-editorial">{{ payment_link.description }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- GARANTÍAS -->
+                <div class="right-panel-section">
+                    <div class="section-title-editorial">GARANTÍAS DE SEGURIDAD</div>
+                    <ul class="trust-list-editorial">
+                        <li>Pago 100% seguro procesado por Mercado Pago</li>
+                        {% if payment_link.requires_invoice %}
+                        <li>Incluye factura CFDI 4.0 válida ante el SAT</li>
+                        {% endif %}
+                        <li>Tus datos están protegidos con encriptación SSL 256-bit</li>
+                        <li>Recibes confirmación inmediata por email</li>
+                    </ul>
+                </div>
+
+                <!-- CTA -->
+                <div class="cta-editorial">
+                    <button class="btn-cta-editorial" onclick="proceedToPay()">
+                        PAGAR DE FORMA SEGURA →
+                    </button>
+                </div>
+
+                <!-- FAQ -->
+                <div class="faq-editorial">
+                    <div class="faq-title-editorial">¿NECESITAS AYUDA?</div>
+
+                    <details class="faq-item-editorial">
+                        <summary>¿Cómo pagar?</summary>
+                        <div class="faq-answer-editorial">
+                            <p>1. Click en "Pagar de Forma Segura"<br>
+                            2. Completa tus datos en Mercado Pago<br>
+                            3. Confirma el pago<br>
+                            4. Recibes confirmación por email</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item-editorial">
+                        <summary>¿Es seguro?</summary>
+                        <div class="faq-answer-editorial">
+                            <p>Sí, 100% seguro. Kita usa Mercado Pago (empresa de MercadoLibre). Tus datos van directo a MP con encriptación SSL.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item-editorial">
+                        <summary>¿Qué es Kita?</summary>
+                        <div class="faq-answer-editorial">
+                            <p>Plataforma mexicana de pagos y facturación. {{ tenant.business_name }} usa Kita para procesar pagos.</p>
+                        </div>
+                    </details>
+
+                    <details class="faq-item-editorial">
+                        <summary>Contactar a {{ tenant.business_name }}</summary>
+                        <div class="faq-answer-editorial">
+                            {% if tenant.email %}
+                            <p><strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a></p>
+                            {% endif %}
+                            {% if tenant.phone %}
+                            <p><strong>Teléfono:</strong> {{ tenant.phone }}</p>
+                            {% endif %}
+                        </div>
+                    </details>
+                </div>
+
+            {% elif payment_link.status == 'paid' %}
+                <!-- PAID STATE -->
+                {% if invoice %}
+                <div class="right-panel-section">
+                    <div class="section-title-editorial">FACTURA GENERADA</div>
+                    <h1 class="payment-title-editorial">Tu factura CFDI 4.0 está lista</h1>
+                    <p class="payment-description-editorial">UUID: <code>{{ invoice.uuid }}</code></p>
+                </div>
+
+                <div class="cta-editorial">
+                    <a href="/descargar/{{ payment_link.token }}/{{ invoice.uuid }}/" class="btn-cta-editorial">
+                        Descargar PDF y XML →
+                    </a>
+                </div>
+
+                {% elif payment_link.requires_invoice %}
+                <div class="right-panel-section">
+                    <div class="section-title-editorial">GENERA TU FACTURA</div>
+                    <h1 class="payment-title-editorial">¿Necesitas factura?</h1>
+                    <p class="payment-description-editorial">
+                        Ingresa tus datos fiscales para generar tu factura CFDI 4.0 válida ante el SAT.
+                    </p>
+                </div>
+
+                <div class="cta-editorial">
+                    <a href="/facturar/{{ payment_link.token }}/" class="btn-cta-editorial">
+                        Generar Mi Factura →
+                    </a>
+                </div>
+
+                {% else %}
+                <div class="state-message-editorial success">
+                    <p>Pago no incluye facturación.</p>
+                    <p>Gracias por tu pago. Recibirás confirmación por email.</p>
+                </div>
+                {% endif %}
+
+            {% elif payment_link.status == 'expired' %}
+                <div class="state-message-editorial">
+                    <p>Este link expiró.</p>
+                    <p>Contacta a {{ tenant.business_name }} para un nuevo link.</p>
+                </div>
+                {% if tenant.email %}
+                <div class="cta-editorial">
+                    <a href="mailto:{{ tenant.email }}?subject=Link expirado: {{ payment_link.title }}" class="btn-cta-editorial">
+                        Contactar por Email →
+                    </a>
+                </div>
+                {% endif %}
+
+            {% elif payment_link.status == 'cancelled' %}
+                <div class="state-message-editorial">
+                    <p>Este link fue cancelado.</p>
+                    {% if payment_link.cancellation_reason %}
+                    <p>Motivo: {{ payment_link.cancellation_reason }}</p>
+                    {% endif %}
+                </div>
+                {% if tenant.email %}
+                <div class="cta-editorial">
+                    <a href="mailto:{{ tenant.email }}?subject=Link cancelado: {{ payment_link.title }}" class="btn-cta-editorial">
+                        Contactar por Email →
+                    </a>
+                </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+
+        <!-- FOOTER (Spans both columns) -->
+        <footer class="payment-footer-editorial">
+            <div class="footer-branding">
+                Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+            </div>
+            <div class="footer-links">
+                <a href="/legal/privacidad/" target="_blank">Privacidad</a> ·
+                <a href="/legal/terminos/" target="_blank">Términos</a> ·
+                <a href="mailto:hola@kita.mx">Soporte</a>
+            </div>
+            <div class="trust-badges">
+                🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ Mercado Pago Oficial
+            </div>
+            <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+                © 2025 Kita
+            </div>
+        </footer>
+
+    </div>
+    {% endif %}
+
+    <!-- COOKIE BANNER -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>🍪 Usamos cookies esenciales para procesar tu pago.</p>
+            <div class="cookie-actions">
+                <button class="btn-accept-cookies" onclick="acceptCookies()">Aceptar</button>
+                <button class="btn-reject-cookies" onclick="rejectCookies()">Rechazar</button>
+                <a href="/legal/cookies/" target="_blank">Más info</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        // Cookie consent
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('kita_cookie_consent')) {
+                setTimeout(() => {
+                    document.getElementById('cookieBanner').classList.add('show');
+                }, 1000);
+            }
+        });
+
+        function acceptCookies() {
+            localStorage.setItem('kita_cookie_consent', 'accepted');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+
+        function rejectCookies() {
+            localStorage.setItem('kita_cookie_consent', 'rejected');
+            document.getElementById('cookieBanner').classList.remove('show');
+            showToast('Has rechazado cookies no esenciales. Algunas funciones pueden estar limitadas.', 'info');
+        }
+
+        // Track page view
+        {% if payment_link %}
+        fetch('/track-view/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: '{{ payment_link.token }}',
+                action: 'page_view'
+            })
+        }).catch(e => console.log('Analytics:', e));
+        {% endif %}
+
+        function proceedToPay() {
+            {% if payment_link %}
+            trackInteraction('payment_button_clicked');
+            {% endif %}
+
+            {% if init_point %}
+                showToast('Redirigiendo a pago seguro...', 'info');
+                setTimeout(() => {
+                    window.location.href = '{{ init_point }}';
+                }, 1000);
+            {% else %}
+                showToast('Error: No se pudo preparar el pago.', 'error');
+            {% endif %}
+        }
+
+        function trackInteraction(action) {
+            {% if payment_link %}
+            fetch('/track-interaction/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: '{{ payment_link.token }}',
+                    action: action
+                })
+            }).catch(e => console.log('Tracking:', e));
+            {% endif %}
+        }
+
+        function showToast(message, type) {
+            const colors = {
+                'success': '#15803d',
+                'error': '#ef4444',
+                'info': '#111827'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: colors[type] || '#111827',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '0.875rem',
+                    borderRadius: '2px',
+                    padding: '1rem 1.5rem'
+                }
+            }).showToast();
+        }
+    </script>
+</body>
+</html>

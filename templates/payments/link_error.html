@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - {% if tenant %}{{ tenant.business_name }}{% else %}Kita{% endif %}</title>
+
+    <!-- SEO -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    {% load static %}
+    <!-- SPLIT SCREEN EDITORIAL CSS -->
+    <link rel="stylesheet" href="{% static 'css/public-payments-landing-style.css' %}?v=4.1">
+</head>
+<body class="payment-page">
+
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="payment-split-container">
+
+        <!-- LEFT PANEL - INFO STICKY (Navy-50) -->
+        <div class="left-panel-sticky">
+
+            <!-- Kita Branding -->
+            <div class="panel-section" style="margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" style="height: 32px; width: auto;">
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-black);">Kita</div>
+                </div>
+                <div style="font-size: 0.6875rem; color: var(--color-gray-500);">
+                    <i class="iconoir-lock"></i> Conexión Segura
+                </div>
+            </div>
+
+            <!-- Status Badge - Error -->
+            <div class="panel-section" style="background: rgba(239, 68, 68, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #ef4444;">
+                <div style="font-size: 0.875rem; color: #991b1b; font-weight: 600;">
+                    ⚠️ Sistema temporalmente no disponible
+                </div>
+            </div>
+
+            {% if payment_link %}
+            <!-- Merchant Info -->
+            <div class="panel-section">
+                <div class="panel-label">PAGO A</div>
+                <div class="merchant-name-large">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc-large">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Amount HERO - Editorial -->
+            <div class="panel-section amount-editorial">
+                <div class="panel-label">MONTO</div>
+                <div class="amount-hero-editorial">${{ payment_link.amount }}</div>
+                <span class="currency-editorial">{{ payment_link.currency }}</span>
+            </div>
+
+            <div class="panel-divider"></div>
+            {% else %}
+            <!-- No payment link -->
+            <div class="panel-section">
+                <div class="panel-label">ERROR</div>
+                <div class="merchant-name-large">{% if tenant %}{{ tenant.business_name }}{% else %}Kita{% endif %}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+            {% endif %}
+
+            <!-- Error Info -->
+            <div class="panel-section metadata-editorial">
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-warning-triangle"></i>
+                    <strong>Error técnico</strong>
+                </div>
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-info-circle"></i>
+                    Integraciones no disponibles
+                </div>
+            </div>
+
+            <!-- Info Badge -->
+            <div class="trust-badge-editorial" style="background: rgba(239, 68, 68, 0.08); border-left-color: #ef4444;">
+                <i class="iconoir-warning-triangle"></i>
+                <span>Error temporal</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL - MESSAGE (White) -->
+        <div class="right-panel-action">
+
+            <div class="right-panel-section">
+                <div class="section-title-editorial">ERROR TEMPORAL</div>
+
+                <h1 class="payment-title-editorial">Sistema de pagos temporalmente no disponible</h1>
+
+                <div class="state-message-editorial" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+                    <p><strong>El sistema de pagos no está disponible en este momento</strong></p>
+
+                    {% if error_message %}
+                    <p>Detalles: {{ error_message }}</p>
+                    {% endif %}
+
+                    <p>Esto puede ocurrir por:</p>
+                    <ul>
+                        <li>Integración con Mercado Pago en configuración</li>
+                        <li>Mantenimiento temporal del sistema</li>
+                        <li>Error de conexión con servicios de pago</li>
+                    </ul>
+
+                    <p><strong>Por favor contacta a {{ tenant.business_name|default:"quien te envió el link" }} para completar tu pago.</strong></p>
+                </div>
+            </div>
+
+            {% if tenant and tenant.email %}
+            <div class="cta-editorial">
+                <a href="mailto:{{ tenant.email }}?subject=Error en sistema de pagos{% if payment_link %}: {{ payment_link.title }}{% endif %}" class="btn-cta-editorial">
+                    Contactar por Email →
+                </a>
+            </div>
+            {% else %}
+            <div class="cta-editorial">
+                <a href="mailto:hola@kita.mx?subject=Error en sistema de pagos" class="btn-cta-editorial">
+                    Contactar Soporte Kita →
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- FAQ -->
+            <div class="faq-editorial">
+                <div class="faq-title-editorial">¿NECESITAS AYUDA?</div>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Qué significa este error?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>El proveedor está configurando su integración con Mercado Pago o hay un problema temporal de conexión.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Cuándo podré pagar?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Contacta directamente al proveedor para conocer el estado y coordinar tu pago.</p>
+                    </div>
+                </details>
+
+                {% if tenant %}
+                <details class="faq-item-editorial">
+                    <summary>Contactar a {{ tenant.business_name }}</summary>
+                    <div class="faq-answer-editorial">
+                        {% if tenant.email %}
+                        <p><strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a></p>
+                        {% endif %}
+                        {% if tenant.phone %}
+                        <p><strong>Teléfono:</strong> {{ tenant.phone }}</p>
+                        {% endif %}
+                    </div>
+                </details>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- FOOTER (Spans both columns) -->
+        <footer class="payment-footer-editorial">
+            <div class="footer-branding">
+                Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+            </div>
+            <div class="footer-links">
+                <a href="/legal/privacidad/" target="_blank">Privacidad</a> ·
+                <a href="/legal/terminos/" target="_blank">Términos</a> ·
+                <a href="mailto:hola@kita.mx">Soporte</a>
+            </div>
+            <div class="trust-badges">
+                🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ Mercado Pago Oficial
+            </div>
+            <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+                © 2025 Kita
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- COOKIE BANNER -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>🍪 Usamos cookies esenciales.</p>
+            <div class="cookie-actions">
+                <button class="btn-accept-cookies" onclick="acceptCookies()">Aceptar</button>
+                <a href="/legal/cookies/" target="_blank">Más info</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        // Cookie consent
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('kita_cookie_consent')) {
+                setTimeout(() => {
+                    document.getElementById('cookieBanner').classList.add('show');
+                }, 1000);
+            }
+        });
+
+        function acceptCookies() {
+            localStorage.setItem('kita_cookie_consent', 'accepted');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

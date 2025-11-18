@@ -1,0 +1,343 @@
+/**
+ * ACCOUNT PAGE - PROFILE SHEET STYLE
+ * ====================================
+ *
+ * Diseño vertical sin tabs para /account/
+ * Secciones apiladas, forms inline, minimalista.
+ *
+ * Features:
+ * - ✅ Sin tabs (secciones verticales)
+ * - ✅ Headers UPPERCASE Inter
+ * - ✅ Forms inline
+ * - ✅ Checkboxes simples (no switches)
+ * - ✅ Sin badges coloridos
+ * - ✅ Monocromático
+ *
+ * @version 1.0 - Profile Sheet
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+
+.account-page-header {
+    background: #ffffff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+
+.account-page-header h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.account-page-header h1 i {
+    display: none !important;
+}
+
+.account-page-header .btn {
+    display: none !important;
+}
+
+.account-page-header small {
+    display: none !important;
+}
+
+/* Ocultar header original */
+.d-flex.border-bottom {
+    display: none !important;
+}
+
+/* ============================================
+   TABS - OCULTAR
+   ============================================ */
+
+.nav-tabs {
+    display: none !important;
+}
+
+.tab-pane {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+.card-header-tabs {
+    display: none !important;
+}
+
+/* ============================================
+   SECCIONES VERTICALES
+   ============================================ */
+
+.account-section {
+    background: #ffffff;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 1.5rem 0;
+    margin-bottom: 0;
+}
+
+.account-section:last-child {
+    border-bottom: none;
+}
+
+.account-section-header {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* ============================================
+   FORMS - MINIMALISTAS
+   ============================================ */
+
+.form-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.375rem;
+}
+
+.form-label small {
+    text-transform: none;
+    font-weight: 400;
+    font-size: 0.7rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #ffffff;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #111827;
+    box-shadow: none;
+}
+
+.form-control:disabled,
+.form-control[readonly] {
+    background: #f9fafb;
+    color: #6b7280;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ============================================
+   CHECKBOXES - SIMPLES (NO SWITCHES)
+   ============================================ */
+
+.form-check-input {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    width: 18px;
+    height: 18px;
+}
+
+.form-check-input:checked {
+    background-color: #111827;
+    border-color: #111827;
+}
+
+.form-check-input:focus {
+    border-color: #111827;
+    box-shadow: none;
+}
+
+.form-check-label {
+    font-size: 0.875rem;
+    color: #111827;
+    margin-left: 0.5rem;
+}
+
+.form-check-label i {
+    display: none;
+}
+
+/* Switches convertir a checkboxes */
+.form-switch .form-check-input {
+    width: 18px;
+    height: 18px;
+    border-radius: 0;
+}
+
+/* ============================================
+   SECURITY INFO - TABLA
+   ============================================ */
+
+.security-info-table {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.security-info-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+}
+
+.security-info-row:last-child {
+    border-bottom: none;
+}
+
+.security-info-label {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+.security-info-value {
+    color: #111827;
+}
+
+.security-info-value i {
+    display: none;
+}
+
+.security-info-value.text-success,
+.security-info-value.text-warning {
+    color: #111827 !important;
+}
+
+/* ============================================
+   BUTTONS - MINIMALISTAS
+   ============================================ */
+
+.btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.btn:hover {
+    background: #15803d;
+}
+
+.btn i {
+    display: none;
+}
+
+.btn-warning {
+    background: #111827;
+}
+
+.btn-warning:hover {
+    background: #f59e0b;
+}
+
+.btn-primary {
+    background: #111827;
+}
+
+.btn-outline-secondary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    color: #111827;
+}
+
+.btn-outline-secondary:hover {
+    background: #111827;
+    color: #ffffff;
+}
+
+/* ============================================
+   CARDS - ELIMINAR
+   ============================================ */
+
+.card {
+    background: #ffffff;
+    border: none;
+    box-shadow: none;
+}
+
+.card-header {
+    background: #ffffff;
+    border: none;
+    padding: 0;
+}
+
+.card-body {
+    padding: 0;
+}
+
+.card.bg-light {
+    background: transparent !important;
+    border: none;
+}
+
+/* ============================================
+   VALIDATION FEEDBACK
+   ============================================ */
+
+.invalid-feedback,
+.valid-feedback {
+    font-size: 0.75rem;
+}
+
+.is-invalid {
+    border-color: #ef4444 !important;
+}
+
+.is-valid {
+    border-color: #111827 !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .account-page-header h1 {
+        font-size: 1.25rem !important;
+    }
+
+    .account-section {
+        padding: 1rem 0;
+    }
+
+    .security-info-row {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+    }
+
+    .security-info-label {
+        font-weight: 600;
+    }
+}

@@ -1,0 +1,123 @@
+{% extends 'base_minimal.html' %}
+{% load static %}
+
+{% block title %}Email de Verificación Enviado - Kita{% endblock %}
+
+{% block extra_head %}
+<!-- Auth Brutalist Styles -->
+<link rel="stylesheet" href="{% static 'css/04-pages/auth-brutalist.css' %}?v=3.0">
+{% endblock %}
+
+{% block content %}
+<main role="main" class="auth-page-centered">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-sm-10">
+                <div class="auth-form-card">
+                    <!-- Header -->
+                    <div class="auth-header text-center mb-4">
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <img src="{% static logo_path %}"
+                                 alt="Kita"
+                                 height="48"
+                                 loading="eager"
+                                 class="auth-logo">
+                            <h1 class="kita-brand mb-0">Kita</h1>
+                        </div>
+                        <p class="auth-tagline">Kit de Ayuda para Emprendedores</p>
+
+                        <!-- Success Icon -->
+                        <div class="mb-4 mt-4">
+                            <div class="success-icon-large">
+                                <span class="iconoir-send-mail" style="font-size: 64px; color: #15803d;" aria-hidden="true"></span>
+                            </div>
+                        </div>
+
+                        <h2 class="auth-title">¡Email Enviado!</h2>
+                        <p class="auth-subtitle">Confirma tu cuenta para continuar</p>
+                    </div>
+
+                    <!-- Message -->
+                    <div class="alert alert-success mb-4" role="alert">
+                        <div class="d-flex align-items-start">
+                            <span class="iconoir-mail me-2 mt-1" style="font-size: 20px;" aria-hidden="true"></span>
+                            <div>
+                                <p class="mb-2">
+                                    <strong>Te hemos enviado un email de verificación</strong> a tu correo electrónico.
+                                </p>
+                                <p class="mb-0 small text-muted">
+                                    Si no recibes el email en los próximos minutos, revisa tu carpeta de spam.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instructions -->
+                    <div class="mb-4">
+                        <h3 class="h6 fw-bold mb-3">📋 Próximos pasos:</h3>
+                        <ol class="small text-muted" style="line-height: 1.8;">
+                            <li>Revisa tu bandeja de entrada (y carpeta de spam)</li>
+                            <li>Abre el email de <strong>Kita</strong></li>
+                            <li>Haz click en el botón <strong>"Verificar mi Email"</strong></li>
+                            <li>Serás redirigido al onboarding automáticamente</li>
+                            <li>¡Listo! Tu cuenta estará activa y lista para usar</li>
+                        </ol>
+                    </div>
+
+                    <!-- Info Box -->
+                    <div class="alert alert-light border mb-4">
+                        <div class="d-flex align-items-start">
+                            <span class="iconoir-info-circle me-2 mt-1 text-primary" aria-hidden="true"></span>
+                            <div class="small">
+                                <p class="mb-1"><strong>El enlace expira en 3 días</strong></p>
+                                <p class="mb-0 text-muted">
+                                    Por seguridad, el enlace de verificación solo funciona una vez y tiene validez de 3 días.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Help Box -->
+                    <div class="alert alert-warning border-warning mb-4">
+                        <div class="d-flex align-items-start">
+                            <span class="iconoir-help-circle me-2 mt-1" aria-hidden="true"></span>
+                            <div class="small">
+                                <p class="mb-1"><strong>¿No recibiste el email?</strong></p>
+                                <p class="mb-0">
+                                    Revisa tu carpeta de spam o correo no deseado.
+                                    Si el problema persiste, contacta con
+                                    <a href="mailto:hola@kita.mx" class="fw-semibold">hola@kita.mx</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'account_login' %}"
+                           class="btn btn-outline-secondary"
+                           data-tracking="verification-sent-to-login">
+                            <span class="iconoir-arrow-left me-2" aria-hidden="true"></span>
+                            <span class="btn-text">Volver al Login</span>
+                        </a>
+                    </div>
+
+                    <!-- Back to Home -->
+                    <div class="auth-back-link text-center mt-3">
+                        <a href="{% url 'home' %}" data-tracking="verification-sent-back-home">
+                            <span class="iconoir-arrow-left" aria-hidden="true"></span>
+                            Volver al inicio
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Legal Bundle para loading states en botones -->
+<script src="{% static 'js/legal-bundle.js' %}?v=1.1" defer></script>
+{% endblock %}

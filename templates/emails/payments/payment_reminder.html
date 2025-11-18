@@ -1,0 +1,98 @@
+{% extends "emails/base.html" %}
+{% load email_filters %}
+
+{% block email_title %}Recordatorio: Link de Pago Pendiente - {{ tenant.name }}{% endblock %}
+
+{% block email_content %}
+<!-- Icon Hero -->
+<div style="text-align: center; margin-bottom: 24px;">
+    <div style="font-size: 64px; line-height: 1;">⏰</div>
+</div>
+
+<!-- Title -->
+<h1 style="font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; color: #111827; text-align: center; margin: 0 0 16px 0; line-height: 1.3;">
+    Recordatorio: Link de Pago Pendiente
+</h1>
+
+<!-- Lead Text -->
+<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
+    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+</p>
+
+<!-- Main Message -->
+<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
+    Te recordamos que tienes un link de pago pendiente de {{ tenant.name }}.
+    El link expirará pronto, ¡no lo dejes pasar!
+</p>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+    <a href="{{ link_url }}" class="btn-primary" style="background-color: #15803d; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(21, 128, 61, 0.15);">
+        💳 Realizar Pago Ahora
+    </a>
+</div>
+
+<!-- Info Box - Detalles -->
+<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
+        📋 Detalles del Pago
+    </h3>
+    <ul style="margin: 0; padding-left: 20px; color: #78350F;">
+        <li style="margin-bottom: 8px;">
+            <strong>Concepto:</strong> {{ title }}
+        </li>
+        <li style="margin-bottom: 8px;">
+            <strong>Monto:</strong> ${{ amount|currency_mx }} MXN
+        </li>
+        {% if description %}
+        <li style="margin-bottom: 8px;">
+            <strong>Descripción:</strong> {{ description }}
+        </li>
+        {% endif %}
+        <li style="margin-bottom: 8px;">
+            <strong>⏳ Expira:</strong> {{ expires_at|friendly_datetime }}
+        </li>
+    </ul>
+</div>
+
+<!-- Success Box - Proceso -->
+<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
+        ✅ Proceso Rápido y Seguro
+    </h3>
+    <ol style="margin: 0; padding-left: 20px; color: #166534;">
+        <li style="margin-bottom: 8px;">Haz clic en "Realizar Pago Ahora"</li>
+        <li style="margin-bottom: 8px;">Selecciona tu método de pago preferido</li>
+        <li style="margin-bottom: 8px;">Completa el pago de forma segura</li>
+        <li>Recibirás confirmación inmediata</li>
+    </ol>
+</div>
+
+<!-- Security Box -->
+<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <p style="margin: 0; font-size: 14px; color: #6B7280;">
+        💡 <strong>Ya realizaste el pago?</strong> Puedes ignorar este mensaje.
+        Los pagos se confirman automáticamente.
+    </p>
+</div>
+
+<!-- Fallback Link -->
+<div class="link-fallback" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E5E7EB; text-align: center;">
+    <p style="font-size: 13px; color: #9CA3AF; margin: 0 0 8px 0;">
+        ¿El botón no funciona? Copia y pega este enlace:
+    </p>
+    <p style="margin: 0;">
+        <a href="{{ link_url }}" style="color: #15803d; word-break: break-all; font-size: 12px;">{{ link_url }}</a>
+    </p>
+</div>
+
+<!-- Help -->
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
+    ¿Dudas?{% if tenant.support_email or tenant.email %} Contáctanos en
+    <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>{% else %} Responde a este email{% endif %}
+</p>
+{% endblock %}
+
+{% block email_footer_note %}
+Recordatorio enviado por {{ tenant.name }} a través de Kita.
+{% endblock %}

@@ -1,0 +1,476 @@
+/**
+ * SETTINGS PAGE - SETTINGS PANEL STYLE
+ * ======================================
+ *
+ * Diseño vertical sin tabs para /settings/
+ * Secciones apiladas, headers UPPERCASE, minimalista.
+ *
+ * Features:
+ * - ✅ Sin tabs (secciones verticales)
+ * - ✅ Headers UPPERCASE Inter
+ * - ✅ Forms minimalistas
+ * - ✅ Sin badges coloridos
+ * - ✅ Sin progress bars
+ * - ✅ Monocromático
+ *
+ * @version 1.0 - Settings Panel
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+
+.settings-page-header {
+    background: #ffffff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+}
+
+.settings-page-header h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.settings-page-header h1 i {
+    display: none !important;
+}
+
+/* Ocultar header original */
+.d-flex.border-bottom {
+    display: none !important;
+}
+
+/* ============================================
+   TABS - OCULTAR
+   ============================================ */
+
+.nav-tabs {
+    display: none !important;
+}
+
+/* Mostrar todos los tab-panes */
+.tab-pane {
+    display: block !important;
+    opacity: 1 !important;
+}
+
+/* ============================================
+   SECCIONES VERTICALES
+   ============================================ */
+
+.settings-section {
+    background: #ffffff;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 1.5rem 0;
+    margin-bottom: 0;
+}
+
+.settings-section:last-child {
+    border-bottom: none;
+}
+
+.settings-section-header {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* ============================================
+   FORMS - MINIMALISTAS
+   ============================================ */
+
+.form-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.375rem;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #ffffff;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #111827;
+    box-shadow: none;
+}
+
+.form-control:read-only {
+    background: #f9fafb;
+    color: #6b7280;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback,
+.valid-feedback {
+    font-size: 0.75rem;
+}
+
+/* ============================================
+   BUTTONS - MINIMALISTAS
+   ============================================ */
+
+.btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background: #15803d;
+    color: #ffffff;
+}
+
+.btn i {
+    display: none;
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    color: #111827;
+}
+
+.btn-secondary:hover {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+.btn-outline-primary,
+.btn-outline-danger,
+.btn-outline-secondary {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    color: #111827;
+    border-radius: 0;
+    padding: 0.375rem 0.875rem;
+    font-size: 0.875rem;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+.btn-outline-danger:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+}
+
+.btn-success {
+    background: #111827;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #15803d;
+}
+
+/* ============================================
+   ALERTS - MINIMALISTAS
+   ============================================ */
+
+.alert {
+    background: #f9fafb !important;
+    border: none !important;
+    border-left: 2px solid #111827 !important;
+    border-radius: 0 !important;
+    padding: 0.875rem !important;
+    margin-bottom: 1rem;
+}
+
+.alert strong {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #111827;
+}
+
+.alert p,
+.alert .small {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0.25rem 0 0 0;
+}
+
+.alert i {
+    display: none;
+}
+
+.alert-info,
+.alert-warning,
+.alert-danger {
+    background: #f9fafb !important;
+    border-left-color: #111827 !important;
+}
+
+/* ============================================
+   BADGES - TEXTO SIMPLE
+   ============================================ */
+
+.badge {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 0.25rem 0.75rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    text-transform: uppercase;
+}
+
+.badge.bg-success,
+.badge.bg-warning,
+.badge.bg-danger,
+.badge.bg-secondary,
+.badge.bg-info {
+    background: transparent !important;
+    color: #111827 !important;
+}
+
+/* ============================================
+   CERTIFICADOS - LISTA
+   ============================================ */
+
+.list-group {
+    border: none;
+}
+
+.list-group-item {
+    background: #ffffff;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 1rem 0;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
+}
+
+.list-group-item h6 {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.list-group-item p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.list-group-item p strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ============================================
+   INTEGRACIONES - CARDS SIMPLES
+   ============================================ */
+
+.integration-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: none;
+}
+
+.integration-card h6 {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.75rem;
+}
+
+.integration-card h6 i {
+    display: none;
+}
+
+.integration-card p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.integration-card small {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.integration-card .d-grid {
+    display: flex !important;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.text-center.py-4 {
+    padding: 2rem !important;
+}
+
+.text-center i {
+    font-size: 2.5rem !important;
+    color: #d1d5db;
+    opacity: 0.5;
+}
+
+.text-center h6 {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-top: 1rem;
+}
+
+.text-center p {
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+/* ============================================
+   MODAL CSD
+   ============================================ */
+
+#uploadCSDModal {
+    z-index: 99999 !important;
+}
+
+#uploadCSDModal .modal-content {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+#uploadCSDModal .modal-header {
+    background: #fafbfc;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
+}
+
+#uploadCSDModal .modal-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    color: #111827 !important;
+}
+
+#uploadCSDModal .modal-title i {
+    display: none;
+}
+
+#uploadCSDModal .modal-body {
+    padding: 1.25rem;
+}
+
+#uploadCSDModal .alert {
+    background: #f9fafb !important;
+    border: none !important;
+    border-left: 2px solid #111827 !important;
+}
+
+#uploadCSDModal .dropzone {
+    border: 1px dashed #d1d5db !important;
+    border-radius: 0 !important;
+    background: #fafbfc !important;
+}
+
+#uploadCSDModal .dropzone:hover {
+    border-color: #111827 !important;
+}
+
+#uploadCSDModal .dropzone.file-ready {
+    border-color: #111827 !important;
+    border-style: solid !important;
+    background: #ffffff !important;
+}
+
+/* Progress steps */
+.progress-step {
+    padding: 0.75rem;
+    border-left: 2px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.progress-step.active {
+    border-color: #111827;
+    background: #fafbfc;
+    color: #111827;
+}
+
+.progress-step.completed {
+    border-color: #111827;
+    background: #f9fafb;
+    color: #111827;
+}
+
+.progress-step i {
+    color: #111827 !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .settings-page-header h1 {
+        font-size: 1.25rem !important;
+    }
+
+    .settings-section {
+        padding: 1rem 0;
+    }
+
+    .integration-card {
+        margin-bottom: 0.75rem;
+    }
+
+    .integration-card .d-grid {
+        flex-direction: column;
+    }
+}

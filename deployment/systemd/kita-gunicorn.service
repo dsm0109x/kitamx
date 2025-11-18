@@ -1,0 +1,23 @@
+[Unit]
+Description=Kita Gunicorn WSGI Server
+After=network.target
+
+[Service]
+Type=notify
+User=kita
+Group=kita
+RuntimeDirectory=gunicorn
+WorkingDirectory=/home/kita/kita
+Environment="PATH=/home/kita/kita/venv/bin"
+ExecStart=/home/kita/kita/venv/bin/gunicorn \
+    --config /home/kita/kita/gunicorn_config.py \
+    kita.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

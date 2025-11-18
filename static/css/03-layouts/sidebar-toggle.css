@@ -1,0 +1,94 @@
+/**
+ * SIDEBAR TOGGLE - Cambio rápido entre modos
+ * ============================================
+ *
+ * Permite cambiar entre Ghost Mode y Glass Premium
+ * usando data-attributes en el HTML.
+ *
+ * Uso:
+ * <nav class="kita-sidebar" data-sidebar-mode="ghost">
+ * <nav class="kita-sidebar" data-sidebar-mode="glass">
+ *
+ * @version 1.0
+ * @created 2025-11-10
+ */
+
+/* ========================================
+   GLASS MODE - Premium anterior
+   ======================================== */
+
+.kita-sidebar[data-sidebar-mode="glass"] {
+    background: rgba(255, 255, 255, 0.85) !important;
+    backdrop-filter: blur(12px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+    box-shadow: 2px 0 16px rgba(0, 0, 0, 0.04) !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.kita-sidebar[data-sidebar-mode="glass"] .tenant-selector {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.kita-sidebar[data-sidebar-mode="glass"] .tenant-selector:hover {
+    background: transparent !important;
+    transform: none !important;
+}
+
+.kita-sidebar[data-sidebar-mode="glass"] .nav-link {
+    background: transparent !important;
+    border: none !important;
+    border-left: 4px solid transparent !important;
+    border-radius: 0 !important;
+}
+
+.kita-sidebar[data-sidebar-mode="glass"] .nav-link:hover {
+    border-left-color: #15803d !important;
+    background: linear-gradient(90deg, #f0fdf4 0%, #f9fafb 100%) !important;
+    box-shadow: none !important;
+    transform: scale(1.01) !important;
+}
+
+.kita-sidebar[data-sidebar-mode="glass"] .nav-link.active {
+    background: #f0fdf4 !important;
+    border-left-color: #15803d !important;
+    box-shadow: inset 4px 0 0 0 #15803d, 0 2px 8px rgba(21, 128, 61, 0.12) !important;
+    transform: none !important;
+}
+
+/* ========================================
+   GHOST MODE - Transparencia absoluta
+   ======================================== */
+
+.kita-sidebar[data-sidebar-mode="ghost"] {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Ya está implementado en sidebar-premium.css */
+
+/* ========================================
+   HYBRID MODE - Lo mejor de ambos mundos
+   ======================================== */
+
+.kita-sidebar[data-sidebar-mode="hybrid"] {
+    /* Fondo ultra-sutil */
+    background: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.1) 100%) !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
+}
+
+.kita-sidebar[data-sidebar-mode="hybrid"] .tenant-selector,
+.kita-sidebar[data-sidebar-mode="hybrid"] .nav-link:hover,
+.kita-sidebar[data-sidebar-mode="hybrid"] .nav-link.active {
+    /* Usa los estilos de Ghost Mode (flotantes) */
+}

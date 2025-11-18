@@ -1,0 +1,816 @@
+/**
+ * DASHBOARD HYBRID - Typography First + Swiss Minimal
+ * =====================================================
+ *
+ * Combinación perfecta de jerarquía tipográfica (Diseño 1)
+ * con el orden y estructura del diseño suizo (Diseño 2).
+ *
+ * Features:
+ * - ✅ DM Serif Display para números y hero (personalidad)
+ * - ✅ Inter UPPERCASE para headers (estructura)
+ * - ✅ Grid estricto de 12 columnas
+ * - ✅ Sistema de espaciado 8px
+ * - ✅ Fondos alternados (blanco/gray-50)
+ * - ✅ Sin sombras, sin gradientes
+ * - ✅ Monocromático (negro + grises + verde accent)
+ * - ✅ Bordes horizontales (top/bottom)
+ * - ✅ Espaciado compacto
+ *
+ * Inspiración: NY Times + Swiss Design + Brutalism
+ *
+ * @version 3.0 - Hybrid
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   VARIABLES CSS - SISTEMA HÍBRIDO
+   ============================================ */
+
+:root {
+    /* Tipografía - Inter + DM Serif Display */
+    --font-dm: 'DM Serif Display', Georgia, serif;     /* ✅ DM Serif Display */
+    --font-inter: 'Inter', -apple-system, sans-serif;  /* ✅ Inter */
+
+    /* Espaciado (sistema 8px) */
+    --space-xs: 0.5rem;    /* 8px */
+    --space-sm: 1rem;      /* 16px */
+    --space-md: 1.5rem;    /* 24px */
+    --space-lg: 2rem;      /* 32px */
+
+    /* Colores backgrounds */
+    --bg-white: #ffffff;
+    --bg-gray-50: #f9fafb;
+    --bg-body: #fafbfc;
+
+    /* Colores texto */
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --text-tertiary: #9ca3af;
+
+    /* Bordes */
+    --border-visible: #e5e7eb;
+    --border-subtle: #f3f4f6;
+
+    /* Accent */
+    --accent-green: #15803d;
+}
+
+/* ============================================
+   HERO SECTION - TYPOGRAPHY HERO
+   ============================================ */
+
+.command-center-hero {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    padding: var(--space-sm) 0;               /* 1rem vertical, 0 horizontal */
+    border-radius: 0;
+    margin-bottom: var(--space-sm);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.hero-content {
+    /* Container sin estilos extra */
+}
+
+.hero-title {
+    font-family: 'DM Serif Display', Georgia, serif !important; /* ✅ !important */
+    font-size: 3rem !important;
+    font-weight: 400 !important;
+    margin-bottom: 0.375rem;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: -0.02em !important;
+}
+
+.hero-subtitle {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.875rem;                      /* 14px */
+    font-weight: 400;
+    margin: 0;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   QUICK ACTIONS - ELIMINADO
+   ============================================ */
+
+.quick-actions-grid {
+    display: none !important;                 /* Ocultar botones coloridos */
+}
+
+/* ============================================
+   TRIAL CARD - MINIMAL CON FONDO ALTERNADO
+   ============================================ */
+
+.trial-progress-card {
+    background: var(--bg-gray-50);            /* ✅ Gray-50 (fondos alternados) */
+    border: none;                             /* ✅ Sin borde completo */
+    border-top: 1px solid var(--border-visible);
+    border-bottom: 1px solid var(--border-visible);
+    border-left: 3px solid var(--text-primary); /* ✅ Accent negro izquierdo */
+    border-radius: 0;
+    padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    box-shadow: none;
+}
+
+/* Crítico - solo cambio de borde */
+.trial-progress-card:has(.trial-critical) {
+    background: var(--bg-gray-50);            /* Mantener gray-50 */
+    border-left-color: var(--text-primary);   /* Negro igual */
+}
+
+.trial-progress-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.trial-info-section {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-sm);
+}
+
+.trial-icon-large {
+    display: none;                            /* Sin emoji */
+}
+
+.trial-text-content {
+    flex-grow: 1;
+}
+
+.trial-card-title {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 1rem;
+    font-weight: 700;                         /* Inter tiene 700 */
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+    text-transform: uppercase;                /* ✅ UPPERCASE (Swiss) */
+    letter-spacing: 0.05em;
+}
+
+.trial-card-subtitle {
+    font-size: 0.875rem;
+    margin: 0;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.trial-card-subtitle strong {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.trial-progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.trial-progress-bar {
+    width: 100%;
+    height: 4px;                              /* Muy delgado */
+    background: var(--border-visible);
+    border-radius: 0;
+    overflow: hidden;
+}
+
+.trial-progress-fill {
+    height: 100%;
+    background: var(--text-primary);          /* Negro sólido */
+    border-radius: 0;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Sin shimmer, sin colores de estado */
+.trial-progress-fill::after {
+    display: none;
+}
+
+.trial-progress-fill.trial-warning,
+.trial-progress-fill.trial-critical {
+    background: var(--text-primary);
+}
+
+.trial-progress-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.6875rem;                     /* 11px - pequeño */
+    color: var(--text-tertiary);
+    font-feature-settings: "tnum";
+}
+
+.trial-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-weight: 400;
+}
+
+.trial-stat i {
+    font-size: 0.875rem;
+    color: var(--text-tertiary);
+}
+
+.trial-action-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.btn-trial-upgrade {
+    width: auto;
+    padding: 0.5rem 1rem;                     /* Compacto */
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: var(--text-primary);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 0;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-trial-upgrade:hover {
+    background: var(--accent-green);
+    color: var(--bg-white);
+    transform: translateY(-1px);
+}
+
+.trial-benefits-hint {
+    font-size: 0.6875rem;                     /* 11px */
+    color: var(--text-tertiary);
+    margin: 0;
+    font-weight: 400;
+}
+
+/* ============================================
+   SECTION CARDS - FONDOS ALTERNADOS
+   ============================================ */
+
+.section-card {
+    background: var(--bg-white);              /* Blanco por defecto */
+    border: none;                             /* Sin borde completo */
+    border-top: 1px solid var(--border-visible);
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: 0;
+    padding: var(--space-sm);
+    box-shadow: none;
+    margin-bottom: var(--space-sm);
+}
+
+/* Alternar fondos */
+.section-card:nth-child(even) {
+    background: var(--bg-gray-50);            /* ✅ Gray-50 en pares */
+}
+
+.section-header {
+    margin-bottom: var(--space-xs);
+    padding-bottom: var(--space-xs);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+
+.section-title {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 1.25rem;                       /* 20px */
+    font-weight: 700;                         /* Inter 700 */
+    margin: 0;
+    color: var(--text-primary);
+    text-transform: uppercase;                /* ✅ UPPERCASE (Swiss) */
+    letter-spacing: 0.05em;
+}
+
+.section-title i {
+    display: none;                            /* Sin iconos */
+}
+
+.section-title .badge {
+    display: none;                            /* Sin badges */
+}
+
+.section-header .text-muted {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+}
+
+/* ============================================
+   QUICK ACCESS GRID - STATS TIPOGRÁFICOS
+   ============================================ */
+
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+}
+
+.quick-card {
+    background: transparent;                  /* ✅ Transparente (sin card) */
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: left;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.quick-card:hover .quick-card-stat {
+    color: var(--accent-green);               /* ✅ Verde en hover */
+    transform: translateY(-2px);
+}
+
+.quick-card-icon {
+    display: none;                            /* Sin iconos */
+}
+
+.quick-card-title {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.75rem;                       /* 12px */
+    font-weight: 600;                         /* Inter 600 */
+    margin: 0;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    order: 1;                                 /* Label primero */
+}
+
+.quick-card-stat {
+    font-family: 'DM Serif Display', Georgia, serif !important; /* ✅ !important */
+    font-size: 2.5rem !important;
+    font-weight: 400 !important;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1;
+    font-feature-settings: "tnum";
+    order: 2;
+    transition: all 0.2s ease;
+}
+
+.quick-card-label {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.75rem;
+    font-weight: 400;                         /* Inter 400 */
+    margin: 0;
+    color: var(--text-tertiary);
+    order: 3;                                 /* Sublabel tercero */
+}
+
+/* ============================================
+   PENDING TASKS - LISTA COMPACTA
+   ============================================ */
+
+.pending-tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;                                   /* Sin gap, solo borders */
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;                       /* Solo vertical */
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: 0;
+    transition: all 0.2s ease;
+}
+
+.task-item:last-child {
+    border-bottom: none;
+}
+
+.task-item:hover {
+    background: var(--bg-body);               /* Fondo muy sutil */
+}
+
+/* Sin colores de prioridad */
+.task-priority-high,
+.task-priority-medium,
+.task-priority-low {
+    border-bottom-color: var(--border-subtle);
+    background: transparent;
+}
+
+.task-icon {
+    font-size: 1.125rem;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+    color: var(--text-tertiary);              /* Todos gris */
+}
+
+.task-priority-high .task-icon,
+.task-priority-medium .task-icon,
+.task-priority-low .task-icon {
+    color: var(--text-tertiary);              /* Todos gris uniforme */
+}
+
+.task-content {
+    flex-grow: 1;
+}
+
+.task-title {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.9375rem;                     /* 15px */
+    font-weight: 600;                         /* Inter 600 */
+    margin-bottom: 0.125rem;
+    color: var(--text-primary);
+}
+
+.task-description {
+    font-size: 0.8125rem;                     /* 13px */
+    margin: 0;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+.task-action {
+    flex-shrink: 0;
+}
+
+.task-action .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    background: var(--text-primary);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 0;
+    text-decoration: none;
+}
+
+.task-action .btn:hover {
+    background: var(--accent-green);
+}
+
+/* ============================================
+   ACTIVITY STREAM - LISTA MINIMALISTA
+   ============================================ */
+
+.activity-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.activity-item {
+    display: grid;
+    grid-template-columns: 8px 1fr auto;      /* ✅ Grid: dot | content | time */
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    background: transparent;
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: 0;
+    transition: background 0.2s ease;
+    align-items: start;
+    cursor: pointer;                          /* ✅ Clickable */
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-item:hover {
+    background: var(--bg-body);
+}
+
+/* ✅ Hacer todo el item clickable */
+.activity-item:hover .activity-title {
+    color: var(--accent-green);
+    text-decoration: underline;
+}
+
+.activity-icon {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-primary);          /* Dot negro */
+    margin-top: 0.375rem;                     /* Alinear con texto */
+    flex-shrink: 0;
+}
+
+/* Todos los iconos iguales */
+.activity-icon.bg-success,
+.activity-icon.bg-primary,
+.activity-icon.bg-info,
+.activity-icon.bg-warning {
+    background: var(--text-primary);          /* Negro uniforme */
+}
+
+.activity-content {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.activity-title {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.9375rem;                     /* 15px */
+    font-weight: 600;                         /* Inter 600 */
+    margin-bottom: 0.125rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.activity-description {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.8125rem;                     /* 13px */
+    margin-bottom: 0.125rem;
+    color: var(--text-secondary);
+    font-weight: 400;                         /* Inter 400 */
+    line-height: 1.4;
+}
+
+.activity-time {
+    font-family: var(--font-inter);           /* ✅ Inter */
+    font-size: 0.6875rem;                     /* 11px */
+    color: var(--text-tertiary);
+    font-weight: 400;                         /* Inter 400 */
+    text-align: right;
+    font-feature-settings: "tnum";            /* Tabular numbers */
+    white-space: nowrap;
+}
+
+.activity-action {
+    display: block;                           /* ✅ MOSTRAR para funcionalidad */
+}
+
+.activity-action .btn-link {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+}
+
+.activity-action .btn-link:hover {
+    color: var(--accent-green);
+    text-decoration: underline;
+}
+
+.activity-action .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-visible);
+    border-radius: 0;
+}
+
+.activity-action .btn-sm:hover {
+    background: var(--text-primary);
+    color: var(--bg-white);
+    border-color: var(--text-primary);
+}
+
+/* ============================================
+   HEALTH KPIs - ELIMINADO (DUPLICADO)
+   ============================================ */
+
+.health-kpis {
+    display: none !important;                 /* ✅ Ocultar sección duplicada */
+}
+
+/* ============================================
+   ALERTS - MINIMALISTAS
+   ============================================ */
+
+.alerts-section {
+    margin-bottom: var(--space-sm);
+}
+
+.alerts-section .alert {
+    background: var(--bg-gray-50);            /* ✅ Fondo gris para diferenciar */
+    border: none;                             /* ✅ SIN bordes */
+    border-left: 1px solid var(--border-visible); /* ✅ Borde sutil (2px → 1px) */
+    border-radius: 0;
+    margin-bottom: var(--space-xs);
+    box-shadow: none;
+    padding: 0.75rem;
+}
+
+.alerts-section .alert-warning,
+.alerts-section .alert-danger {
+    border-left-color: var(--border-visible); /* ✅ Gris sutil (no negro) */
+    background: var(--bg-gray-50);
+}
+
+.alerts-section .alert i {
+    color: var(--text-tertiary);              /* ✅ Gris sutil (no negro) */
+}
+
+.alerts-section .alert .btn {
+    background: var(--text-primary);
+    color: var(--bg-white);
+    border: none;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+}
+
+.alerts-section .alert .btn:hover {
+    background: var(--accent-green);
+}
+
+/* ============================================
+   EMPTY STATES - MINIMALISTAS
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: var(--space-md);
+    color: var(--text-tertiary);
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.2;
+    color: var(--text-tertiary);
+}
+
+.empty-state p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   BADGES - TODOS OCULTOS
+   ============================================ */
+
+.badge,
+.nav-badge-count,
+.nav-badge-new,
+.nav-badge-dot {
+    display: none !important;
+}
+
+/* ============================================
+   RESPONSIVE - CONSISTENTE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.25rem;                   /* Reducido pero grande */
+    }
+
+    .quick-access-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .section-card {
+        padding: var(--space-sm);
+    }
+
+    .quick-card-stat {
+        font-size: 2rem;
+    }
+
+    .kpi-value {
+        font-size: 1.5rem;
+    }
+
+    .health-kpis {
+        gap: var(--space-sm);
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-title {
+        font-size: 1.875rem;                  /* 30px */
+    }
+
+    .quick-access-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .health-kpis {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .kpi-divider {
+        display: none;
+    }
+
+    .activity-item {
+        grid-template-columns: 8px 1fr;       /* Sin time en mobile */
+    }
+
+    .activity-time {
+        display: none;
+    }
+}
+
+/* ============================================
+   ANIMATIONS - DESHABILITADAS
+   ============================================ */
+
+.section-card,
+.task-item,
+.activity-item,
+.quick-card {
+    animation: none !important;
+}
+
+/* Sin stagger delays */
+.task-item:nth-child(n),
+.activity-item:nth-child(n) {
+    animation-delay: 0s !important;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Bootstrap overrides */
+.btn-primary {
+    background: var(--text-primary) !important;
+    border-color: var(--text-primary) !important;
+    color: var(--bg-white) !important;
+}
+
+.btn-primary:hover {
+    background: var(--accent-green) !important;
+    border-color: var(--accent-green) !important;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+}
+
+.btn-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.btn-link:hover {
+    color: var(--accent-green);
+    text-decoration: underline;
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .section-card {
+        border: 2px solid var(--border-visible);
+    }
+
+    .activity-item {
+        border-bottom-width: 2px;
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+    .command-center-hero,
+    .quick-actions-grid,
+    .trial-action-section {
+        display: none;
+    }
+
+    .section-card {
+        page-break-inside: avoid;
+        border: 1px solid #000;
+    }
+}

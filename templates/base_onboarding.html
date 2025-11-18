@@ -1,0 +1,19 @@
+{% extends 'base_minimal.html' %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+<!-- Onboarding Styles - Unified with Auth + Mobile Enhancements -->
+<link rel="stylesheet" href="{% static 'css/04-pages/onboarding.css' %}?v=2.3">
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<!-- Bootstrap 5 Bundle (includes Popper.js) - Required for modals -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+<!-- BUG FIX #25: Common utilities for all onboarding steps (getCsrfToken, etc.) -->
+<script src="{% static 'js/onboarding-common.js' %}?v=1.0"></script>
+{% endblock %}

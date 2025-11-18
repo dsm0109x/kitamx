@@ -1,0 +1,9 @@
+/**
+ * Inter Font Family - Optimized from Google Fonts
+ *
+ * Using Google Fonts CDN with optimized subset (latin only)
+ * font-display: swap prevents FOIT (Flash of Invisible Text)
+ */
+
+/* Import Inter from Google Fonts with optimized settings */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap&subset=latin');

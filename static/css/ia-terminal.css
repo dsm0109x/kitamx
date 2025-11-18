@@ -1,0 +1,654 @@
+/**
+ * IA PAGE - TERMINAL CHAT STYLE
+ * ==============================
+ *
+ * Diseño tipo terminal/CLI para chat con IA.
+ * Sin avatares, sin colores, solo texto y líneas.
+ *
+ * Features:
+ * - ✅ Estilo terminal/consola
+ * - ✅ Prefijos > (user) ← (IA)
+ * - ✅ Border-radius: 0 (brutalist)
+ * - ✅ Sin avatares circulares
+ * - ✅ Sin colores de fondo
+ * - ✅ Monocromático (negro + grises)
+ * - ✅ Preview como tabla CLI
+ *
+ * @version 1.0 - Terminal Chat
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   PAGE HEADER - TERMINAL STYLE
+   ============================================ */
+
+.ia-page-header {
+    background: #ffffff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ia-page-header h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.ia-page-header h1 i,
+.ia-page-header h1 small {
+    display: none !important;                 /* Sin icono ni subtítulo */
+}
+
+.ia-page-header .btn {
+    background: transparent;
+    border: none;
+    color: #111827;
+    font-size: 0.875rem;
+    padding: 0;
+    text-decoration: none;
+}
+
+.ia-page-header .btn:hover {
+    color: #15803d;
+    text-decoration: underline;
+}
+
+.ia-page-header .btn i {
+    display: none;
+}
+
+.ia-page-header .btn::after {
+    content: ' →';
+}
+
+/* Ocultar header original */
+.d-flex.justify-content-between.border-bottom {
+    display: none !important;
+}
+
+/* ============================================
+   CHAT CONTAINER - SIN DECORACIÓN
+   ============================================ */
+
+.card.h-100 {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    min-height: 70vh !important;
+}
+
+/* ✅ Card header - SIMPLIFICADO */
+.card-header {
+    background: #fafbfc !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0 !important;
+}
+
+.card-header .d-flex {
+    justify-content: space-between;
+}
+
+/* ✅ Ocultar avatares */
+.card-header .avatar-sm,
+.card-header .bg-primary.rounded-circle {
+    display: none !important;
+}
+
+.card-header h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.card-header small {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* ✅ Badge de status - TEXTO SIMPLE */
+.card-header .badge {
+    background: transparent !important;
+    color: #6b7280 !important;
+    border: none !important;
+    padding: 0 !important;
+    font-size: 0.75rem !important;
+    font-weight: 400 !important;
+}
+
+.card-header .badge i {
+    display: none;
+}
+
+.card-header .badge.bg-success::before {
+    content: '● ';
+    color: #15803d;
+}
+
+.card-header .badge.bg-danger::before {
+    content: '● ';
+    color: #ef4444;
+}
+
+.card-header .badge.bg-warning::before {
+    content: '● ';
+    color: #f59e0b;
+}
+
+/* ============================================
+   CHAT BUBBLES - TERMINAL STYLE
+   ============================================ */
+
+#chat-messages {
+    background: #ffffff;
+    padding: 1rem !important;
+}
+
+/* ✅ Ocultar todos los avatares en mensajes */
+.avatar-sm,
+.bg-primary.rounded-circle,
+.bg-info.rounded-circle,
+.bg-success.rounded-circle,
+.bg-danger.rounded-circle {
+    display: none !important;
+}
+
+/* Usuario (derecha) */
+.chat-bubble-user {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 1px solid #111827 !important;     /* Border negro */
+    border-left-width: 2px !important;        /* Más grueso izquierdo */
+    border-radius: 0 !important;              /* Brutalist */
+    padding: 0.75rem 1rem !important;
+    position: relative;
+}
+
+.chat-bubble-user::before {
+    content: '> ';
+    font-weight: 700;
+    color: #111827;
+    margin-right: 0.5rem;
+}
+
+/* IA (izquierda) */
+.chat-bubble-assistant {
+    background: #fafbfc !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1rem !important;
+    position: relative;
+}
+
+.chat-bubble-assistant::before {
+    content: '← ';
+    font-weight: 700;
+    color: #6b7280;
+    margin-right: 0.5rem;
+}
+
+.chat-bubble {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    max-width: 100% !important;               /* Full width en terminal */
+}
+
+/* Timestamps */
+.chat-bubble + small,
+.d-flex small.text-muted,
+.text-end small.text-muted {
+    font-size: 0.6875rem;
+    color: #9ca3af !important;
+    font-family: 'Inter', sans-serif;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* ============================================
+   TYPING INDICATOR - MINIMALISTA
+   ============================================ */
+
+.typing-dots {
+    display: inline-flex;
+    gap: 0.375rem;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    background: #9ca3af !important;           /* Gris */
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+    }
+    30% {
+        transform: translateY(-6px);
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   LINK PREVIEW - TABLA CLI
+   ============================================ */
+
+.link-preview-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    overflow: visible;
+    margin-top: 0.75rem;
+}
+
+.preview-header {
+    background: #fafbfc !important;           /* ✅ Gris (no verde) */
+    color: #111827 !important;                /* ✅ Negro (no blanco) */
+    padding: 0.5rem 1rem !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em;
+}
+
+.preview-header i {
+    display: none;
+}
+
+.preview-item {
+    display: grid;
+    grid-template-columns: 100px 1fr;         /* Label | Valor */
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    align-items: baseline;
+}
+
+.preview-item:last-child {
+    border-bottom: none;
+}
+
+.preview-item i {
+    display: none !important;
+}
+
+.preview-item .text-muted {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #9ca3af !important;
+    text-transform: uppercase;
+}
+
+.preview-item strong {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #111827;
+}
+
+/* Botones en preview */
+.link-preview-card .d-grid {
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+    display: flex !important;
+    flex-direction: row;
+    gap: 0.75rem;
+}
+
+.link-preview-card .btn {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    color: #111827;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    flex: 1;
+}
+
+.link-preview-card .btn:hover {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+.link-preview-card .btn-accent {
+    background: #111827 !important;
+    color: #ffffff !important;
+    border-color: #111827 !important;
+}
+
+.link-preview-card .btn-accent:hover {
+    background: #15803d !important;
+    border-color: #15803d !important;
+}
+
+.link-preview-card .btn i {
+    display: none;
+}
+
+/* ============================================
+   SUCCESS MESSAGE - MINIMALISTA
+   ============================================ */
+
+.alert-success {
+    background: #f9fafb !important;           /* ✅ Gris (no verde) */
+    border: 1px solid #e5e7eb !important;
+    border-left: 2px solid #111827 !important; /* ✅ Negro (no verde) */
+    border-radius: 0 !important;
+    color: #111827 !important;
+}
+
+.success-animation {
+    display: none !important;                 /* Sin emojis animados */
+}
+
+.alert-success h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    color: #111827 !important;
+}
+
+.alert-success h6 i {
+    display: none;
+}
+
+.alert-success .btn {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    color: #111827;
+    font-size: 0.875rem;
+}
+
+.alert-success .btn:hover {
+    background: #111827;
+    color: #ffffff;
+}
+
+.alert-success .btn i {
+    display: none;
+}
+
+/* ============================================
+   ERROR MESSAGE - MINIMALISTA
+   ============================================ */
+
+.alert-danger {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    border-left: 2px solid #111827 !important;
+    border-radius: 0 !important;
+    color: #111827 !important;
+}
+
+/* ============================================
+   CHAT INPUT - TERMINAL STYLE
+   ============================================ */
+
+.border-top.p-3 {
+    background: #fafbfc;
+    border-top: 1px solid #e5e7eb !important;
+    padding: 1rem !important;
+}
+
+#chat-form {
+    display: flex;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+.input-group {
+    border: 1px solid #e5e7eb;
+    border-radius: 0 !important;
+    overflow: hidden;
+}
+
+#chat-input {
+    border: none !important;
+    border-radius: 0 !important;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    background: #ffffff;
+}
+
+#chat-input::placeholder {
+    color: #9ca3af;
+    font-style: normal;
+}
+
+.input-group-text {
+    background: #fafbfc;
+    border: none;
+    border-left: 1px solid #f3f4f6;
+    border-radius: 0;
+    padding: 0.5rem 0.75rem;
+}
+
+#char-count {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-family: monospace;
+}
+
+#send-btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+}
+
+#send-btn:hover {
+    background: #15803d;
+}
+
+#send-btn i {
+    display: none;
+}
+
+#send-btn::after {
+    content: 'Enviar';
+}
+
+/* ============================================
+   QUICK ACTIONS - OCULTAS
+   ============================================ */
+
+.mt-2:has(.btn-outline-primary) {
+    display: none !important;                 /* Ocultar quick actions coloridas */
+}
+
+/* ============================================
+   EMPTY STATE - TERMINAL STYLE
+   ============================================ */
+
+.empty-state-ai {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 3rem 2rem;
+    text-align: left;                         /* ✅ Izquierda (no centro) */
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.empty-state-ai .empty-icon {
+    display: none !important;                 /* Sin icono grande */
+}
+
+.empty-state-ai h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-ai .lead {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+}
+
+.empty-state-ai .btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+}
+
+.empty-state-ai .btn:hover {
+    background: #15803d;
+}
+
+.empty-state-ai .btn i {
+    display: none;
+}
+
+/* ============================================
+   EXAMPLES GRID - LISTA SIMPLE
+   ============================================ */
+
+.examples-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 2rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+}
+
+.example-card {
+    background: #ffffff !important;
+    border: none !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    border-radius: 0 !important;
+    padding: 0.75rem 1rem !important;
+    text-align: left !important;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    box-shadow: none !important;
+    transform: none !important;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.example-card:last-child {
+    border-bottom: none !important;
+}
+
+.example-card:hover {
+    background: #fafbfc !important;
+    transform: none !important;
+    box-shadow: none !important;
+    border-color: #f3f4f6 !important;
+}
+
+.example-card:hover .example-text {
+    color: #15803d;
+}
+
+.example-card .example-icon {
+    display: none !important;                 /* Sin iconos */
+}
+
+.example-card strong {
+    display: none !important;                 /* Sin categoría */
+}
+
+.example-card .example-text {
+    font-size: 0.875rem;
+    color: #111827;
+    font-style: normal !important;
+    font-weight: 400;
+    transition: color 0.2s ease;
+    flex: 1;
+}
+
+.example-card::before {
+    content: '>';
+    font-weight: 700;
+    color: #9ca3af;
+    font-size: 1rem;
+}
+
+/* ============================================
+   TIP BOX - MINIMALISTA
+   ============================================ */
+
+.empty-state-ai .p-3.bg-light {
+    background: #f9fafb !important;
+    border: none !important;
+    border-left: 2px solid #111827 !important;
+    padding: 1rem !important;
+    margin-top: 2rem;
+}
+
+.empty-state-ai .p-3.bg-light strong {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #111827;
+}
+
+.empty-state-ai .p-3.bg-light p {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 0 !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .ia-page-header h1 {
+        font-size: 1.25rem !important;
+    }
+
+    .chat-bubble {
+        font-size: 0.875rem;
+    }
+
+    .empty-state-ai {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state-ai h2 {
+        font-size: 1.5rem;
+    }
+}

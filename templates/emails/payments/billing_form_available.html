@@ -1,0 +1,99 @@
+{% extends "emails/base.html" %}
+{% load email_filters %}
+
+{% block email_title %}Genera tu Factura CFDI 4.0 - {{ tenant.name }}{% endblock %}
+
+{% block email_content %}
+<!-- Icon Hero -->
+<div style="text-align: center; margin-bottom: 24px;">
+    <div style="font-size: 64px; line-height: 1;">📄</div>
+</div>
+
+<!-- Title -->
+<h1 style="font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; color: #111827; text-align: center; margin: 0 0 16px 0; line-height: 1.3;">
+    Genera tu Factura CFDI 4.0
+</h1>
+
+<!-- Lead Text -->
+<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
+    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+</p>
+
+<!-- Main Message -->
+<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
+    ¡Gracias por tu pago! Tu transacción de <strong>${{ amount|currency_mx }} MXN</strong> fue procesada exitosamente.
+    Ahora puedes generar tu factura electrónica CFDI 4.0 completando tus datos fiscales.
+</p>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+    <a href="{{ billing_form_url }}" class="btn-primary" style="background-color: #15803d; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(21, 128, 61, 0.15);">
+        📋 Ingresar Datos Fiscales
+    </a>
+</div>
+
+<!-- Success Box - Qué necesitas -->
+<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
+        📝 Datos que Necesitarás
+    </h3>
+    <ul style="margin: 0; padding-left: 20px; color: #166534;">
+        <li style="margin-bottom: 8px;">RFC (con homoclave)</li>
+        <li style="margin-bottom: 8px;">Razón social o nombre completo</li>
+        <li style="margin-bottom: 8px;">Código postal fiscal</li>
+        <li style="margin-bottom: 8px;">Uso de CFDI (ej: G03 - Gastos en general)</li>
+    </ul>
+</div>
+
+<!-- Info Box - Proceso -->
+<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
+        ⚡ Proceso Automático
+    </h3>
+    <ol style="margin: 0; padding-left: 20px; color: #78350F;">
+        <li style="margin-bottom: 8px;">Completa el formulario con tus datos fiscales</li>
+        <li style="margin-bottom: 8px;">La factura se timbra automáticamente con el SAT</li>
+        <li style="margin-bottom: 8px;">Recibirás XML y PDF por email en minutos</li>
+        <li>Los archivos también estarán disponibles para descarga</li>
+    </ol>
+</div>
+
+<!-- Security Box -->
+<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <p style="margin: 0; font-size: 14px; color: #6B7280;">
+        🔒 <strong>CFDI 4.0 válido:</strong> Tu factura será timbrada por FiscalAPI,
+        Proveedor Autorizado de Certificación del SAT. Cumple 100% con la normativa fiscal mexicana.
+    </p>
+</div>
+
+<!-- Detalles del pago -->
+<div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #E5E7EB;">
+    <p style="font-size: 13px; color: #9CA3AF; text-align: center; margin: 0 0 8px 0;">
+        <strong>Detalles de tu pago:</strong>
+    </p>
+    <p style="font-size: 14px; color: #6B7280; text-align: center; margin: 0;">
+        {{ title }} • ${{ amount|currency_mx }} MXN<br>
+        Pagado el {{ paid_at|friendly_datetime }}
+    </p>
+</div>
+
+<!-- Fallback Link -->
+<div class="link-fallback" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E5E7EB; text-align: center;">
+    <p style="font-size: 13px; color: #9CA3AF; margin: 0 0 8px 0;">
+        ¿El botón no funciona? Copia y pega este enlace:
+    </p>
+    <p style="margin: 0;">
+        <a href="{{ billing_form_url }}" style="color: #15803d; word-break: break-all; font-size: 12px;">{{ billing_form_url }}</a>
+    </p>
+</div>
+
+<!-- Help -->
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
+    ¿Dudas sobre tu factura?{% if tenant.support_email or tenant.email %} Escríbenos a
+    <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>{% else %} Responde a este email{% endif %}
+</p>
+{% endblock %}
+
+{% block email_footer_note %}
+Notificación de facturación enviada por {{ tenant.name }} a través de Kita.
+{% endblock %}

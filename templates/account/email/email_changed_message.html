@@ -1,0 +1,53 @@
+{% extends "emails/base.html" %}
+
+{% block email_title %}Email Cambiado - Kita{% endblock %}
+
+{% block email_content %}
+    <!-- Icono Grande -->
+    <div class="email-icon">📧</div>
+
+    <h1>Email Actualizado</h1>
+
+    <p class="lead">
+        Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+    </p>
+
+    <p>
+        El email principal de tu cuenta en <strong>Kita</strong> ha sido actualizado exitosamente.
+    </p>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p><strong>Nuevo email de acceso:</strong></p>
+        <p style="font-family: 'Courier New', monospace; font-size: 16px; color: #111827; font-weight: 600;">
+            {{ new_email }}
+        </p>
+        <p>
+            A partir de ahora, usa este email para iniciar sesión en Kita.
+        </p>
+    </div>
+
+    <!-- Security Box -->
+    <div class="security-box">
+        <p><strong>Para tu seguridad:</strong></p>
+        <p>• Todas tus sesiones anteriores han sido cerradas automáticamente</p>
+        <p>• Deberás iniciar sesión nuevamente con tu nuevo email</p>
+        <p>• Si no reconoces este cambio, contacta inmediatamente con soporte</p>
+    </div>
+
+    <p class="text-center" style="margin-top: 32px;">
+        <a href="https://kita.mx/ingresar/" class="btn-primary" style="text-decoration: none;">
+            Iniciar Sesión con Nuevo Email
+        </a>
+    </p>
+
+    <p class="text-muted text-center" style="margin-top: 24px;">
+        ¿No fuiste tú? Escríbenos de inmediato a
+        <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+    </p>
+{% endblock %}
+
+{% block email_footer_note %}
+    Este email fue enviado a tu dirección anterior por seguridad.<br>
+    Si no fuiste tú quien cambió el email, contacta inmediatamente con hola@kita.mx
+{% endblock %}

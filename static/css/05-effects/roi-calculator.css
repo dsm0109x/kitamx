@@ -1,0 +1,447 @@
+/**
+ * ROI Calculator - Interactive Time Savings Calculator
+ *
+ * Minimalista design with smooth animations and clear visual hierarchy
+ */
+
+.roi-calculator {
+    background: white;
+    border: 2px solid var(--color-gray-200);
+    border-top: 4px solid #6366f1;
+    padding: 2rem 1.75rem;
+    height: 100%;
+}
+
+.roi-calculator-left {
+    border-right: none;
+}
+
+.roi-calculator-right {
+    border-left: none;
+}
+
+/* ===== SLIDER INPUT SECTION ===== */
+
+.calculator-input-section {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.calculator-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
+}
+
+.slider-container {
+    position: relative;
+    padding: 1.5rem 0;
+}
+
+/* Custom Range Slider */
+.roi-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(to right, var(--color-gray-200) 0%, var(--color-gray-200) 100%);
+    outline: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.roi-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border: 3px solid #6366f1;
+    border-radius: 50%;
+    cursor: grab;
+    transition: all var(--transition-fast) ease;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.roi-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.roi-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+
+.roi-slider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border: 3px solid #6366f1;
+    border-radius: 50%;
+    cursor: grab;
+    transition: all var(--transition-fast) ease;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+.roi-slider::-moz-range-thumb:hover {
+    transform: scale(1.15);
+}
+
+/* Slider value display */
+.slider-value {
+    margin-top: 1rem;
+}
+
+.slider-value-number {
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #6366f1;
+    font-family: 'DM Serif Display', Georgia, serif;
+    line-height: 1;
+}
+
+.slider-value-label {
+    font-size: 1rem;
+    color: #6b7280;
+    margin-left: 0.5rem;
+}
+
+/* Slider marks */
+.slider-marks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0 0.25rem;
+}
+
+.slider-marks span {
+    font-size: 0.8rem;
+    color: #9ca3af;
+}
+
+/* ===== COMPARISON CARDS ===== */
+
+.calculator-comparison {
+    margin-bottom: 0;
+}
+
+.calc-card {
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    padding: 1.25rem;
+    text-align: center;
+    margin-bottom: 0.75rem;
+}
+
+.calc-card-before {
+    border-left: 3px solid #ef4444;
+}
+
+.calc-card-after {
+    border-left: 3px solid #10b981;
+}
+
+.calc-card-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.75rem;
+}
+
+.calc-card-title .iconoir {
+    font-size: 1.1rem;
+}
+
+.calc-formula {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.calc-number {
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 1.1rem;
+}
+
+.calc-time {
+    font-weight: 600;
+    color: #6366f1;
+}
+
+.calc-result {
+    margin-bottom: 0.5rem;
+}
+
+.calc-hours {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    font-family: 'DM Serif Display', Georgia, serif;
+    line-height: 1;
+    transition: all var(--transition-base);
+}
+
+.calc-unit {
+    font-size: 0.85rem;
+    color: #6b7280;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.calc-emoji {
+    font-size: 1.5rem;
+    margin-top: 0.25rem;
+}
+
+/* ===== ROI RESULT CARD ===== */
+
+.calculator-roi {
+    background: #fafafa;
+    border: 2px solid var(--color-gray-200);
+    border-left: 4px solid #10b981;
+    padding: 1.75rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.roi-savings {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+.roi-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.roi-time {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.roi-time .iconoir {
+    font-size: 2rem;
+    color: #10b981;
+}
+
+.roi-number {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #059669;
+    font-family: 'DM Serif Display', Georgia, serif;
+    line-height: 1;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.roi-unit {
+    font-size: 1.1rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ROI Money Section */
+.roi-money {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--color-gray-200);
+}
+
+.roi-sublabel {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;
+}
+
+.roi-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.roi-currency {
+    font-size: 1.5rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+/* ROI Comparison */
+.roi-comparison {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.roi-cost,
+.roi-result {
+    text-align: center;
+}
+
+.roi-cost-label,
+.roi-result-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.roi-cost-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #374151;
+    margin: 0;
+}
+
+.roi-result-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #6366f1;
+    font-family: 'DM Serif Display', Georgia, serif;
+    margin: 0;
+    line-height: 1;
+}
+
+.roi-x {
+    font-size: 1.25rem;
+    color: #9ca3af;
+    margin-left: 0.125rem;
+}
+
+.roi-divider {
+    font-size: 1.5rem;
+    color: #9ca3af;
+    font-weight: 300;
+}
+
+.roi-disclaimer {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-align: center;
+    margin: 0;
+}
+
+/* ===== CTA BADGES ===== */
+
+.cta-trust-badges {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.cta-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #374151;
+    font-weight: 500;
+}
+
+.cta-badge .iconoir {
+    color: #10b981;
+    font-size: 1rem;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 991.98px) {
+    .roi-calculator {
+        padding: 2rem 1.5rem;
+        border: 2px solid var(--color-gray-200);
+        border-top: 4px solid #6366f1;
+        margin-bottom: 1.5rem;
+    }
+
+    .roi-calculator-left,
+    .roi-calculator-right {
+        border-right: none;
+        border-left: none;
+    }
+
+    .slider-value-number {
+        font-size: 2.5rem;
+    }
+
+    .roi-number {
+        font-size: 2.5rem;
+    }
+
+    .roi-comparison {
+        flex-direction: row;
+        gap: 1.5rem;
+    }
+
+    .roi-divider {
+        font-size: 1.25rem;
+    }
+
+    .calc-hours {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .roi-calculator {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .calculator-label {
+        font-size: 0.95rem;
+    }
+
+    .slider-value-number {
+        font-size: 2.25rem;
+    }
+
+    .calc-hours {
+        font-size: 1.5rem;
+    }
+
+    .roi-number {
+        font-size: 2.25rem;
+    }
+
+    .roi-result-value {
+        font-size: 1.75rem;
+    }
+
+    .cta-trust-badges {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: center;
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+
+@keyframes countUp {
+    from {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.calc-hours.updating,
+.roi-number.updating {
+    animation: countUp 0.3s ease-out;
+}

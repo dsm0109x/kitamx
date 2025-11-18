@@ -1,0 +1,387 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+
+{% block title %}Suscripción - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/subscription-card.css' %}?v=1.0">
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header -->
+<div class="subscription-page-header">
+    <h1>Suscripción</h1>
+</div>
+
+<!-- Membership Card -->
+<div class="membership-card-container">
+    <div class="membership-card">
+        <!-- Plan Name -->
+        <div class="membership-card-header">
+            <h2 class="membership-plan-name">{{ subscription.plan_name }}</h2>
+            <p class="membership-plan-subtitle">Membresía Profesional</p>
+        </div>
+
+        <!-- Precio ENORME -->
+        <div class="membership-price-container">
+            <div class="membership-price">
+                ${{ subscription.monthly_price|floatformat:0 }}
+            </div>
+            <div class="membership-price-meta">
+                {{ subscription.currency }}/mes · IVA incluido
+            </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="membership-status">
+            {% if subscription.is_trial %}
+                <div class="membership-status-line">
+                    Estado: <span class="status-badge">Trial</span>
+                </div>
+                <div class="membership-status-line">
+                    <strong>{{ subscription.days_until_trial_end }} día{{ subscription.days_until_trial_end|pluralize }}</strong> restantes
+                </div>
+                <div class="membership-status-line">
+                    Válido hasta: {{ subscription.trial_ends_at|date:"d/m/Y" }}
+                </div>
+                <div class="membership-status-line">
+                    Miembro desde: {{ subscription.trial_started_at|date:"d/m/Y" }}
+                </div>
+
+            {% elif subscription.is_active %}
+                <div class="membership-status-line">
+                    Estado: <span class="status-badge">Activa</span>
+                </div>
+                <div class="membership-status-line">
+                    Próximo cobro: <strong>${{ subscription.monthly_price|floatformat:2 }}</strong>
+                </div>
+                <div class="membership-status-line">
+                    Fecha: {{ subscription.next_billing_date|date:"d/m/Y"|default:"Calculando..." }}
+                </div>
+
+            {% elif subscription.is_past_due %}
+                <div class="membership-status-line">
+                    Estado: <span class="status-badge">Pago Pendiente</span>
+                </div>
+                <div class="membership-status-line">
+                    Monto adeudado: <strong>${{ subscription.monthly_price|floatformat:2 }}</strong>
+                </div>
+                <div class="membership-status-line">
+                    Vencido desde: {{ subscription.last_failed_payment_date|date:"d/m/Y"|default:"N/A" }}
+                </div>
+
+            {% elif subscription.is_cancelled %}
+                <div class="membership-status-line">
+                    Estado: <span class="status-badge">Cancelada</span>
+                </div>
+                <div class="membership-status-line">
+                    Cancelada el: {{ subscription.cancelled_at|date:"d/m/Y"|default:"N/A" }}
+                </div>
+                {% if subscription.cancellation_reason %}
+                <div class="membership-status-line">
+                    Motivo: {{ subscription.cancellation_reason }}
+                </div>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Features en texto corrido -->
+        <div class="membership-features">
+            <p class="membership-features-text">
+                Links ilimitados · Facturas CFDI 4.0 · Integración Mercado Pago ·
+                Notificaciones WhatsApp · Chat IA · Reportes y analytics ·
+                API completa · Soporte por email
+            </p>
+        </div>
+
+        <!-- Alert según estado -->
+        {% if subscription.is_trial %}
+            {% if subscription.is_trial_expired %}
+                <div class="alert">
+                    <strong>Trial expirado</strong><br>
+                    Activa tu suscripción para continuar usando Kita.
+                </div>
+            {% else %}
+                <div class="alert">
+                    <strong>Trial activo</strong><br>
+                    Disfruta de todos los features. Te avisaremos 3 días antes de que termine.
+                </div>
+            {% endif %}
+        {% elif subscription.is_past_due %}
+            <div class="alert">
+                <strong>Pago requerido</strong><br>
+                Tu cuenta se suspenderá si no pagas pronto.
+            </div>
+        {% endif %}
+
+        <!-- Acción Principal -->
+        <div class="membership-action">
+            {% if subscription.is_trial and subscription.is_trial_expired %}
+                <button class="btn" onclick="activateSubscription()">
+                    Activar Suscripción
+                </button>
+
+            {% elif subscription.is_trial and not subscription.is_trial_expired %}
+                <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
+                    Tu suscripción se activará automáticamente al terminar el trial
+                </p>
+
+            {% elif subscription.is_active %}
+                <button class="btn btn-danger" onclick="showCancelModal()">
+                    Cancelar Suscripción
+                </button>
+
+            {% elif subscription.is_past_due %}
+                <button class="btn" onclick="payOverdueSubscription()">
+                    Pagar Ahora
+                </button>
+
+            {% elif subscription.is_cancelled %}
+                <button class="btn" onclick="activateSubscription()">
+                    Reactivar Suscripción
+                </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Historial Resumido -->
+    {% if payments %}
+    <div class="membership-history">
+        <div class="membership-history-title">HISTORIAL</div>
+        <div class="membership-history-summary">
+            <strong>{{ payments|length }}</strong> pago{{ payments|length|pluralize }} ·
+            <strong>${{ payments_total|floatformat:2|default:"0.00" }}</strong> total ·
+            Última: {{ payments.0.created_at|date:"d/m/Y" }}
+        </div>
+        <a href="#" onclick="showAllPayments(); return false;" class="membership-history-link">
+            Ver detalle →
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+
+<!-- Cancel Subscription Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: 1px solid #e5e7eb; border-radius: 0; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+            <div class="modal-header" style="background: #fafbfc; border-bottom: 1px solid #e5e7eb; padding: 1rem 1.25rem;">
+                <h5 class="modal-title" style="font-family: Inter, sans-serif; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #111827; margin: 0;">
+                    Cancelar Suscripción
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem;">
+                <div style="background: #f9fafb; border-left: 2px solid #111827; padding: 0.75rem; margin-bottom: 1rem;">
+                    <strong style="font-size: 0.75rem; text-transform: uppercase;">Atención</strong>
+                    <p style="font-size: 0.8125rem; color: #6b7280; margin: 0.25rem 0 0 0;">
+                        Esta acción cancelará tu suscripción a Kita Pro.
+                    </p>
+                </div>
+
+                <div class="form-check" style="margin-bottom: 1rem; padding: 0.75rem; background: #fafbfc;">
+                    <input class="form-check-input" type="radio" name="cancel_type" id="cancel_end_period" value="end_period" checked>
+                    <label class="form-check-label" for="cancel_end_period" style="font-size: 0.875rem;">
+                        <strong>Al final del período</strong>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">
+                            Usar hasta {{ subscription.current_period_end|date:"d/m/Y"|default:"el final del período" }}
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-check" style="margin-bottom: 1rem; padding: 0.75rem;">
+                    <input class="form-check-input" type="radio" name="cancel_type" id="cancel_immediate" value="immediate">
+                    <label class="form-check-label" for="cancel_immediate" style="font-size: 0.875rem;">
+                        <strong>Inmediatamente</strong>
+                        <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">
+                            Se desactiva ahora (sin reembolso)
+                        </div>
+                    </label>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;">
+                        Motivo (Opcional)
+                    </label>
+                    <textarea class="form-control" id="cancel-reason" rows="3" placeholder="Ayúdanos a mejorar..." style="border: 1px solid #e5e7eb; border-radius: 0; font-size: 0.875rem;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer" style="background: #ffffff; border-top: 1px solid #e5e7eb; padding: 1rem 1.25rem; gap: 0.75rem;">
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: transparent; border: 1px solid #e5e7eb; color: #111827; padding: 0.5rem 1rem; border-radius: 0; font-size: 0.875rem;">
+                    No cancelar
+                </button>
+                <button type="button" class="btn" onclick="confirmCancelSubscription()" style="background: #ef4444; border: none; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0; font-size: 0.875rem;">
+                    Confirmar Cancelación
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-backdrop {
+    z-index: 99998 !important;
+}
+</style>
+
+<script>
+function activateSubscription() {
+    if (confirm('¿Activar suscripción por ${{ subscription.monthly_price }} MXN/mes?')) {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Procesando...';
+        btn.disabled = true;
+
+        fetch('{% url "billing:activate" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Redirigiendo a Mercado Pago...', 'info');
+                window.open(data.payment_url, '_blank');
+            } else {
+                showToast(data.error || 'Error procesando pago', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+}
+
+function payOverdueSubscription() {
+    if (confirm('¿Proceder con el pago de ${{ subscription.monthly_price }} MXN?')) {
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Procesando...';
+        btn.disabled = true;
+
+        fetch('{% url "billing:pay_overdue" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Redirigiendo a Mercado Pago...', 'info');
+                window.open(data.payment_url, '_blank');
+            } else {
+                showToast(data.error || 'Error procesando pago', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        })
+        .finally(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+    }
+}
+
+function showCancelModal() {
+    const modalEl = document.getElementById('cancelModal');
+    const modal = new bootstrap.Modal(modalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+    modal.show();
+
+    setTimeout(() => {
+        modalEl.style.zIndex = '99999';
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.style.zIndex = '99998';
+        }
+    }, 10);
+}
+
+function confirmCancelSubscription() {
+    const cancelType = document.querySelector('input[name="cancel_type"]:checked').value;
+    const reason = document.getElementById('cancel-reason').value;
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Cancelando...';
+    btn.disabled = true;
+
+    fetch('{% url "billing:cancel" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            immediate: cancelType === 'immediate',
+            reason: reason
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Suscripción cancelada', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
+            modal.hide();
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showToast(data.error || 'Error cancelando suscripción', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function showPaymentDetail(paymentId) {
+    fetch(`{% url 'billing:payment_detail' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', paymentId))
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('detail-panel-content').innerHTML = html;
+            document.getElementById('detailPanelTitle').textContent = 'Detalle del Pago';
+            const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailPanel'));
+            offcanvas.show();
+        })
+        .catch(error => {
+            showToast('Error cargando detalles', 'error');
+        });
+}
+
+function showAllPayments() {
+    showToast('Historial completo próximamente', 'info');
+}
+
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+
+    const csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    if (csrfCookie) return csrfCookie.split('=')[1];
+
+    return '';
+}
+</script>
+{% endblock %}

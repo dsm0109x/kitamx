@@ -1,0 +1,53 @@
+{% comment %}
+Stats Grid Component - Reusable across modules
+
+Usage:
+{% include 'components/stats_grid.html' with stats_data=stats_display %}
+
+Where stats_display is a list of dicts:
+[
+    {'icon': 'link', 'label': 'Total Links', 'value': 12, 'value_id': 'total-links'},
+    {'icon': 'check-circle', 'label': 'Pagados', 'value': 5, 'value_id': 'paid-links'},
+    ...
+]
+{% endcomment %}
+
+<div class="row mb-4">
+    {% for stat in stats_data %}
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="stat-icon-container bg-{{ stat.color|default:'primary' }} me-3">
+                        <i class="iconoir-{{ stat.icon }} text-white"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="text-uppercase text-muted small fw-bold mb-1">
+                            {{ stat.label }}
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-dark" {% if stat.value_id %}id="{{ stat.value_id }}"{% endif %}>
+                            {{ stat.value }}
+                        </div>
+                        {% if stat.sublabel %}
+                            <div class="text-muted small">{{ stat.sublabel }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.stat-icon-container {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+</style>

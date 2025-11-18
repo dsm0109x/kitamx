@@ -1,0 +1,40 @@
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+CONFIRMA TU CORREO ELECTRONICO
+
+Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+Bienvenido/a a Kita. Estas a un solo paso de comenzar tu prueba gratuita
+de 30 dias.
+
+Para completar tu registro, confirma tu correo electronico haciendo click
+en el siguiente enlace:
+
+{{ activate_url }}
+
+UNA VEZ CONFIRMADO PODRAS:
+• Crear tus primeros enlaces de pago ilimitados
+• Conectar tu cuenta de Mercado Pago
+• Configurar tu certificado digital (CSD) para facturar
+• Comenzar a cobrar y facturar sin complicaciones
+
+POR TU SEGURIDAD:
+• Este enlace expira en 3 dias
+• Solo puede usarse una vez
+• Si no creaste esta cuenta, puedes ignorar este email
+
+¿Tienes dudas? Escribenos a hola@kita.mx
+
+Nos vemos pronto en tu dashboard!
+
+--
+El equipo de Kita
+https://kita.mx
+hola@kita.mx
+
+--------------------------------------------------------------------------------
+Este email fue enviado porque creaste una cuenta en Kita.
+Si no fuiste tu, puedes ignorar este mensaje de forma segura.
+================================================================================

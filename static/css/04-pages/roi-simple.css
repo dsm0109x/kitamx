@@ -1,0 +1,174 @@
+/**
+ * ROI CALCULATOR SIMPLE - BRUTALIST
+ * 1 columna, solo horas, slider angular
+ */
+
+/* ===== CONTAINER ===== */
+
+.roi-calculator-simple {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 3px solid #111827;
+    border-radius: 0;
+    padding: 2.5rem 2rem;
+}
+
+/* ===== SLIDER SECTION ===== */
+
+.slider-section {
+    margin-bottom: 2rem;
+}
+
+.slider-label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.slider-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Slider Brutalist (Angular) */
+.slider-brutalist {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 0;  /* Angular */
+    outline: none;
+    cursor: pointer;
+}
+
+.slider-brutalist::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background: #111827;  /* Negro */
+    border-radius: 0;  /* Cuadrado */
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.slider-brutalist::-webkit-slider-thumb:hover {
+    background: #000000;
+    transform: scale(1.1);
+}
+
+.slider-brutalist::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(0.95);
+}
+
+.slider-brutalist::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    background: #111827;
+    border: none;
+    border-radius: 0;  /* Cuadrado */
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.slider-brutalist::-moz-range-thumb:hover {
+    background: #000000;
+    transform: scale(1.1);
+}
+
+.slider-value-large {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #111827;
+    font-variant-numeric: tabular-nums;
+}
+
+.slider-value-large span:first-child {
+    color: #059669;  /* Verde accent para el número */
+}
+
+/* ===== SAVINGS RESULT ===== */
+
+.savings-result {
+    background: rgba(5, 150, 105, 0.05);  /* Verde muy sutil */
+    padding: 2rem;
+    border-radius: 0;
+    margin: 2rem 0;
+}
+
+.savings-number {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.savings-number .iconoir {
+    font-size: 3rem;
+    flex-shrink: 0;
+}
+
+.result-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.hours-saved {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.hours-saved strong {
+    font-size: inherit;
+    font-variant-numeric: tabular-nums;
+}
+
+.hours-unit {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-left: 0.5rem;
+}
+
+.savings-message {
+    font-size: 1.05rem;
+    color: #4b5563;
+    text-align: center;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+    .roi-calculator-simple {
+        padding: 2rem 1.5rem;
+    }
+
+    .slider-value-large {
+        font-size: 2.5rem;
+    }
+
+    .hours-saved {
+        font-size: 2.5rem;
+    }
+
+    .savings-number {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+}

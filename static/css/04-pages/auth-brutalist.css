@@ -1,0 +1,916 @@
+/**
+ * AUTH BRUTALIST STYLES
+ * Signup/Login forms consistentes con home page
+ *
+ * Principios:
+ * - Tipografía DM Serif Display + Inter (como home)
+ * - Inputs sin icons, brutalist con radius 8px
+ * - Botones sistema home (btn-accent, btn-outline-secondary)
+ * - Checkboxes cuadrados brutalist con checkmark
+ * - Focus negro (como FAQ search)
+ * - Sin video, layout centrado
+ * - Microanimaciones premium
+ *
+ * @version 3.0 - Google OAuth integrado
+ */
+
+/* ========================================
+   PAGE LAYOUT
+   ======================================== */
+
+/* ========================================
+   FONDO - NAVY-50 ESTÁTICO
+   ======================================== */
+
+.auth-page-centered {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+
+    /* Color base - Navy-50 como hero de home (sin animación) */
+    background: #f0f4f8;
+
+    padding: 1rem 0;
+}
+
+.auth-form-card {
+    background: #ffffff;
+    border: none;  /* ✅ Sin borde como las demás cards */
+    border-radius: var(--radius-card, 15px) !important;  /* ✅ Border-radius 15px como todas */
+    box-shadow: var(--shadow-sm) !important;  /* ✅ Sombra suave como cards */
+    padding: 2rem 2rem;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;  /* Sobre el fondo animado */
+
+    /* Microanimación: Fade-in + slide up al cargar */
+    animation: card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes card-appear {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   HEADER - CON MICROANIMACIONES
+   ======================================== */
+
+.auth-header {
+    margin-bottom: 1.5rem;
+}
+
+.auth-logo {
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+    animation: fade-in 0.3s ease backwards;
+    animation-delay: 0.05s;
+}
+
+.auth-header h1.kita-brand {
+    animation: fade-in 0.3s ease backwards;
+    animation-delay: 0.08s;
+}
+
+.auth-tagline {
+    animation: fade-in 0.3s ease backwards;
+    animation-delay: 0.11s;
+}
+
+.auth-title {
+    animation: fade-in 0.3s ease backwards;
+    animation-delay: 0.14s;
+}
+
+.auth-subtitle {
+    animation: fade-in 0.3s ease backwards;
+    animation-delay: 0.17s;
+}
+
+.auth-trust-badges {
+    animation: fade-in 0.3s ease backwards;
+    animation-delay: 0.2s;
+}
+
+.auth-header h1.kita-brand {
+    font-family: 'DM Serif Display', serif;  /* Como home */
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.auth-tagline {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+    margin-bottom: 1rem;  /* Reducido de 1.5rem a 1rem */
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+    font-size: 1.05rem;
+    color: #6b7280;
+    margin-bottom: 1rem;  /* Reducido de 1.5rem a 1rem */
+}
+
+/* ========================================
+   TRUST BADGES (Como home)
+   ======================================== */
+
+.auth-trust-badges {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;  /* Reducido de 1rem a 0.75rem */
+}
+
+.trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;  /* Sutil como FAQ buttons */
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #4b5563;
+    transition: all 0.2s ease;
+}
+
+.trust-badge .iconoir {
+    font-size: 1rem;
+    color: #15803d;  /* Verde accent */
+}
+
+/* ========================================
+   FORM STYLING
+   ======================================== */
+
+.auth-form {
+    margin-bottom: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;  /* Reducido de 1.25rem a 1rem */
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 700;  /* Más bold como home */
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   INPUTS - CON MICROANIMACIONES
+   ======================================== */
+
+/* Los estilos principales están en brutalist-overrides.css */
+
+/* Fade-in stagger para form groups - OPTIMIZADO */
+.form-group:nth-child(1) { animation: fade-in-up 0.3s ease backwards; animation-delay: 0.25s; }
+.form-group:nth-child(2) { animation: fade-in-up 0.3s ease backwards; animation-delay: 0.28s; }
+.form-group:nth-child(3) { animation: fade-in-up 0.3s ease backwards; animation-delay: 0.31s; }
+.form-group:nth-child(4) { animation: fade-in-up 0.3s ease backwards; animation-delay: 0.34s; }
+.form-group:nth-child(5) { animation: fade-in-up 0.3s ease backwards; animation-delay: 0.37s; }
+.form-group:nth-child(6) { animation: fade-in-up 0.3s ease backwards; animation-delay: 0.4s; }
+
+/* Permitir interacción inmediata */
+.auth-form {
+    /* Form completo animado en <0.5s total */
+}
+
+/* Input focus glow premium */
+.auth-form .form-control:focus {
+    transform: scale(1.01);  /* Micro scale */
+    box-shadow:
+        0 0 0 4px rgba(17, 24, 39, 0.1),
+        0 4px 12px rgba(17, 24, 39, 0.08) !important;  /* Glow sutil */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-control::placeholder {
+    color: #9ca3af !important;
+}
+
+.form-control:disabled {
+    background: #f3f4f6 !important;
+    color: #9ca3af !important;
+    cursor: not-allowed;
+}
+
+/* ========================================
+   PASSWORD TOGGLE
+   ======================================== */
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.password-toggle:hover {
+    color: #111827;
+}
+
+.password-toggle .iconoir {
+    font-size: 1.25rem;
+}
+
+/* ========================================
+   CHECKBOXES - BRUTALIST
+   ======================================== */
+
+.form-check-brutalist {
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+}
+
+.form-check-brutalist .form-check-input {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;  /* No shrink */
+    border: 3px solid #111827;  /* Negro bold */
+    border-radius: 0;  /* Cuadrado brutalist */
+    background: #ffffff;
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    position: relative;
+    appearance: none;  /* Quitar estilo default */
+    -webkit-appearance: none;
+}
+
+.form-check-brutalist .form-check-input:checked {
+    background: #15803d;  /* Verde */
+    border-color: #15803d;
+}
+
+/* Checkmark visible cuando está checked con bounce */
+.form-check-brutalist .form-check-input:checked {
+    animation: checkbox-bounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.form-check-brutalist .form-check-input:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+@keyframes checkbox-bounce {
+    0% { transform: scale(0.8); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.form-check-brutalist .form-check-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.1);
+}
+
+.form-check-brutalist .form-check-label {
+    font-size: 0.9rem;
+    color: #4b5563;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+.form-check-brutalist .form-check-label a {
+    color: #15803d;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.form-check-brutalist .form-check-label a:hover {
+    color: #166534;
+}
+
+/* ========================================
+   ERROR MESSAGES
+   ======================================== */
+
+.form-error {
+    color: #dc2626 !important;  /* ✅ Rojo visible (Red-600) */
+    font-size: 0.875rem !important;
+    margin-top: 0.375rem !important;
+    display: block;
+    font-weight: 600 !important;  /* ✅ Bold para más visibilidad */
+    line-height: 1.4 !important;
+    animation: error-appear 0.3s ease;
+}
+
+.form-error small {
+    color: #dc2626 !important;  /* ✅ Asegurar rojo en small también */
+    font-weight: 600 !important;
+}
+
+@keyframes error-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-error-global {
+    background: #fef2f2 !important;  /* ✅ Fondo rojo sutil */
+    border-left: 4px solid #dc2626 !important;  /* ✅ Borde rojo visible */
+    border-radius: var(--radius-card, 15px) !important;  /* ✅ Border radius */
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.5rem;
+    color: #dc2626 !important;  /* ✅ Texto rojo visible (no dark red) */
+    font-weight: 600 !important;  /* ✅ Bold */
+    font-size: 0.9rem;
+    animation: error-appear 0.3s ease;
+}
+
+/* ========================================
+   INPUT VALIDATION STATES
+   ======================================== */
+
+/* Invalid state con shake animation - TODOS los inputs */
+.form-control.is-invalid,
+.form-select.is-invalid,
+textarea.is-invalid,
+input.is-invalid {
+    border-color: #dc2626 !important;  /* ✅ Rojo visible */
+    background: #fef2f2 !important;  /* ✅ Fondo rojo sutil */
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15) !important;  /* ✅ Glow rojo */
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97);  /* ✅ Shake suave */
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* Valid state con checkmark */
+.form-control.is-valid {
+    border-color: #15803d !important;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 45px;
+}
+
+/* Validating state (durante AJAX) */
+.form-control.is-validating {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' stroke='%236b7280' stroke-width='3' fill='none' stroke-dasharray='31.4' stroke-dashoffset='10'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='1s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+    padding-right: 45px;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* ========================================
+   DIVIDER
+   ======================================== */
+
+.auth-divider {
+    text-align: center;
+    margin: 1.5rem 0;  /* Reducido de 2rem a 1.5rem */
+    position: relative;
+}
+
+.auth-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #111827;  /* Negro como home */
+}
+
+.auth-divider span {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* ========================================
+   LINKS
+   ======================================== */
+
+.auth-login-link {
+    margin-bottom: 1rem;  /* Reducido espaciado */
+}
+
+.auth-login-link p {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin-bottom: 0.75rem;  /* Reducido */
+}
+
+.auth-back-link {
+    margin-top: 1rem;  /* Reducido */
+}
+
+.auth-back-link a {
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.auth-back-link a:hover {
+    color: #111827;
+}
+
+.auth-back-link .iconoir {
+    font-size: 1.1rem;
+}
+
+.link-accent {
+    color: #15803d;
+    text-decoration: underline;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.link-accent:hover {
+    color: #166534;
+}
+
+.link-muted {
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s ease;
+}
+
+.link-muted:hover {
+    color: #111827;
+}
+
+.auth-helper-text {
+    position: relative;
+    background: rgba(21, 128, 61, 0.06);  /* ✅ Verde muy sutil */
+    border: none;  /* ✅ Sin borde */
+    border-radius: var(--radius-card, 15px);  /* ✅ Border radius como cards */
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    color: #374151;  /* Gris oscuro para legibilidad */
+    font-weight: 500;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+/* Icono de marca de agua - Derecha, grande, transparente, inclinado */
+.auth-helper-text::before {
+    content: 'i';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%) rotate(-12deg);  /* ✅ Inclinación sutil */
+    font-size: 3rem;  /* ✅ Grande pero no gigante */
+    opacity: 0.08;  /* ✅ Muy transparente */
+    color: #15803d;  /* ✅ Verde */
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+}
+
+/* Contenido al frente */
+.auth-helper-text > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ocultar icono del HTML */
+.auth-helper-text .iconoir {
+    display: none !important;  /* ✅ Icono legacy oculto */
+}
+
+/* Info box para logout y confirmaciones */
+.auth-info-box {
+    background: #f0f9ff;
+    border-left: 3px solid #0284c7;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: start;
+    gap: 0.75rem;
+}
+
+.auth-info-box .iconoir {
+    color: #0284c7;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.auth-info-box strong {
+    display: block;
+    color: #111827;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
+.auth-info-box p {
+    color: #4b5563;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .auth-form-card {
+        padding: 1.5rem 1.25rem;  /* Reducido */
+    }
+
+    .auth-header {
+        margin-bottom: 1.25rem;  /* Reducido */
+    }
+
+    .auth-header h1.kita-brand {
+        font-size: 2rem;
+    }
+
+    .auth-title {
+        font-size: 1.5rem;
+    }
+
+    .auth-trust-badges {
+        gap: 0.5rem;
+    }
+
+    .trust-badge {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+
+    .form-group {
+        margin-bottom: 0.875rem;  /* Reducido */
+    }
+}
+
+@media (max-width: 576px) {
+    .auth-form-card {
+        padding: 1.25rem 1rem;  /* Más compacto */
+        border: none;  /* Ya sin borde global */
+    }
+
+    .auth-page-centered {
+        padding: 0.5rem 0;  /* Reducido */
+    }
+
+    .auth-header {
+        margin-bottom: 1rem;  /* Reducido */
+    }
+
+    .auth-header h1.kita-brand {
+        font-size: 1.75rem;
+    }
+
+    .auth-trust-badges {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .trust-badge {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========================================
+   LOADING STATE - Auth Buttons
+   ======================================== */
+
+/* Universal loading state para todos los botones auth */
+.auth-form .btn.is-loading,
+.btn-google.is-loading {
+    pointer-events: none;
+    opacity: 0.85;
+    cursor: wait;
+}
+
+/* Spinner para botones accent/primary (fondo verde) */
+.auth-form .btn-accent.is-loading::before,
+.auth-form .btn-primary.is-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: btn-spinner-spin 0.6s linear infinite;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+/* Spinner para botones outline-secondary (fondo gris claro) */
+.auth-form .btn-outline-secondary.is-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(17, 24, 39, 0.2);
+    border-top-color: #111827;
+    border-radius: 50%;
+    animation: btn-spinner-spin 0.6s linear infinite;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+/* Spinner para botón Google OAuth (fondo blanco) */
+.btn-google.is-loading::before {
+    content: '';
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(17, 24, 39, 0.2);
+    border-top-color: #111827;
+    border-radius: 50%;
+    animation: btn-spinner-spin 0.6s linear infinite;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+/* Texto opaco mientras carga */
+.auth-form .btn.is-loading .btn-text,
+.btn-google.is-loading span {
+    opacity: 0.7;
+    margin-left: 8px;
+}
+
+/* Ocultar icon original cuando está loading */
+.auth-form .btn.is-loading .iconoir:not(.btn-text *),
+.btn-google.is-loading svg {
+    display: none;
+}
+
+/* Keyframe para el spinner */
+@keyframes btn-spinner-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* IDs específicos para compatibilidad */
+#loginSubmit.is-loading .btn-text,
+#signupSubmit.is-loading .btn-text {
+    opacity: 0.7;
+}
+
+/* Botón submit más compacto que btn-xl */
+.auth-form .btn-lg {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+}
+
+/* Submit button con pulse sutil */
+#signupSubmit {
+    animation:
+        fade-in 0.5s ease backwards 0.8s,
+        pulse-submit 3s ease-in-out 1.5s infinite;
+}
+
+@keyframes pulse-submit {
+    0%, 100% {
+        box-shadow: 0 4px 16px rgba(21, 128, 61, 0.3);
+    }
+    50% {
+        box-shadow: 0 6px 24px rgba(21, 128, 61, 0.45);
+    }
+}
+
+/* Divider y links con fade-in */
+.auth-divider {
+    animation: fade-in 0.5s ease backwards;
+    animation-delay: 0.85s;
+}
+
+.auth-login-link {
+    animation: fade-in 0.5s ease backwards;
+    animation-delay: 0.9s;
+}
+
+.auth-back-link {
+    animation: fade-in 0.5s ease backwards;
+    animation-delay: 0.95s;
+}
+
+/* ========================================
+   KEYFRAMES GLOBALES
+   ======================================== */
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   GOOGLE OAUTH BUTTON
+   ======================================== */
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    background: #ffffff;
+    border: 2px solid #dadce0;  /* Google official gray */
+    border-radius: 8px;
+    color: #3c4043;  /* Google text color */
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.btn-google:hover {
+    background: #f8f9fa;
+    border-color: #d2d3d4;
+    box-shadow: 0 1px 3px rgba(60, 64, 67, 0.3);
+    transform: translateY(-1px);
+    color: #3c4043;
+}
+
+.btn-google-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* ========================================
+   PASSWORD STRENGTH METER
+   ======================================== */
+
+.password-strength-meter {
+    margin-top: 0.75rem;
+    animation: fade-in 0.3s ease;
+}
+
+.strength-bar {
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-fill.strength-none {
+    width: 0%;
+}
+
+.strength-fill.strength-weak {
+    animation: pulse-weak 2s ease-in-out infinite;
+}
+
+.strength-fill.strength-strong {
+    animation: pulse-strong 2s ease-in-out infinite;
+}
+
+@keyframes pulse-weak {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes pulse-strong {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.strength-requirements {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Social divider */
+.auth-social-divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    position: relative;
+}
+
+.auth-social-divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #111827;
+}
+
+.auth-social-divider span {
+    position: relative;
+    background: white;
+    padding: 0 1rem;
+    color: #6b7280;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* ========================================
+   ACCESSIBILITY - REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-form-card,
+    .auth-logo,
+    .auth-header h1,
+    .auth-tagline,
+    .auth-title,
+    .auth-subtitle,
+    .auth-trust-badges,
+    .form-group,
+    #signupSubmit,
+    .auth-divider,
+    .auth-login-link,
+    .auth-back-link,
+    .form-check-input {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .auth-form .form-control:focus {
+        transform: none !important;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    }
+}

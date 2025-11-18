@@ -1,0 +1,579 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+
+{% block title %}Facturación - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/invoices-ledger.css' %}?v=1.1">
+<style>
+/* ✅ Z-index inline para máxima prioridad */
+.modal.show { z-index: 10000 !important; }
+.modal-backdrop.show { z-index: 9500 !important; }
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header Ledger -->
+<div class="invoices-page-header">
+    <h1>Facturación</h1>
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <button class="btn btn-outline-primary" onclick="refreshInvoices()">
+                Actualizar
+            </button>
+            <button class="btn btn-outline-success" onclick="exportInvoices('csv')">
+                CSV
+            </button>
+            <button class="btn btn-outline-success" onclick="exportInvoices('xlsx')">
+                XLSX
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Inline -->
+<div class="stats-inline-invoices">
+    Total: <strong id="total-invoices">{{ stats.total_invoices }}</strong> |
+    Timbradas: <strong id="stamped-invoices">{{ stats.stamped_invoices }}</strong> |
+    Canceladas: <strong id="cancelled-invoices">{{ stats.cancelled_invoices }}</strong> |
+    Mes actual: <strong id="month-invoices">{{ stats.month_invoices }}</strong>
+</div>
+
+<!-- Filters Inline -->
+<div class="filters-inline-invoices">
+    <select class="form-select" id="status-filter" style="width: auto;">
+        <option value="">Estado</option>
+        <option value="draft">Borrador</option>
+        <option value="stamped">Timbrada</option>
+        <option value="sent">Enviada</option>
+        <option value="cancelled">Cancelada</option>
+    </select>
+    <input type="date" class="form-control" id="date-from" style="width: auto;" placeholder="Desde" />
+    <input type="date" class="form-control" id="date-to" style="width: auto;" placeholder="Hasta" />
+    <input type="text" class="form-control" id="customer-filter" style="width: auto;" placeholder="Cliente o RFC" />
+    <button class="btn btn-primary" onclick="applyFilters()">Aplicar</button>
+    <button class="btn btn-outline-secondary" onclick="clearFilters()">Limpiar</button>
+</div>
+
+<!-- Invoices Table -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="fas fa-list me-2"></i>
+            Lista de CFDIs
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="invoices-table" class="table">
+                <thead>
+                    <tr>
+                        <th>Serie-Folio</th>
+                        <th>Cliente</th>
+                        <th>RFC</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data loaded via AJAX -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+
+<!-- ============================================
+     MODALS REDISEÑADOS - FUERA DE OFFCANVAS
+     ============================================ -->
+
+<!-- Modal Cancelar Factura -->
+<div class="modal fade" id="cancelModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: 1px solid #e5e7eb; border-radius: 0; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+            <div class="modal-header" style="background: #fafbfc; border-bottom: 1px solid #e5e7eb; padding: 1rem 1.25rem;">
+                <h5 class="modal-title" style="font-family: Inter, sans-serif; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #111827; margin: 0;">
+                    Cancelar Factura
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem;">
+                <div style="background: #f9fafb; border-left: 2px solid #111827; padding: 0.75rem; margin-bottom: 1rem;">
+                    <strong style="font-size: 0.75rem; text-transform: uppercase;">Atención</strong>
+                    <p style="font-size: 0.8125rem; color: #6b7280; margin: 0.25rem 0 0 0;">
+                        Esta acción cancelará la factura en el SAT. Solo puedes cancelar facturas del mes calendario actual.
+                    </p>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
+                        Factura: <strong style="color: #111827;" id="cancel-invoice-info"></strong>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;">
+                        Motivo SAT
+                    </label>
+                    <select class="form-select" id="cancel-reason" style="border: 1px solid #e5e7eb; border-radius: 0; font-size: 0.875rem;">
+                        <option value="02" selected>02 - Errores sin relación</option>
+                        <option value="01">01 - Errores con relación</option>
+                        <option value="03">03 - No se realizó la operación</option>
+                        <option value="04">04 - Operación nominativa global</option>
+                    </select>
+                </div>
+
+                <input type="hidden" id="cancel-invoice-id" />
+            </div>
+            <div class="modal-footer" style="background: #ffffff; border-top: 1px solid #e5e7eb; padding: 1rem 1.25rem; gap: 0.75rem;">
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: transparent; border: 1px solid #e5e7eb; color: #111827; padding: 0.5rem 1rem; border-radius: 0; font-size: 0.875rem;">
+                    Cancelar
+                </button>
+                <button type="button" class="btn" onclick="confirmCancelInvoice()" style="background: #ef4444; border: none; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0; font-size: 0.875rem;">
+                    Cancelar Factura
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Reenviar Factura -->
+<div class="modal fade" id="resendModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border: 1px solid #e5e7eb; border-radius: 0; box-shadow: 0 8px 24px rgba(0,0,0,0.12);">
+            <div class="modal-header" style="background: #fafbfc; border-bottom: 1px solid #e5e7eb; padding: 1rem 1.25rem;">
+                <h5 class="modal-title" style="font-family: Inter, sans-serif; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: #111827; margin: 0;">
+                    Reenviar Factura
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding: 1.25rem;">
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem;">
+                        Factura: <strong style="color: #111827;" id="resend-invoice-info"></strong>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 0;">
+                    <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #9ca3af;">
+                        Email del Cliente
+                    </label>
+                    <input type="email" class="form-control" id="resend-email-input" placeholder="cliente@email.com" style="border: 1px solid #e5e7eb; border-radius: 0; font-size: 0.875rem; padding: 0.625rem 0.875rem;" />
+                </div>
+
+                <input type="hidden" id="resend-invoice-id" />
+            </div>
+            <div class="modal-footer" style="background: #ffffff; border-top: 1px solid #e5e7eb; padding: 1rem 1.25rem; gap: 0.75rem;">
+                <button type="button" class="btn" data-bs-dismiss="modal" style="background: transparent; border: 1px solid #e5e7eb; color: #111827; padding: 0.5rem 1rem; border-radius: 0; font-size: 0.875rem;">
+                    Cancelar
+                </button>
+                <button type="button" class="btn" onclick="confirmResendInvoice()" style="background: #111827; border: none; color: #ffffff; padding: 0.5rem 1rem; border-radius: 0; font-size: 0.875rem;">
+                    Reenviar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ✅ Z-index MÁXIMO para modals - inline para máxima prioridad */
+#cancelModal,
+#resendModal {
+    z-index: 99999 !important;
+}
+
+#cancelModal.show,
+#resendModal.show {
+    z-index: 99999 !important;
+}
+
+.modal-backdrop {
+    z-index: 99998 !important;
+}
+
+.modal-backdrop.show {
+    z-index: 99998 !important;
+}
+
+/* Offcanvas DEBAJO */
+.offcanvas {
+    z-index: 1045 !important;
+}
+</style>
+
+<script>
+let invoicesTable;
+
+$(document).ready(function() {
+    // Initialize DataTable
+    invoicesTable = $('#invoices-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '{% url "invoicing:ajax_invoices" %}',
+            data: function(d) {
+                d.status = $('#status-filter').val();
+                d.date_from = $('#date-from').val();
+                d.date_to = $('#date-to').val();
+                d.customer = $('#customer-filter').val();
+            }
+        },
+        columns: [
+            {
+                data: 'serie_folio',
+                render: function(data, type, row) {
+                    return `<strong>${data}</strong>`;
+                }
+            },
+            {
+                data: 'customer_name',
+                render: function(data, type, row) {
+                    return data || '-';
+                }
+            },
+            {
+                data: 'customer_rfc',
+                render: function(data, type, row) {
+                    return `<code>${data}</code>`;
+                }
+            },
+            {
+                data: 'total',
+                render: function(data, type, row) {
+                    return `$${parseFloat(data).toFixed(2)}<br><small class="text-muted">${row.currency}</small>`;
+                }
+            },
+            {
+                data: 'status',
+                render: function(data, type, row) {
+                    let html = `<span class="badge">${row.status_display}</span>`;
+                    html += `<br><small class="text-muted">${row.created_at}</small>`;
+
+                    if (row.uuid) {
+                        html += `<br><small class="text-muted">UUID: ${row.uuid.substring(0, 20)}...</small>`;
+                    }
+
+                    html += `<br><div class="btn-group btn-group-sm mt-1">`;
+
+                    html += `<button class="btn btn-outline-primary btn-sm" onclick="showInvoiceDetail('${row.id}')" title="Ver">👁</button>`;
+
+                    if (row.has_pdf) {
+                        html += `<button class="btn btn-outline-primary btn-sm" onclick="downloadFile('${row.id}', 'pdf')" title="PDF">↓</button>`;
+                    }
+
+                    if (row.has_xml) {
+                        html += `<button class="btn btn-outline-primary btn-sm" onclick="downloadFile('${row.id}', 'xml')" title="XML">⟨⟩</button>`;
+                    }
+
+                    if (row.status === 'stamped' || row.status === 'sent') {
+                        html += `<button class="btn btn-outline-primary btn-sm" onclick="showResendModal('${row.id}', '${row.serie_folio}')" title="Reenviar">✉</button>`;
+                    }
+
+                    if (row.can_cancel) {
+                        html += `<button class="btn btn-outline-danger btn-sm" onclick="showCancelModal('${row.id}', '${row.serie_folio}')" title="Cancelar">×</button>`;
+                    }
+
+                    html += `</div>`;
+
+                    return html;
+                }
+            }
+        ],
+        order: [[0, 'desc']],
+        pageLength: 25,
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-MX.json'
+        },
+        responsive: true
+    });
+
+    // Set default date range (current month)
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    $('#date-from').val(firstDay.toISOString().split('T')[0]);
+    $('#date-to').val(today.toISOString().split('T')[0]);
+});
+
+function applyFilters() {
+    invoicesTable.ajax.reload();
+    updateStats();
+}
+
+function clearFilters() {
+    $('#status-filter').val('');
+    $('#date-from').val('');
+    $('#date-to').val('');
+    $('#customer-filter').val('');
+    applyFilters();
+}
+
+function refreshInvoices() {
+    invoicesTable.ajax.reload();
+    updateStats();
+}
+
+function updateStats() {
+    const params = new URLSearchParams({
+        date_from: $('#date-from').val(),
+        date_to: $('#date-to').val(),
+        status: $('#status-filter').val()
+    });
+
+    fetch(`{% url "invoicing:ajax_invoice_stats" %}?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#total-invoices').text(data.stats.total_invoices);
+                $('#stamped-invoices').text(data.stats.stamped_invoices);
+                $('#cancelled-invoices').text(data.stats.cancelled_invoices);
+                $('#month-invoices').text(data.stats.total_invoices);
+            }
+        })
+        .catch(error => {
+            showToast('Error actualizando estadísticas', 'error');
+        });
+}
+
+// ✅ Prevenir múltiples clicks - MÉTODO ROBUSTO
+let isLoadingInvoiceDetail = false;
+
+function showInvoiceDetail(invoiceId) {
+    // Prevenir múltiples llamadas
+    if (isLoadingInvoiceDetail) {
+        console.log('⏳ Ya cargando factura, ignorando click');
+        return false;
+    }
+
+    isLoadingInvoiceDetail = true;
+
+    // Deshabilitar TODOS los botones de ver
+    const allViewButtons = document.querySelectorAll('[onclick*="showInvoiceDetail"]');
+    allViewButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'wait';
+    });
+
+    fetch(`{% url "invoicing:invoice_detail" "00000000-0000-0000-0000-000000000000" %}`.replace('00000000-0000-0000-0000-000000000000', invoiceId))
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('detail-panel-content').innerHTML = html;
+            document.getElementById('detailPanelTitle').textContent = 'Detalle de Factura';
+            const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailPanel'));
+            offcanvas.show();
+        })
+        .catch(error => {
+            showToast('Error cargando detalles', 'error');
+        })
+        .finally(() => {
+            // Re-habilitar botones después de 500ms
+            setTimeout(() => {
+                isLoadingInvoiceDetail = false;
+                allViewButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                });
+            }, 500);
+        });
+
+    return false;
+}
+
+function showCancelModal(invoiceId, serieFolio) {
+    // ✅ Cerrar offcanvas primero si está abierto
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('detailPanel'));
+    if (offcanvas) {
+        offcanvas.hide();
+        setTimeout(() => openCancelModal(invoiceId, serieFolio), 350);
+    } else {
+        openCancelModal(invoiceId, serieFolio);
+    }
+}
+
+function openCancelModal(invoiceId, serieFolio) {
+    document.getElementById('cancel-invoice-id').value = invoiceId;
+    document.getElementById('cancel-invoice-info').textContent = serieFolio;
+
+    const modalEl = document.getElementById('cancelModal');
+    const modal = new bootstrap.Modal(modalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    modal.show();
+
+    // ✅ Forzar z-index MÁXIMO
+    setTimeout(() => {
+        modalEl.style.zIndex = '99999';
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.style.zIndex = '99998';
+        }
+    }, 10);
+}
+
+function confirmCancelInvoice() {
+    const invoiceId = document.getElementById('cancel-invoice-id').value;
+    const reason = document.getElementById('cancel-reason').value;
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Cancelando...';
+    btn.disabled = true;
+
+    fetch('{% url "invoicing:cancel_invoice" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            invoice_id: invoiceId,
+            reason: reason
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Cancelación enviada al PAC', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('cancelModal'));
+            modal.hide();
+            invoicesTable.ajax.reload();
+        } else {
+            showToast(data.error || 'Error cancelando factura', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function showResendModal(invoiceId, serieFolio) {
+    // ✅ Cerrar offcanvas primero si está abierto
+    const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('detailPanel'));
+    if (offcanvas) {
+        offcanvas.hide();
+        setTimeout(() => openResendModal(invoiceId, serieFolio), 350);
+    } else {
+        openResendModal(invoiceId, serieFolio);
+    }
+}
+
+function openResendModal(invoiceId, serieFolio) {
+    document.getElementById('resend-invoice-id').value = invoiceId;
+    document.getElementById('resend-invoice-info').textContent = serieFolio;
+    document.getElementById('resend-email-input').value = '';
+
+    const modalEl = document.getElementById('resendModal');
+    const modal = new bootstrap.Modal(modalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+
+    modal.show();
+
+    // ✅ Forzar z-index MÁXIMO
+    setTimeout(() => {
+        modalEl.style.zIndex = '99999';
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.style.zIndex = '99998';
+        }
+
+        // Focus en email
+        document.getElementById('resend-email-input').focus();
+    }, 10);
+}
+
+function confirmResendInvoice() {
+    const invoiceId = document.getElementById('resend-invoice-id').value;
+    const email = document.getElementById('resend-email-input').value.trim();
+
+    // Validar email
+    if (!email) {
+        showToast('Ingresa un email', 'warning');
+        document.getElementById('resend-email-input').focus();
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        showToast('Email inválido', 'error');
+        document.getElementById('resend-email-input').focus();
+        return;
+    }
+
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Enviando...';
+    btn.disabled = true;
+
+    fetch('{% url "invoicing:resend_invoice" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            invoice_id: invoiceId,
+            email: email
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || 'Factura reenviada', 'success');
+            const modal = bootstrap.Modal.getInstance(document.getElementById('resendModal'));
+            modal.hide();
+        } else {
+            showToast(data.error || 'Error reenviando factura', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function downloadFile(invoiceId, fileType) {
+    window.open(`{% url "invoicing:download_file" "00000000-0000-0000-0000-000000000000" "xml" %}`.replace('00000000-0000-0000-0000-000000000000', invoiceId).replace('xml', fileType), '_blank');
+}
+
+function exportInvoices(format) {
+    const params = new URLSearchParams({
+        format: format,
+        status: $('#status-filter').val(),
+        date_from: $('#date-from').val(),
+        date_to: $('#date-to').val()
+    });
+
+    window.open(`{% url "invoicing:export_invoices" %}?${params}`, '_blank');
+}
+
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+
+    const csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    if (csrfCookie) return csrfCookie.split('=')[1];
+
+    return '';
+}
+</script>
+{% endblock %}

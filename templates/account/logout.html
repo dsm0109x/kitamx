@@ -1,0 +1,107 @@
+{% extends 'base_minimal.html' %}
+{% load static %}
+
+{% block title %}Cerrar Sesión - Kita{% endblock %}
+
+{% block extra_head %}
+<!-- Auth Brutalist Styles -->
+<link rel="stylesheet" href="{% static 'css/04-pages/auth-brutalist.css' %}?v=2.4">
+{% endblock %}
+
+{% block content %}
+<main role="main" class="auth-page-centered">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7 col-sm-10">
+                <div class="auth-form-card">
+                    <!-- Header -->
+                    <div class="auth-header text-center mb-4">
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <img src="{% static logo_path %}"
+                                 alt="Kita"
+                                 height="48"
+                                 loading="eager"
+                                 class="auth-logo">
+                            <h1 class="kita-brand mb-0">Kita</h1>
+                        </div>
+                        <p class="auth-tagline">Kit de Ayuda para Emprendedores</p>
+
+                        <h2 class="auth-title">Cerrar Sesión</h2>
+                        <p class="auth-subtitle">¿Estás seguro que deseas cerrar tu sesión?</p>
+                    </div>
+
+                <!-- Confirmation Message -->
+                <div class="auth-info-box">
+                    <span class="iconoir-info-circle" aria-hidden="true"></span>
+                    <div>
+                        <strong>Tu sesión se cerrará</strong>
+                        <p>Podrás volver a iniciar sesión cuando quieras</p>
+                    </div>
+                </div>
+
+                <!-- Form -->
+                <form method="post" class="auth-form" aria-label="Formulario de cierre de sesión">
+                    {% csrf_token %}
+
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-3 mb-3">
+                        <button type="submit"
+                                class="btn btn-accent btn-lg"
+                                id="logoutSubmit"
+                                data-tracking="logout-confirm">
+                            <span class="iconoir-log-out" aria-hidden="true"></span>
+                            <span class="btn-text">Sí, Cerrar Sesión</span>
+                        </button>
+
+                        <a href="{% url 'dashboard:index' %}"
+                           class="btn btn-outline-secondary btn-lg"
+                           data-tracking="logout-cancel">
+                            <span class="btn-text">Cancelar y Volver</span>
+                        </a>
+                    </div>
+                </form>
+
+                <!-- Back to Home -->
+                <div class="auth-back-link text-center">
+                    <a href="{% url 'home' %}" data-tracking="logout-back-home">
+                        <span class="iconoir-home" aria-hidden="true"></span>
+                        Volver al inicio
+                    </a>
+                </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+/**
+ * Auth Logout - Event Delegation (CSP Compliant)
+ */
+(function() {
+    'use strict';
+
+    // Loading state on submit
+    const form = document.querySelector('.auth-form');
+    const submitBtn = document.getElementById('logoutSubmit');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            submitBtn.classList.add('is-loading');
+            submitBtn.disabled = true;
+
+            // Analytics
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'logout_confirm', {
+                    'event_category': 'engagement',
+                    'event_label': 'logout-form',
+                    'value': 1
+                });
+            }
+        });
+    }
+
+})();
+</script>
+{% endblock %}

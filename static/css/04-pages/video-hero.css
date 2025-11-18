@@ -1,0 +1,692 @@
+/**
+ * VIDEO HERO - Hero Section with Demo Video
+ * Diseñado para landing page de Kita
+ * Responsive, elegante, con badges flotantes
+ * @version 1.0
+ */
+
+/* ========================================
+   VIDEO HERO CONTAINER
+   ======================================== */
+
+.video-hero-container {
+    position: relative;
+    width: 100%;
+    max-width: 640px; /* Max width para desktop */
+    margin: 0 auto;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.video-hero-container.animate-scale-in {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ========================================
+   VIDEO THUMBNAIL (Preview con Play Button)
+   ======================================== */
+
+.video-hero-thumbnail {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-card, 15px);
+    overflow: hidden;
+    background: var(--color-gray-900, #111827);
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.06),
+        0 8px 16px rgba(0, 0, 0, 0.04),
+        0 0 0 1px rgba(0, 0, 0, 0.02);
+
+    /* Aspect ratio container */
+    aspect-ratio: 16 / 9;
+    cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1),
+                box-shadow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.video-hero-thumbnail:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.08),
+        0 12px 24px rgba(0, 0, 0, 0.06),
+        0 0 0 1px rgba(21, 128, 61, 0.15);
+}
+
+/* Video preview (primer frame) */
+.video-hero-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Overlay oscuro sobre video */
+.video-thumbnail-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    transition: background 0.3s ease;
+    pointer-events: none;
+}
+
+.video-hero-thumbnail:hover .video-thumbnail-overlay {
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+}
+
+/* ========================================
+   PLAY BUTTON (Centro del Thumbnail)
+   ======================================== */
+
+.video-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.video-play-button:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+.video-play-button:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* Play Button Circle */
+.play-button-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* Pulse animation */
+    animation: playButtonPulse 2s ease-in-out infinite;
+}
+
+.video-play-button:hover .play-button-circle {
+    background: rgba(255, 255, 255, 1);
+    box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.125),
+        0 4px 12px rgba(0, 0, 0, 0.075),
+        0 0 0 3px rgba(21, 128, 61, 0.15);
+    animation: none;
+}
+
+/* Play Icon */
+.play-button-icon {
+    font-size: 32px;
+    color: var(--color-forest-700, #15803d);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.play-button-icon::before {
+    display: block;
+}
+
+/* Play Button Text */
+.play-button-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.3px;
+}
+
+/* Pulse Animation */
+@keyframes playButtonPulse {
+    0%, 100% {
+        box-shadow:
+            0 8px 24px rgba(0, 0, 0, 0.1),
+            0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    50% {
+        box-shadow:
+            0 12px 32px rgba(0, 0, 0, 0.125),
+            0 4px 12px rgba(0, 0, 0, 0.075),
+            0 0 0 8px rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* ========================================
+   VIDEO MODAL (Fullscreen)
+   ======================================== */
+
+.video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.video-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Backdrop */
+.video-modal-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+}
+
+/* Modal Content */
+.video-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    z-index: 10;
+    transform: scale(0.9);
+    transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.video-modal.active .video-modal-content {
+    transform: scale(1);
+}
+
+/* Close Button */
+.video-modal-close {
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    z-index: 20;
+}
+
+.video-modal-close:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: rotate(90deg) scale(1.1);
+}
+
+.video-modal-close:active {
+    transform: rotate(90deg) scale(0.95);
+}
+
+.video-modal-close .iconoir-xmark {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.video-modal-close .iconoir-xmark::before {
+    display: block;
+}
+
+/* Video Wrapper */
+.video-modal-wrapper {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-card, 15px);
+    overflow: hidden;
+    background: #000000;
+    box-shadow:
+        0 24px 48px rgba(0, 0, 0, 0.2),
+        0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Video Player */
+.video-modal-player {
+    width: 100%;
+    height: auto;
+    display: block;
+    max-height: 80vh;
+    outline: none; /* Remover outline de focus en video */
+}
+
+/* Video Controls Customization (opcional) */
+.video-modal-player::-webkit-media-controls-panel {
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.8));
+}
+
+/* ========================================
+   MODAL - RESPONSIVE MOBILE
+   ======================================== */
+
+@media (max-width: 767px) {
+    .video-modal-content {
+        width: 95%;
+        max-width: none;
+    }
+
+    .video-modal-close {
+        top: -40px;
+        width: 40px;
+        height: 40px;
+    }
+
+    .video-modal-close .iconoir-xmark {
+        width: 20px;
+        height: 20px;
+    }
+
+    .video-modal-wrapper {
+        border-radius: var(--radius-card, 15px);
+    }
+
+    .video-modal-player {
+        max-height: 70vh;
+    }
+}
+
+/* ========================================
+   FEATURE BADGES FLOTANTES
+   ======================================== */
+
+.video-badge {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-radius: var(--radius-button, 16px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px) saturate(180%);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(0, 0, 0, 0.04);
+
+    /* Animación de entrada */
+    opacity: 0;
+    transform: translateY(10px);
+    animation: badgeFadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+
+    /* Prevent selection */
+    user-select: none;
+    pointer-events: none;
+    will-change: opacity, transform;
+}
+
+/* Posicionamiento de badges */
+.video-badge-1 {
+    top: 20px;
+    right: -20px;
+    animation-delay: 0.3s;
+}
+
+.video-badge-2 {
+    bottom: 100px;
+    left: -30px;
+    animation-delay: 0.5s;
+}
+
+.video-badge-3 {
+    bottom: 20px;
+    right: -25px;
+    animation-delay: 0.7s;
+}
+
+/* Badge Icon */
+.video-badge-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg,
+        var(--color-forest-700, #15803d) 0%,
+        var(--color-forest-500, #22c55e) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.video-badge-icon .iconoir-flash,
+.video-badge-icon .iconoir-page,
+.video-badge-icon .iconoir-wallet {
+    width: 18px;
+    height: 18px;
+    color: white;
+}
+
+/* Badge Content */
+.video-badge-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.video-badge-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-gray-900, #111827);
+    line-height: 1.2;
+}
+
+.video-badge-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--color-gray-600, #4b5563);
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Badge Animation */
+@keyframes badgeFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Subtle Pulse Animation (opcional) */
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow:
+            0 8px 24px rgba(0, 0, 0, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+    50% {
+        box-shadow:
+            0 12px 32px rgba(0, 0, 0, 0.16),
+            0 4px 12px rgba(0, 0, 0, 0.12),
+            0 0 0 1px rgba(21, 128, 61, 0.2);
+    }
+}
+
+.video-badge:hover {
+    animation: badgePulse 2s ease-in-out infinite;
+}
+
+/* ========================================
+   RESPONSIVE - TABLET (768px - 1023px)
+   ======================================== */
+
+@media (max-width: 1023px) {
+    .video-hero-container {
+        max-width: 540px;
+    }
+
+    /* Badges más pequeños */
+    .video-badge {
+        padding: 10px 14px;
+        gap: 8px;
+    }
+
+    .video-badge-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .video-badge-icon .iconoir-flash,
+    .video-badge-icon .iconoir-page,
+    .video-badge-icon .iconoir-wallet {
+        width: 16px;
+        height: 16px;
+    }
+
+    .video-badge-value {
+        font-size: 13px;
+    }
+
+    .video-badge-label {
+        font-size: 10px;
+    }
+
+    /* Ajustar posiciones */
+    .video-badge-1 {
+        top: 15px;
+        right: -15px;
+    }
+
+    .video-badge-2 {
+        bottom: 80px;
+        left: -20px;
+    }
+
+    .video-badge-3 {
+        bottom: 15px;
+        right: -20px;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE (< 768px)
+   ======================================== */
+
+@media (max-width: 767px) {
+    .video-hero-container {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+
+    .video-hero-thumbnail {
+        border-radius: var(--radius-card, 15px);
+        /* Aspect ratio más compacto en mobile */
+        aspect-ratio: 4 / 3;
+    }
+
+    /* Play Button más pequeño en mobile */
+    .play-button-circle {
+        width: 64px;
+        height: 64px;
+    }
+
+    .play-button-icon {
+        width: 26px;
+        height: 26px;
+    }
+
+    .play-button-text {
+        font-size: 13px;
+    }
+
+    /* Badges inline en mobile (no flotantes) */
+    .video-badge {
+        position: static;
+        transform: none;
+        margin-top: 12px;
+        width: 100%;
+        justify-content: flex-start;
+        animation: none;
+        opacity: 1;
+    }
+
+    .video-badge-1,
+    .video-badge-2,
+    .video-badge-3 {
+        position: static;
+    }
+
+    /* Stack badges en mobile */
+    .video-hero-container::after {
+        content: '';
+        display: block;
+        margin-top: 12px;
+    }
+
+    /* Crear wrapper para badges en mobile */
+    @supports (display: flex) {
+        .video-hero-container {
+            display: flex;
+            flex-direction: column;
+        }
+    }
+}
+
+/* ========================================
+   RESPONSIVE - SMALL MOBILE (< 480px)
+   ======================================== */
+
+@media (max-width: 479px) {
+    .video-hero-container {
+        padding: 0 12px;
+    }
+
+    .video-hero-thumbnail {
+        border-radius: var(--radius-card, 15px);
+    }
+
+    /* Play Button más pequeño */
+    .play-button-circle {
+        width: 56px;
+        height: 56px;
+    }
+
+    .play-button-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .play-button-text {
+        font-size: 12px;
+    }
+
+    .video-badge {
+        padding: 8px 12px;
+        gap: 6px;
+    }
+
+    .video-badge-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .video-badge-icon .iconoir-flash,
+    .video-badge-icon .iconoir-page,
+    .video-badge-icon .iconoir-wallet {
+        width: 14px;
+        height: 14px;
+    }
+
+    .video-badge-value {
+        font-size: 12px;
+    }
+
+    .video-badge-label {
+        font-size: 9px;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Respeta preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .video-hero-container,
+    .video-badge,
+    .play-button-circle {
+        animation: none;
+        transition: none;
+    }
+
+    .video-hero-container.animate-scale-in {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* Focus states para accesibilidad */
+.video-play-button:focus-visible {
+    outline: 3px solid var(--color-forest-500, #22c55e);
+    outline-offset: 8px;
+    border-radius: 50%;
+}
+
+.video-modal-close:focus-visible {
+    outline: 3px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   DARK MODE SUPPORT (opcional)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    .video-hero-thumbnail {
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 8px 16px rgba(0, 0, 0, 0.1),
+            0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .video-badge {
+        background: rgba(30, 30, 30, 0.95);
+    }
+
+    .video-badge-value {
+        color: #ffffff;
+    }
+
+    .video-badge-label {
+        color: #a0a0a0;
+    }
+
+    .play-button-text {
+        text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+}
+
+/* ========================================
+   PREVENT BODY SCROLL WHEN MODAL OPEN
+   ======================================== */
+
+body.video-modal-open {
+    overflow: hidden;
+}

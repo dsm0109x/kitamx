@@ -1,0 +1,242 @@
+/**
+ * Before vs After Comparison Section
+ *
+ * Visual side-by-side comparison showing time savings with Kita
+ * Color scheme: Red/danger for "before", Green/success for "after"
+ */
+
+.section-comparison {
+    background: #ffffff;
+    padding: var(--space-12, 96px) 0;
+}
+
+/* Problem badge - minimal */
+.comparison-problem-badge {
+    display: inline-block;
+    background: transparent;
+    color: #6b7280;
+    padding: 0;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Comparison cards - minimal design */
+.comparison-card {
+    background: transparent;
+    border-radius: var(--radius-lg);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Before card (problem) */
+.comparison-card-before {
+    border-left: 3px solid #ef4444;
+    padding-left: 1.5rem;
+}
+
+/* After card (solution) */
+.comparison-card-after {
+    border-left: 3px solid #10b981;
+    padding-left: 1.5rem;
+}
+
+/* Headers - minimal */
+.comparison-header {
+    padding-bottom: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-gray-200);
+    margin-bottom: 1.5rem;
+}
+
+.comparison-header-before {
+    color: var(--color-primary);
+}
+
+.comparison-header-after {
+    color: var(--color-primary);
+}
+
+.comparison-header h3 {
+    color: #0f172a;
+    font-size: 1.25rem;
+}
+
+.comparison-header .iconoir {
+    color: #6b7280;
+}
+
+.comparison-header p {
+    color: #6b7280;
+}
+
+/* Body */
+.comparison-body {
+    padding: 0;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Steps - minimal */
+.comparison-step {
+    background: transparent;
+    border-radius: var(--radius-lg);
+    padding: 0 0 1.25rem 0;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid var(--color-gray-100);
+}
+
+.comparison-step:last-of-type {
+    border-bottom: none;
+}
+
+/* Step numbers - minimal circles */
+.comparison-step-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    border: 2px solid;
+}
+
+.comparison-step-number-before {
+    background: white;
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.comparison-step-number-after {
+    background: white;
+    border-color: #10b981;
+    color: #10b981;
+}
+
+/* Step content */
+.comparison-step h6 {
+    color: #0f172a;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.comparison-step p {
+    color: #6b7280;
+    line-height: 1.5;
+    font-size: 0.9rem;
+}
+
+/* Time indicators - minimal */
+.comparison-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.comparison-time strong {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Magic section - minimal */
+.comparison-magic {
+    background: #fafafa;
+    border-top: 1px solid var(--color-gray-200);
+    border-bottom: 1px solid var(--color-gray-200);
+    padding: 1rem 0;
+    margin: 1.5rem 0;
+}
+
+.magic-label {
+    background: transparent;
+    padding: 0;
+    font-weight: 600;
+    color: #6366f1;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.magic-divider {
+    flex-grow: 1;
+    height: 1px;
+    background: var(--color-gray-200);
+}
+
+/* Totals - minimal */
+.comparison-total {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-gray-200);
+}
+
+.comparison-total-time {
+    background: transparent;
+    padding: 0;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #0f172a;
+}
+
+/* Savings highlight - minimal */
+.comparison-savings {
+    background: #fafafa;
+    border: none;
+    border-top: 1px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: 1rem 0 0 0;
+}
+
+.comparison-savings strong {
+    font-size: 1rem;
+    color: #059669;
+}
+
+/* Bottom stat - minimal */
+.comparison-bottom-stat {
+    background: #fafafa;
+    border: none;
+    border-top: 2px solid var(--color-gray-200);
+    border-radius: var(--radius-lg);
+    padding: 2rem 1.5rem;
+}
+
+.comparison-bottom-stat .h5 {
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.comparison-bottom-stat .lead {
+    color: #374151;
+    font-size: 1.1rem;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .section-comparison {
+        padding: 4rem 0;
+    }
+
+    .comparison-card {
+        margin-bottom: 3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .comparison-card-before,
+    .comparison-card-after {
+        padding-left: 1rem;
+    }
+
+    .comparison-step {
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+}

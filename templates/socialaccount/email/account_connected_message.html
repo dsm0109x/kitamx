@@ -1,0 +1,44 @@
+{% extends "emails/base.html" %}
+
+{% block email_title %}Cuenta de Google Conectada - Kita{% endblock %}
+
+{% block email_content %}
+    <!-- Icono Grande -->
+    <div class="email-icon">🔗</div>
+
+    <h1>Google Conectado Exitosamente</h1>
+
+    <p class="lead">
+        Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+    </p>
+
+    <p>
+        Has conectado exitosamente tu cuenta de <strong>Google</strong> con tu cuenta de Kita.
+    </p>
+
+    <!-- Success Box -->
+    <div class="success-box">
+        <p><strong>Ahora puedes iniciar sesión de 2 formas:</strong></p>
+        <p>• Con tu email y contraseña</p>
+        <p>• Con el botón "Continuar con Google"</p>
+    </div>
+
+    <!-- Security Box -->
+    <div class="security-box">
+        <p><strong>Para tu seguridad:</strong></p>
+        <p>• Puedes desconectar Google en cualquier momento desde Configuración</p>
+        <p>• Si no reconoces esta actividad, cambia tu contraseña inmediatamente</p>
+        <p>• Contacta con soporte si tienes dudas: hola@kita.mx</p>
+    </div>
+
+    <p class="text-center" style="margin-top: 32px;">
+        <a href="https://kita.mx/ingresar/" class="btn-primary" style="text-decoration: none;">
+            Ir a Mi Dashboard
+        </a>
+    </p>
+{% endblock %}
+
+{% block email_footer_note %}
+    Este email fue enviado porque conectaste tu cuenta de Google.<br>
+    Si no fuiste tú, contacta inmediatamente con hola@kita.mx
+{% endblock %}

@@ -1,0 +1,33 @@
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+EMAIL ACTUALIZADO
+
+Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+El email principal de tu cuenta en Kita ha sido actualizado exitosamente.
+
+NUEVO EMAIL DE ACCESO:
+{{ new_email }}
+
+A partir de ahora, usa este email para iniciar sesion en Kita.
+
+PARA TU SEGURIDAD:
+• Todas tus sesiones anteriores han sido cerradas automaticamente
+• Deberas iniciar sesion nuevamente con tu nuevo email
+• Si no reconoces este cambio, contacta inmediatamente con soporte
+
+Inicia sesion con tu nuevo email en: https://kita.mx/ingresar/
+
+¿No fuiste tu? Escribenos de inmediato a hola@kita.mx
+
+--
+El equipo de Kita
+https://kita.mx
+hola@kita.mx
+
+--------------------------------------------------------------------------------
+Este email fue enviado a tu direccion anterior por seguridad.
+Si no fuiste tu quien cambio el email, contacta inmediatamente con hola@kita.mx
+================================================================================

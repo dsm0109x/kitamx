@@ -1,0 +1,53 @@
+{% extends "emails/base.html" %}
+
+{% block email_title %}Intento de Recuperación de Contraseña - Kita{% endblock %}
+
+{% block email_content %}
+    <!-- Icono Grande -->
+    <div class="email-icon">⚠️</div>
+
+    <h1>Cuenta No Encontrada</h1>
+
+    <p>
+        Hola,
+    </p>
+
+    <p>
+        Recibimos una solicitud para recuperar la contraseña de una cuenta asociada a este email,
+        pero <strong>no encontramos ninguna cuenta registrada</strong> con esta dirección.
+    </p>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p><strong>¿Qué significa esto?</strong></p>
+        <p>
+            • Puede que te hayas registrado con un email diferente<br>
+            • O puede que aún no tengas una cuenta en Kita
+        </p>
+    </div>
+
+    <!-- Success Box -->
+    <div class="success-box">
+        <p><strong>¿Quieres usar Kita?</strong></p>
+        <p>
+            Puedes crear tu cuenta gratuita en cualquier momento y comenzar
+            tu prueba de 30 días sin tarjeta de crédito.
+        </p>
+    </div>
+
+    <p class="text-center" style="margin-top: 32px;">
+        <a href="https://kita.mx/registrarme/" class="btn-primary" style="text-decoration: none;">
+            Crear Cuenta Gratuita
+        </a>
+    </p>
+
+    <p class="text-muted text-center" style="margin-top: 24px;">
+        ¿Tienes dudas? Escríbenos a
+        <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+    </p>
+{% endblock %}
+
+{% block email_footer_note %}
+    Este email fue enviado porque alguien intentó recuperar una contraseña con tu email.<br>
+    Si no fuiste tú, puedes ignorar este mensaje de forma segura.
+{% endblock %}

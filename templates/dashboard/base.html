@@ -1,0 +1,2059 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title|default:"Dashboard" }} - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{% load static %}
+<!-- Sidebar Premium CSS -->
+<link rel="stylesheet" href="{% static 'css/03-layouts/sidebar-premium.css' %}?v=2.2">
+<!-- Top Bar Glass Floating CSS -->
+<link rel="stylesheet" href="{% static 'css/03-layouts/topbar-glass-floating.css' %}?v=3.1">
+<!-- Footer Glass CSS -->
+<link rel="stylesheet" href="{% static 'css/03-layouts/footer-glass.css' %}?v=3.0">
+<!-- Bottom Nav Mobile CSS -->
+<link rel="stylesheet" href="{% static 'css/03-layouts/bottom-nav-mobile.css' %}?v=1.0">
+<!-- Command Palette CSS -->
+<link rel="stylesheet" href="{% static 'css/03-layouts/command-palette.css' %}?v=2.1">
+<!-- Detail Panel CSS -->
+<link rel="stylesheet" href="{% static 'css/detail-panel.css' %}?v=1.0">
+<!-- Create Link Notifications CSS - Minimal -->
+<link rel="stylesheet" href="{% static 'css/create-link-notifications-minimal.css' %}?v=1.0">
+<!-- Modals Mobile Optimized CSS -->
+<link rel="stylesheet" href="{% static 'css/modals-mobile-optimized.css' %}?v=1.0">
+
+<script>
+// Topbar glassmorphism en scroll (iOS style)
+document.addEventListener('DOMContentLoaded', function() {
+    const topbar = document.getElementById('topbarFloating');
+    if (!topbar) {
+        console.error('Topbar not found');
+        return;
+    }
+
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 20) {
+            topbar.classList.add('scrolled');
+            console.log('Topbar scrolled class added');
+        } else {
+            topbar.classList.remove('scrolled');
+        }
+    }, { passive: true });
+
+    console.log('Topbar glassmorphism script loaded');
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-layout">
+    <!-- TOP BAR FLOATING GLASS - PREMIUM -->
+    <header class="topbar-floating" id="topbarFloating" role="banner">
+        <div class="topbar-glass-inner">
+            <div class="topbar-content">
+
+                <!-- LEFT SECTION - Toggle + Branding + Title -->
+                <div class="topbar-left">
+                    <!-- Sidebar Toggle -->
+                    <button class="sidebar-toggle-btn"
+                            id="sidebarToggleTopbar"
+                            aria-label="Toggle sidebar"
+                            aria-expanded="true">
+                        <i class="iconoir-sidebar-collapse"></i>
+                    </button>
+
+                    <!-- Page Title -->
+                    <div class="topbar-title-section">
+                        <h1 class="topbar-page-title" id="page-title">{{ page_title|default:"Dashboard" }}</h1>
+                    </div>
+                </div>
+
+                <!-- CENTER SECTION - Clean (trial info moved to dashboard) -->
+                <div class="topbar-center">
+                    <!-- Espacio limpio - trial info ahora en dashboard -->
+                </div>
+
+                <!-- RIGHT SECTION - Actions -->
+                <div class="topbar-right">
+                    <!-- Crear Link Button -->
+                    <button class="create-link-btn"
+                            onclick="showCreateLinkModal()"
+                            aria-label="Crear link de pago">
+                        <i class="iconoir-plus"></i>
+                    </button>
+
+                    <!-- Search Button -->
+                    <button class="command-hint-btn"
+                            onclick="openCommandPalette()"
+                            aria-label="Buscar (Cmd+K)">
+                        <i class="iconoir-search"></i>
+                    </button>
+
+                    <!-- User Menu -->
+                    <button class="user-menu-btn"
+                            id="userMenuBtn"
+                            aria-label="Menú de usuario"
+                            aria-expanded="false"
+                            aria-haspopup="true">
+                        <div class="user-avatar-topbar">
+                            {{ user.first_name|slice:":1"|upper }}{{ user.last_name|slice:":1"|upper }}
+                        </div>
+                        <span class="user-name-topbar">{{ user.first_name }}</span>
+                        <i class="iconoir-nav-arrow-down user-dropdown-arrow"></i>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- User Menu Dropdown -->
+        <div class="user-menu-dropdown" id="userMenuDropdown">
+            <div class="user-menu-header">
+                <div class="user-menu-name">{{ user.first_name }} {{ user.last_name }}</div>
+                <div class="user-menu-email">{{ user.email }}</div>
+            </div>
+            <div class="user-menu-body">
+                <a href="/cuenta/" class="user-menu-item">
+                    <i class="iconoir-user"></i>
+                    <span>Mi Perfil</span>
+                </a>
+                <a href="/negocio/" class="user-menu-item">
+                    <i class="iconoir-shop"></i>
+                    <span>Mi Negocio</span>
+                </a>
+                <a href="{% url 'billing:index' %}" class="user-menu-item">
+                    <i class="iconoir-credit-card"></i>
+                    <span>Suscripción</span>
+                </a>
+            </div>
+            <div class="user-menu-footer">
+                <a href="{% url 'account_logout' %}" class="user-menu-logout">
+                    <i class="iconoir-log-out"></i>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-body">
+        <!-- SIDEBAR PREMIUM - Desktop/Tablet -->
+        <nav class="kita-sidebar" id="kitaSidebar" role="navigation" aria-label="Navegación principal del dashboard">
+            <div class="sidebar-inner">
+
+                <!-- Logo Kita - Top -->
+                <div class="sidebar-logo-section">
+                    {% load static %}
+                    <img src="{% static 'images/kita-logo.png' %}" alt="Kita" class="sidebar-logo-img">
+                    <span class="sidebar-brand-text">Kita</span>
+                </div>
+
+                <!-- Quick Action Button -->
+                <button class="sidebar-cta-primary" onclick="showCreateLinkModal()">
+                    <i class="iconoir-plus"></i>
+                    <span class="cta-text">Crear Link de Pago</span>
+                </button>
+
+                <!-- Navigation Container -->
+                <div class="sidebar-nav-container">
+
+                    <!-- Section: Principal (sin título) -->
+                    <div class="nav-section">
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'index' and 'panel' in request.path %}active{% endif %}"
+                                   href="{% url 'dashboard:index' %}"
+                                   data-tooltip="Dashboard - Vista general (D)"
+                                   aria-current="{% if request.resolver_match.url_name == 'index' and 'panel' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-dashboard nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Dashboard</span>
+                                        <span class="nav-subtitle">Vista general</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'enlaces' in request.path %}active{% endif %}"
+                                   href="{% url 'links:index' %}"
+                                   data-tooltip="Links de Pago - Gestiona tus cobros (L)"
+                                   aria-current="{% if 'enlaces' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-link nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Links de Pago</span>
+                                        <span class="nav-subtitle">Gestiona tus cobros</span>
+                                    </span>
+                                    <span class="nav-badge-count" id="links-count" style="display: none;">0</span>
+                                    <span class="nav-badge-dot" id="links-dot" style="display: none;"></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'facturas' in request.path %}active{% endif %}"
+                                   href="/facturas/"
+                                   data-tooltip="Facturación - CFDIs y timbrado"
+                                   aria-current="{% if 'facturas' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-page nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Facturación</span>
+                                        <span class="nav-subtitle">CFDIs y timbrado</span>
+                                    </span>
+                                    <span class="nav-badge-count" id="invoices-count" style="display: none;">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/ia/' in request.path %}active{% endif %}"
+                                   href="{% url 'kita_ia:index' %}"
+                                   data-tooltip="IA - Asistente inteligente (I)"
+                                   aria-current="{% if '/ia/' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-brain nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">IA</span>
+                                        <span class="nav-subtitle">Crea links con IA</span>
+                                    </span>
+                                    <span class="nav-badge-new">NEW</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Section: Configuración -->
+                    <div class="nav-section">
+                        <h6 class="nav-section-title">CONFIGURACIÓN</h6>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'cuenta' in request.path %}active{% endif %}"
+                                   href="/cuenta/"
+                                   data-tooltip="Mi Cuenta - Perfil y seguridad"
+                                   aria-current="{% if 'cuenta' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-user nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Mi Cuenta</span>
+                                        <span class="nav-subtitle">Perfil y seguridad</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/suscripcion/' in request.path or 'billing' in request.path %}active{% endif %}"
+                                   href="{% url 'billing:index' %}"
+                                   data-tooltip="Suscripción - Plan y facturación"
+                                   aria-current="{% if '/suscripcion/' in request.path or 'billing' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-credit-card nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Suscripción</span>
+                                        <span class="nav-subtitle">Plan y facturación</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'negocio' in request.path %}active{% endif %}"
+                                   href="/negocio/"
+                                   data-tooltip="Mi Negocio - Configuración fiscal (S)"
+                                   aria-current="{% if 'negocio' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-shop nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Mi Negocio</span>
+                                        <span class="nav-subtitle">Configuración fiscal</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'auditoria' in request.path %}active{% endif %}"
+                                   href="/auditoria/"
+                                   data-tooltip="Logs - Auditoría del sistema"
+                                   aria-current="{% if 'auditoria' in request.path %}page{% else %}false{% endif %}">
+                                    <i class="iconoir-list nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Logs</span>
+                                        <span class="nav-subtitle">Auditoría</span>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Tenant Info - Bottom -->
+                <div class="sidebar-tenant-card sidebar-tenant-bottom">
+                    <div class="tenant-selector">
+                        <div class="tenant-avatar">
+                            {{ tenant.name|slice:":1"|upper }}
+                        </div>
+                        <div class="tenant-info">
+                            <div class="tenant-name">{{ tenant.name }}</div>
+                            <div class="tenant-rfc">{{ tenant.rfc }}</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </nav>
+
+        <!-- MOBILE DRAWER (Solo visible <768px) -->
+        <div class="mobile-drawer-overlay" id="mobileDrawerOverlay"></div>
+
+        <nav class="mobile-sidebar-drawer" id="mobileSidebarDrawer" role="navigation" aria-label="Menú de navegación móvil">
+            <div class="drawer-header">
+                <button class="drawer-close" data-mobile-drawer="close" aria-label="Cerrar menú">
+                    <i class="iconoir-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Logo Centrado -->
+            <div class="drawer-logo-section">
+                {% load static %}
+                <img src="{% static 'images/kita-logo.png' %}" alt="Kita">
+                <span class="drawer-logo-text">Kita</span>
+                <div class="drawer-logo-divider"></div>
+            </div>
+
+            <div class="drawer-body">
+                <!-- Tenant Info - Clean Display -->
+                <div class="sidebar-tenant-card">
+                    <div class="tenant-selector">
+                        <div class="tenant-avatar">
+                            {{ tenant.name|slice:":1"|upper }}
+                        </div>
+                        <div class="tenant-info">
+                            <div class="tenant-name">{{ tenant.name }}</div>
+                            <div class="tenant-rfc">{{ tenant.rfc }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action -->
+                <button class="sidebar-cta-primary" onclick="showCreateLinkModal(); toggleMobileDrawer();">
+                    <i class="iconoir-plus"></i>
+                    <span class="cta-text">Crear Link de Pago</span>
+                </button>
+
+                <!-- Same nav structure -->
+                <div class="sidebar-nav-container">
+                    <!-- Copy all nav-section blocks from above -->
+                    {% comment %}Same structure as desktop sidebar{% endcomment %}
+
+                    <!-- Section: Principal (sin título) -->
+                    <div class="nav-section">
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'dashboard:index' %}">
+                                    <i class="iconoir-dashboard nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Dashboard</span>
+                                        <span class="nav-subtitle">Vista general</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'enlaces' in request.path %}active{% endif %}" href="{% url 'links:index' %}">
+                                    <i class="iconoir-link nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Links de Pago</span>
+                                        <span class="nav-subtitle">Gestiona tus cobros</span>
+                                    </span>
+                                    <span class="nav-badge-count" id="drawer-links-count" style="display: none;">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'facturas' in request.path %}active{% endif %}" href="/facturas/">
+                                    <i class="iconoir-page nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Facturación</span>
+                                        <span class="nav-subtitle">CFDIs y timbrado</span>
+                                    </span>
+                                    <span class="nav-badge-count" id="drawer-invoices-count" style="display: none;">0</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/ia/' in request.path %}active{% endif %}" href="{% url 'kita_ia:index' %}">
+                                    <i class="iconoir-brain nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">IA</span>
+                                        <span class="nav-subtitle">Crea links con IA</span>
+                                    </span>
+                                    <span class="nav-badge-new">NEW</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Section: Configuración -->
+                    <div class="nav-section">
+                        <h6 class="nav-section-title">CONFIGURACIÓN</h6>
+                        <ul class="nav-list">
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'cuenta' in request.path %}active{% endif %}" href="/cuenta/">
+                                    <i class="iconoir-user nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Mi Cuenta</span>
+                                        <span class="nav-subtitle">Perfil y seguridad</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if '/suscripcion/' in request.path or 'billing' in request.path %}active{% endif %}" href="{% url 'billing:index' %}">
+                                    <i class="iconoir-credit-card nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Suscripción</span>
+                                        <span class="nav-subtitle">Plan y facturación</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'negocio' in request.path %}active{% endif %}" href="/negocio/">
+                                    <i class="iconoir-shop nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Mi Negocio</span>
+                                        <span class="nav-subtitle">Configuración fiscal</span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if 'auditoria' in request.path %}active{% endif %}" href="/auditoria/">
+                                    <i class="iconoir-list nav-icon"></i>
+                                    <span class="nav-content">
+                                        <span class="nav-text">Logs</span>
+                                        <span class="nav-subtitle">Auditoría</span>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Drawer Footer -->
+                <div class="drawer-footer">
+                    <a href="{% url 'account_logout' %}" class="drawer-logout-btn">
+                        <i class="iconoir-log-out"></i>
+                        <span>Cerrar Sesión</span>
+                    </a>
+                </div>
+
+            </div>
+        </nav>
+
+        <!-- BOTTOM NAVIGATION - Mobile Only (<768px) -->
+        <nav class="bottom-navigation" role="navigation" aria-label="Navegación principal móvil">
+            <a href="{% url 'dashboard:index' %}"
+               class="bottom-nav-item {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+               aria-current="{% if request.resolver_match.url_name == 'index' %}page{% else %}false{% endif %}">
+                <span class="nav-icon">
+                    <i class="iconoir-dashboard"></i>
+                </span>
+                <span class="nav-label">Inicio</span>
+            </a>
+
+            <a href="{% url 'links:index' %}"
+               class="bottom-nav-item {% if 'enlaces' in request.path %}active{% endif %}"
+               aria-current="{% if 'enlaces' in request.path %}page{% else %}false{% endif %}">
+                <span class="nav-icon">
+                    <i class="iconoir-link"></i>
+                    <span class="badge-dot" id="bottom-links-dot" style="display: none;"></span>
+                    <span class="badge-count" id="bottom-links-count" style="display: none;">0</span>
+                </span>
+                <span class="nav-label">Links</span>
+            </a>
+
+            <button class="bottom-nav-fab" onclick="showCreateLinkModal()" aria-label="Crear link de pago">
+                <i class="iconoir-plus"></i>
+            </button>
+
+            <a href="/facturas/"
+               class="bottom-nav-item {% if 'facturas' in request.path %}active{% endif %}"
+               aria-current="{% if 'facturas' in request.path %}page{% else %}false{% endif %}">
+                <span class="nav-icon">
+                    <i class="iconoir-page"></i>
+                    <span class="badge-count" id="bottom-invoices-count" style="display: none;">0</span>
+                </span>
+                <span class="nav-label">Facturas</span>
+            </a>
+
+            <button class="bottom-nav-item" data-mobile-drawer="open" aria-label="Abrir menú completo">
+                <span class="nav-icon">
+                    <i class="iconoir-menu"></i>
+                </span>
+                <span class="nav-label">Menú</span>
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="dashboard-main" id="dashboardMain">
+            <div class="main-content">
+                <div class="container-fluid">
+                    {% block dashboard_content %}
+                    <!-- Dashboard content will be loaded here -->
+                    {% endblock %}
+                </div>
+            </div>
+
+            <!-- App Footer Glass - Brutalist Minimal -->
+            <footer class="app-footer-glass">
+                <div class="footer-glass-inner">
+                    <div class="footer-content">
+                        <!-- Left: Logo + Copyright + Links -->
+                        <div class="footer-left">
+                            <!-- Logo Kita -->
+                            <div class="footer-kita-brand">
+                                {% load static %}
+                                <img src="{% static 'images/kita-logo.png' %}" alt="Kita" class="footer-kita-logo">
+                                <span class="footer-kita-name kita-brand">Kita</span>
+                            </div>
+
+                            <span class="footer-copyright">© {% now "Y" %}</span>
+                            <span class="footer-separator">·</span>
+                            <a href="mailto:hola@kita.mx" class="footer-link">hola@kita.mx</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+</div>
+
+<!-- Modal for Create Link -->
+<div class="modal fade"
+     id="createLinkModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="createLinkModalTitle"
+     aria-describedby="createLinkModalDesc"
+     aria-modal="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content create-link-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createLinkModalTitle">
+                    <i class="iconoir-link me-2"></i>
+                    Crear Link de Pago
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="createLinkModalDesc" class="text-muted mb-3 small">
+                </p>
+                <!-- Setup Warnings -->
+                <div id="setup-warnings">
+                    <!-- Warnings will be loaded here -->
+                </div>
+                <div id="create-link-form">
+                    <!-- Form will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Side panel for details -->
+<div class="offcanvas offcanvas-end offcanvas-detail-panel" tabindex="-1" id="detailPanel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="detailPanelTitle">Detalles</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div id="detail-panel-content">
+            <!-- Detail content will be loaded here -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Global Utilities (MUST load first) -->
+<script src="{% static 'js/utils.js' %}?v=1.0"></script>
+
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Dashboard Charts JS -->
+<script src="{% static 'js/dashboard-charts.js' %}?v=1.0"></script>
+
+<!-- QR Code Generator Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+<!-- Link Actions JS (Centralized) -->
+<script src="{% static 'js/link-actions.js' %}?v=1.1"></script>
+
+<!-- Sidebar Premium JS -->
+<script src="{% static 'js/sidebar-premium.js' %}?v=1.0"></script>
+
+<!-- Command Palette Enhanced JS (NEW - v2.1 with improvements) -->
+<script src="{% static 'js/command-palette-enhanced.js' %}?v=2.1"></script>
+
+<!-- Top Bar Floating JS (NEW) -->
+<script src="{% static 'js/topbar-floating.js' %}?v=1.0"></script>
+
+<script>
+// Global navigation functions - sections removed, all apps are independent now
+
+// ========================================
+// SETUP WARNINGS - GLOBAL FUNCTION
+// ========================================
+function loadSetupWarnings() {
+    fetch('/panel/verificar-configuracion/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const warningsContainer = document.getElementById('setup-warnings');
+                if (!warningsContainer) return;
+
+                let warningsHTML = '';
+
+                // Warning: MercadoPago no conectado
+                if (!data.has_mercadopago) {
+                    warningsHTML += `
+                        <div class="alert alert-warning d-flex align-items-start mb-3">
+                            <i class="iconoir-warning-triangle me-2 mt-1"></i>
+                            <div>
+                                <strong>MercadoPago no conectado</strong>
+                                <p class="mb-0 small">Para recibir pagos, conecta tu cuenta de MercadoPago en
+                                <a href="/negocio/" class="alert-link">Mi Negocio</a>.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Warning: CSD no registrado
+                if (!data.has_csd) {
+                    warningsHTML += `
+                        <div class="alert alert-warning d-flex align-items-start mb-3">
+                            <i class="iconoir-warning-triangle me-2 mt-1"></i>
+                            <div>
+                                <strong>Certificados CSD no registrados</strong>
+                                <p class="mb-0 small">Para emitir facturas automáticas, sube tus sellos digitales en
+                                <a href="/negocio/csd/" class="alert-link">Mi Negocio</a>.</p>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                warningsContainer.innerHTML = warningsHTML;
+            }
+        })
+        .catch(error => console.log('❌ No se pudo verificar configuración:', error));
+}
+
+// Open create link modal
+function showCreateLinkModal() {
+    console.log('🔍 showCreateLinkModal called');
+
+    // Get modal element
+    const modalElement = document.getElementById('createLinkModal');
+    if (!modalElement) {
+        console.error('❌ Modal element not found');
+        return;
+    }
+
+    // Get form container
+    const formContainer = document.getElementById('create-link-form');
+    if (!formContainer) {
+        console.error('❌ Form container not found');
+        return;
+    }
+
+    // Show loading
+    formContainer.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary"></div><p class="mt-3">Cargando formulario...</p></div>';
+
+    // Open modal immediately
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+
+    // ✅ Load setup warnings when modal opens
+    loadSetupWarnings();
+
+    // Load form via AJAX
+    fetch('/panel/crear-enlace-form/')  // 🇪🇸 Migrado
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load form');
+            }
+            return response.text();
+        })
+        .then(html => {
+            formContainer.innerHTML = html;
+
+            // Initialize validation
+            if (typeof initializeCreateLinkForm === 'function') {
+                initializeCreateLinkForm();
+            } else {
+                console.error('❌ initializeCreateLinkForm not found');
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error loading form:', error);
+            formContainer.innerHTML = '<div class="alert alert-danger">Error cargando formulario. Recarga la página.</div>';
+        });
+}
+
+function initializeCreateLinkForm() {
+    'use strict';
+
+    const form = document.getElementById('createLinkForm');
+    if (!form) {
+        console.warn('⚠️ createLinkForm not found');
+        return;
+    }
+
+    console.log('✅ Form found, initializing NEW validation with debounce...');
+
+    // ========================================
+    // DEBOUNCE UTILITY
+    // ========================================
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const context = this; // Preserve 'this' context
+            const later = () => {
+                clearTimeout(timeout);
+                func.apply(context, args); // Apply with correct context
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // ========================================
+    // VALIDATION HELPERS
+    // ========================================
+
+    const ValidationHelpers = {
+        setValid(input) {
+            input.classList.add('is-valid');
+            input.classList.remove('is-invalid');
+            input.setAttribute('aria-invalid', 'false');
+            const feedback = input.parentElement.querySelector('.invalid-feedback') ||
+                             input.closest('.mb-3').querySelector('.invalid-feedback');
+            if (feedback) feedback.textContent = '';
+        },
+
+        setInvalid(input, message) {
+            input.classList.add('is-invalid');
+            input.classList.remove('is-valid');
+            input.setAttribute('aria-invalid', 'true');
+            const feedback = input.parentElement.querySelector('.invalid-feedback') ||
+                             input.closest('.mb-3').querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = message;
+                feedback.style.display = 'block';
+            }
+        },
+
+        clearValidation(input) {
+            input.classList.remove('is-valid', 'is-invalid');
+            input.setAttribute('aria-invalid', 'false');
+            const feedback = input.parentElement.querySelector('.invalid-feedback') ||
+                             input.closest('.mb-3').querySelector('.invalid-feedback');
+            if (feedback) {
+                feedback.textContent = '';
+                feedback.style.display = 'none';
+            }
+        }
+    };
+
+    // ========================================
+    // LOAD RECENT CUSTOMERS
+    // ========================================
+    function loadRecentCustomers() {
+        fetch('/panel/clientes-recientes/')  // 🇪🇸 Migrado
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.customers) {
+                    const namesDatalist = document.getElementById('recent-customers-names');
+                    const emailsDatalist = document.getElementById('recent-customers-emails');
+
+                    if (namesDatalist && emailsDatalist) {
+                        data.customers.forEach(customer => {
+                            if (customer.name) {
+                                const nameOption = document.createElement('option');
+                                nameOption.value = customer.name;
+                                namesDatalist.appendChild(nameOption);
+                            }
+                            if (customer.email) {
+                                const emailOption = document.createElement('option');
+                                emailOption.value = customer.email;
+                                emailsDatalist.appendChild(emailOption);
+                            }
+                        });
+                        console.log('✅ Recent customers loaded');
+                    }
+                }
+            })
+            .catch(error => console.log('❌ No se pudieron cargar clientes recientes:', error));
+    }
+
+    // Load recent customers on init
+    loadRecentCustomers();
+
+    // ========================================
+    // REAL-TIME VALIDATION
+    // ========================================
+
+    // Título - Validación en tiempo real con debounce
+    const titleInput = form.querySelector('#title');
+    if (titleInput) {
+        const validateTitle = debounce(function() {
+            const value = this.value.trim();
+            if (!value) {
+                ValidationHelpers.setInvalid(this, 'Título es requerido');
+            } else if (value.length < 3) {
+                ValidationHelpers.setInvalid(this, 'Título debe tener al menos 3 caracteres');
+            } else if (value.length > 255) {
+                ValidationHelpers.setInvalid(this, 'Título no puede exceder 255 caracteres');
+            } else {
+                ValidationHelpers.setValid(this);
+            }
+        }, 500);
+
+        // Validación en tiempo real
+        titleInput.addEventListener('input', function(e) {
+            // Clear error while typing
+            if (this.classList.contains('is-invalid')) {
+                ValidationHelpers.clearValidation(this);
+            }
+            // Validate with debounce
+            validateTitle.call(this, e);
+        });
+
+        // También validar en blur
+        titleInput.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (!value) {
+                ValidationHelpers.setInvalid(this, 'Título es requerido');
+            } else if (value.length < 3) {
+                ValidationHelpers.setInvalid(this, 'Título debe tener al menos 3 caracteres');
+            } else if (value.length > 255) {
+                ValidationHelpers.setInvalid(this, 'Título no puede exceder 255 caracteres');
+            } else {
+                ValidationHelpers.setValid(this);
+            }
+        });
+        console.log('✅ Title validation with debounce attached');
+    }
+
+    // Monto
+    const amountInput = form.querySelector('#amount');
+    if (amountInput) {
+        amountInput.addEventListener('blur', function() {
+            const value = parseFloat(this.value);
+            if (!this.value) {
+                ValidationHelpers.setInvalid(this, 'Monto es requerido');
+            } else if (value < 1) {
+                ValidationHelpers.setInvalid(this, 'Monto mínimo: $1 MXN');
+            } else if (value > 999999) {
+                ValidationHelpers.setInvalid(this, 'Monto máximo: $999,999 MXN');
+            } else {
+                ValidationHelpers.setValid(this);
+            }
+        });
+        amountInput.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) ValidationHelpers.clearValidation(this);
+        });
+        console.log('✅ Amount validation attached');
+    }
+
+    // Descripción con contador
+    const descriptionInput = form.querySelector('#description');
+    const descriptionCount = document.getElementById('descriptionCount');
+    if (descriptionInput && descriptionCount) {
+        descriptionInput.addEventListener('input', function() {
+            const length = this.value.length;
+            descriptionCount.textContent = length;
+
+            if (length > 500) {
+                this.value = this.value.substring(0, 500);
+                descriptionCount.textContent = 500;
+            }
+        });
+    }
+
+    // Nombre del cliente
+    const customerNameInput = form.querySelector('#customer_name');
+    if (customerNameInput) {
+        customerNameInput.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (value && value.length > 255) {
+                ValidationHelpers.setInvalid(this, 'Nombre no puede exceder 255 caracteres');
+            } else if (value) {
+                ValidationHelpers.setValid(this);
+            } else {
+                ValidationHelpers.clearValidation(this);
+            }
+        });
+        customerNameInput.addEventListener('input', function() {
+            if (this.classList.contains('is-invalid')) ValidationHelpers.clearValidation(this);
+        });
+    }
+
+    // Email del cliente - Validación en tiempo real con debounce
+    const customerEmailInput = form.querySelector('#customer_email');
+    if (customerEmailInput) {
+        const validateEmail = debounce(function() {
+            const value = this.value.trim();
+            if (value) {
+                // Regex más estricto para email
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailRegex.test(value)) {
+                    ValidationHelpers.setInvalid(this, 'Formato de email inválido (ej: usuario@dominio.com)');
+                } else if (value.length > 254) {
+                    ValidationHelpers.setInvalid(this, 'Email no puede exceder 254 caracteres');
+                } else {
+                    ValidationHelpers.setValid(this);
+                }
+            } else {
+                ValidationHelpers.clearValidation(this);
+            }
+
+            // ✅ Update email preview en notificaciones
+            updateEmailPreview(value);
+        }, 600);
+
+        customerEmailInput.addEventListener('input', function(e) {
+            // Auto-lowercase
+            this.value = this.value.toLowerCase();
+            // Clear error while typing
+            if (this.classList.contains('is-invalid')) {
+                ValidationHelpers.clearValidation(this);
+            }
+            // Validate after 600ms with correct context
+            validateEmail.call(this, e);
+        });
+
+        customerEmailInput.addEventListener('blur', function() {
+            const value = this.value.trim();
+            if (value) {
+                const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!emailRegex.test(value)) {
+                    ValidationHelpers.setInvalid(this, 'Formato de email inválido (ej: usuario@dominio.com)');
+                } else if (value.length > 254) {
+                    ValidationHelpers.setInvalid(this, 'Email no puede exceder 254 caracteres');
+                } else {
+                    ValidationHelpers.setValid(this);
+                }
+            } else {
+                ValidationHelpers.clearValidation(this);
+            }
+        });
+        console.log('✅ Email validation with debounce attached');
+    }
+
+    // Vigencia
+    const expiresSelect = form.querySelector('#expires_days');
+    if (expiresSelect) {
+        expiresSelect.addEventListener('change', function() {
+            const value = this.value;
+            const validDays = ['1', '3', '7'];
+            if (validDays.includes(value)) {
+                ValidationHelpers.setValid(this);
+            } else {
+                ValidationHelpers.setInvalid(this, 'Selecciona 1, 3 o 7 días');
+            }
+        });
+    }
+
+    console.log('✅ All validation listeners attached');
+
+    // ========================================
+    // NOTIFICATIONS CONFIGURATION
+    // ========================================
+
+    // Toggle master de notificaciones
+    const notificationsToggle = document.getElementById('notifications_enabled');
+    const notificationsSummary = document.getElementById('notifications-summary');
+    const notificationsDisabledMsg = document.getElementById('notifications-disabled-msg');
+
+    if (notificationsToggle) {
+        notificationsToggle.addEventListener('change', function() {
+            if (this.checked) {
+                notificationsSummary.style.display = 'block';
+                notificationsDisabledMsg.style.display = 'none';
+            } else {
+                notificationsSummary.style.display = 'none';
+                notificationsDisabledMsg.style.display = 'block';
+            }
+            updateNotificationCount();
+            updateNotificationTimeline();
+        });
+    }
+
+    // Sincronizar checkbox "Permitir facturar" con notificación de factura
+    const requiresInvoiceCheckbox = form.querySelector('#requires_invoice');
+    if (requiresInvoiceCheckbox) {
+        requiresInvoiceCheckbox.addEventListener('change', function() {
+            const invoiceAutoItem = document.getElementById('invoice-auto-notification');
+            if (invoiceAutoItem) {
+                invoiceAutoItem.style.display = this.checked ? 'inline-flex' : 'none';
+            }
+        });
+
+        // ✅ Inicializar estado correcto al cargar
+        setTimeout(() => {
+            const invoiceAutoItem = document.getElementById('invoice-auto-notification');
+            if (invoiceAutoItem) {
+                invoiceAutoItem.style.display = requiresInvoiceCheckbox.checked ? 'inline-flex' : 'none';
+            }
+        }, 100);
+    }
+
+    // Actualizar vigencia - Validar pills
+    const expirySelect = form.querySelector('#expires_days');
+    if (expirySelect) {
+        expirySelect.addEventListener('change', function() {
+            validateTimingPills();
+            validateReminderConfiguration();
+        });
+    }
+
+    // Inicializar al cargar
+    setTimeout(() => {
+        updateReminderScheduledTime();
+        validateReminderConfiguration();
+        validateTimingPills();
+
+        // ✅ Inicializar email preview
+        const emailInput = form.querySelector('#customer_email');
+        if (emailInput && emailInput.value) {
+            updateEmailPreview(emailInput.value);
+        }
+
+        // ✅ Inicializar estados visuales de notificaciones
+        // Esto sincroniza el checkbox HTML con el estado visual del toggle
+        const notifyOnCreate = document.getElementById('notify_on_create');
+        const sendReminders = document.getElementById('send_reminders');
+        const notifyOnExpiry = document.getElementById('notify_on_expiry');
+
+        if (notifyOnCreate) {
+            toggleNotificationContext('notify_on_create');
+        }
+        if (sendReminders) {
+            toggleNotificationContext('send_reminders');
+        }
+        if (notifyOnExpiry) {
+            toggleNotificationContext('notify_on_expiry');
+        }
+
+        // ✅ Inicializar requerimiento de email
+        updateEmailRequirement();
+
+        console.log('✅ Notification toggles initialized:', {
+            notify_on_create: notifyOnCreate?.checked,
+            send_reminders: sendReminders?.checked,
+            notify_on_expiry: notifyOnExpiry?.checked
+        });
+    }, 200);
+
+    // ========================================
+    // FORM SUBMISSION
+    // ========================================
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('🔍 Form submit intercepted');
+
+        // ✅ NO usar FormData para checkboxes (solo incluye checked)
+        // Leer cada campo explícitamente
+        const data = {
+            // Campos de texto
+            title: document.getElementById('title')?.value || '',
+            amount: document.getElementById('amount')?.value || '',
+            description: document.getElementById('description')?.value || '',
+            customer_name: document.getElementById('customer_name')?.value || '',
+            customer_email: document.getElementById('customer_email')?.value || '',
+            expires_days: document.getElementById('expires_days')?.value || '3',
+
+            // Checkboxes - Leer .checked explícitamente
+            requires_invoice: document.getElementById('requires_invoice')?.checked || false,
+            notifications_enabled: true,  // Siempre true en propuesta 4
+            notify_on_create: document.getElementById('notify_on_create')?.checked || false,
+            send_reminders: document.getElementById('send_reminders')?.checked || false,
+            notify_on_expiry: document.getElementById('notify_on_expiry')?.checked || false,
+
+            // Timing
+            reminder_hours_before: document.getElementById('reminder_hours_before')?.value || '24'
+        };
+
+        console.log('📧 Notification settings:', {
+            notify_on_create: data.notify_on_create,
+            send_reminders: data.send_reminders,
+            notify_on_expiry: data.notify_on_expiry,
+            reminder_hours_before: data.reminder_hours_before
+        });
+
+        console.log('📦 Complete data to send:', data);
+
+        // ✅ Validar email si notificaciones están activadas
+        const anyNotificationActive = data.notify_on_create || data.send_reminders || data.notify_on_expiry;
+        if (anyNotificationActive && !data.customer_email) {
+            showToast('Email del cliente es requerido para enviar notificaciones', 'error');
+            const emailInput = document.getElementById('customer_email');
+            if (emailInput) {
+                emailInput.focus();
+                emailInput.classList.add('is-invalid');
+                const errorDiv = document.getElementById('customer-email-error');
+                if (errorDiv) {
+                    errorDiv.textContent = 'Requerido para enviar notificaciones';
+                    errorDiv.style.display = 'block';
+                }
+            }
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const btnContent = submitBtn.querySelector('.btn-content');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+
+        if (btnContent) btnContent.classList.add('d-none');
+        if (btnLoading) btnLoading.classList.remove('d-none');
+        submitBtn.disabled = true;
+
+        // Timeout 30 segundos
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+        fetch('/panel/crear-enlace/', {  // 🇪🇸 Migrado
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(data),
+            signal: controller.signal
+        })
+        .then(response => {
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showToast('Link creado exitosamente', 'success');
+
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('createLinkModal'));
+                if (modal) modal.hide();
+
+                // Show success modal
+                showSuccessModal(data);
+
+                // Update dashboard
+                if (typeof updateDashboardCounts === 'function') {
+                    updateDashboardCounts();
+                }
+                if (window.kitaSidebar && window.kitaSidebar.updateCounts) {
+                    window.kitaSidebar.updateCounts();
+                }
+            } else {
+                showToast(data.error || 'Error creando link', 'error');
+            }
+        })
+        .catch(error => {
+            clearTimeout(timeoutId);
+            console.error('Link creation error:', error);
+
+            if (error.name === 'AbortError') {
+                showToast('Operación tomó demasiado tiempo. El link podría haberse creado.', 'warning');
+            } else if (error.message && error.message.includes('HTTP 500')) {
+                showToast('Error del servidor. Intenta de nuevo.', 'error');
+            } else {
+                showToast('Error de conexión. Verifica tu internet.', 'error');
+            }
+        })
+        .finally(() => {
+            if (btnContent) btnContent.classList.remove('d-none');
+            if (btnLoading) btnLoading.classList.add('d-none');
+            submitBtn.disabled = false;
+        });
+    });
+
+    console.log('✅ Notification controls initialized');
+}
+
+// ========================================
+// GLOBAL NOTIFICATION FUNCTIONS (OUTSIDE initializeCreateLinkForm)
+// ========================================
+
+// Update email preview
+function updateEmailPreview(email) {
+    const previewEmail = document.getElementById('preview-email');
+    if (previewEmail) {
+        previewEmail.textContent = email || 'cliente@ejemplo.com';
+    }
+}
+
+// Toggle de contexto de notificaciones (Propuesta 4 - Compacta)
+function toggleNotificationContext(notificationId) {
+    const checkbox = document.getElementById(notificationId);
+    const label = document.getElementById(`${notificationId}_label`);
+    const context = document.getElementById(`${notificationId}_context`);
+
+    if (!checkbox || !label) {
+        console.warn(`[Toggle] Element not found: ${notificationId}`);
+        return;
+    }
+
+    console.log(`[Toggle] ${notificationId}:`, checkbox.checked);
+
+    if (checkbox.checked) {
+        label.textContent = 'Activado';
+        label.style.color = '#15803d';
+        if (context) {
+            // ✅ Mostrar inline (no block)
+            if (notificationId === 'send_reminders') {
+                context.style.display = 'inline-flex';
+            } else if (context.tagName === 'SPAN') {
+                context.style.display = 'inline';
+            } else {
+                context.style.display = 'block';
+            }
+            context.classList.add('active');
+        }
+    } else {
+        label.textContent = 'Desactivado';
+        label.style.color = '#9ca3af';
+        if (context) {
+            context.style.display = 'none';
+            context.classList.remove('active');
+        }
+    }
+
+    // ✅ Actualizar requerimiento de email
+    updateEmailRequirement();
+}
+
+// ✅ Actualizar si email es requerido según notificaciones
+function updateEmailRequirement() {
+    const emailInput = document.getElementById('customer_email');
+    const requiredIndicator = document.getElementById('email-required-indicator');
+    const optionalIndicator = document.getElementById('email-optional-indicator');
+    const helpText = document.getElementById('email-help-text');
+
+    if (!emailInput) return;
+
+    // Verificar si alguna notificación está activada
+    const notifyOnCreate = document.getElementById('notify_on_create')?.checked || false;
+    const sendReminders = document.getElementById('send_reminders')?.checked || false;
+    const notifyOnExpiry = document.getElementById('notify_on_expiry')?.checked || false;
+
+    const anyNotificationActive = notifyOnCreate || sendReminders || notifyOnExpiry;
+
+    if (anyNotificationActive) {
+        // ✅ Email REQUERIDO
+        emailInput.setAttribute('required', 'required');
+        emailInput.setAttribute('aria-required', 'true');
+        if (requiredIndicator) requiredIndicator.style.display = 'inline';
+        if (optionalIndicator) optionalIndicator.style.display = 'none';
+        if (helpText) helpText.textContent = 'Requerido para enviar notificaciones';
+    } else {
+        // Email opcional
+        emailInput.removeAttribute('required');
+        emailInput.setAttribute('aria-required', 'false');
+        if (requiredIndicator) requiredIndicator.style.display = 'none';
+        if (optionalIndicator) optionalIndicator.style.display = 'inline';
+        if (helpText) helpText.textContent = 'Se enviará el link automáticamente si lo proporcionas';
+    }
+}
+
+// Validar pills según vigencia
+function validateTimingPills() {
+    const expiryDays = parseInt(document.getElementById('expires_days')?.value || 3);
+    const expiryHours = expiryDays * 24;
+
+    document.querySelectorAll('.timing-pill').forEach(pill => {
+        const hours = parseInt(pill.dataset.hours);
+        const hoursAfterCreation = expiryHours - hours;
+
+        // Deshabilitar si no es válido (< 12h después de crear)
+        if (hours >= expiryHours || hoursAfterCreation < 12) {
+            pill.classList.add('disabled');
+        } else {
+            pill.classList.remove('disabled');
+        }
+    });
+
+    // Si el seleccionado está deshabilitado, cambiar a uno válido
+    const currentHours = parseInt(document.getElementById('reminder_hours_before')?.value || 24);
+    const currentPill = document.querySelector(`.timing-pill[data-hours="${currentHours}"]`);
+    if (currentPill && currentPill.classList.contains('disabled')) {
+        // Seleccionar el primer pill válido
+        const validPill = document.querySelector('.timing-pill:not(.disabled)');
+        if (validPill) {
+            selectReminderTiming(parseInt(validPill.dataset.hours));
+        }
+    }
+}
+
+// Selección de timing con pills
+function selectReminderTiming(hours) {
+    // Update hidden input
+    const hiddenInput = document.getElementById('reminder_hours_before');
+    if (hiddenInput) {
+        hiddenInput.value = hours;
+    }
+
+    // Update active pill
+    document.querySelectorAll('.timing-pill').forEach(pill => {
+        pill.classList.remove('active');
+    });
+    const activePill = document.querySelector(`.timing-pill[data-hours="${hours}"]`);
+    if (activePill) {
+        activePill.classList.add('active');
+    }
+
+    // Update timing text
+    const timingText = document.getElementById('reminder-timing-text');
+    if (timingText) {
+        if (hours < 24) {
+            timingText.textContent = `${hours}h antes de expirar`;
+        } else {
+            const days = hours / 24;
+            timingText.textContent = `${days}d antes de expirar`;
+        }
+    }
+
+    // Update scheduled time
+    updateReminderScheduledTime();
+
+    // Validate configuration
+    validateReminderConfiguration();
+}
+
+// ========================================
+// FUNCIONES OBSOLETAS REMOVIDAS
+// ========================================
+// toggleAdvancedNotifications() - No hay sección colapsable
+// toggleReminderOptions() - Opciones siempre visibles
+// updateNotificationCount() - No hay contador
+// updateNotificationTimeline() - No hay timeline visual
+
+function updateReminderScheduledTime() {
+    const expiryDays = parseInt(document.getElementById('expires_days')?.value || 3);
+    const reminderHours = parseInt(document.getElementById('reminder_hours_before')?.value || 24);
+
+    // Calcular fecha/hora del recordatorio
+    const now = new Date();
+    const expiryDate = new Date(now.getTime() + (expiryDays * 24 * 60 * 60 * 1000));
+    const reminderDate = new Date(expiryDate.getTime() - (reminderHours * 60 * 60 * 1000));
+
+    const dateStr = reminderDate.toLocaleDateString('es-MX', {
+        day: 'numeric',
+        month: 'short'
+    });
+    const timeStr = reminderDate.toLocaleTimeString('es-MX', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const timeElement = document.getElementById('reminder-scheduled-time');
+    if (timeElement) {
+        // ✅ Formato compacto: "16 ene, 14:30"
+        timeElement.textContent = `${dateStr}, ${timeStr}`;
+    }
+}
+
+// updateNotificationTimeline() - REMOVIDA (no hay timeline visual en propuesta 3)
+
+// showNotificationPreview() - REMOVIDA (simplificación propuesta 3)
+
+// updateReminderOptionsBasedOnExpiry() - REMOVIDA (reemplazada por validateTimingPills)
+
+function validateReminderConfiguration() {
+    const expiryDays = parseInt(document.getElementById('expires_days')?.value || 3);
+    const reminderHours = parseInt(document.getElementById('reminder_hours_before')?.value || 24);
+    const contextMsg = document.getElementById('reminder-context-msg');
+
+    if (!contextMsg) return;
+
+    const expiryHours = expiryDays * 24;
+    const hoursAfterCreation = expiryHours - reminderHours;
+
+    // Calcular cuándo se enviará (días y horas después de crear)
+    const daysAfter = Math.floor(hoursAfterCreation / 24);
+    const hoursRem = hoursAfterCreation % 24;
+
+    let timeAfterStr;
+    if (daysAfter > 0) {
+        if (hoursRem > 0) {
+            timeAfterStr = `${daysAfter}d ${hoursRem}h`;
+        } else {
+            timeAfterStr = `${daysAfter}d`;
+        }
+    } else {
+        timeAfterStr = `${hoursAfterCreation}h`;
+    }
+
+    // Validar casos - Versión compacta inline
+    if (reminderHours >= expiryHours) {
+        contextMsg.innerHTML = `<span class="notification-alert error">❌ Imposible</span>`;
+    } else if (hoursAfterCreation < 12) {
+        contextMsg.innerHTML = `<span class="notification-alert warning">⚠️ Muy cercano</span>`;
+    } else if (hoursAfterCreation < 24) {
+        contextMsg.innerHTML = `<span class="notification-alert warning">${timeAfterStr} después</span>`;
+    } else {
+        contextMsg.innerHTML = `<span class="notification-alert success">✓ ${timeAfterStr}</span>`;
+    }
+
+    updateReminderScheduledTime();
+}
+
+function showSuccessModal(linkData) {
+    const successModal = document.createElement('div');
+    successModal.className = 'modal fade';
+    successModal.id = 'linkSuccessModal';
+
+    // Build WhatsApp message
+    const whatsappMessage = encodeURIComponent(
+        `¡Hola! Te comparto el link para realizar el pago:\n\n${linkData.url}\n\nGracias.`
+    );
+
+    successModal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <!-- Animated Success Icon -->
+                    <div class="mb-4">
+                        <div class="success-checkmark">
+                            <div class="check-icon">
+                                <span class="icon-line line-tip"></span>
+                                <span class="icon-line line-long"></span>
+                                <div class="icon-circle"></div>
+                                <div class="icon-fix"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="mb-2">¡Link de Pago Creado!</h3>
+                    <p class="text-muted mb-4">Tu link está listo para compartir</p>
+
+                    <!-- Link Preview Card -->
+                    <div class="card border mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8 text-start">
+                                    <h6 class="mb-1">${linkData.title || 'Link de pago'}</h6>
+                                    <p class="text-muted mb-0 small">
+                                        <i class="iconoir-dollar me-1"></i>
+                                        $${parseFloat(linkData.amount || 0).toFixed(2)} MXN
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <span class="badge bg-success">Activo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- URL Input with Copy -->
+                    <div class="input-group mb-3">
+                        <input type="text"
+                               class="form-control"
+                               id="success-link-url"
+                               value="${linkData.url}"
+                               readonly
+                               onclick="this.select()">
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                onclick="copySuccessLink()"
+                                title="Copiar link">
+                            <i class="iconoir-copy"></i>
+                        </button>
+                    </div>
+
+                    <!-- Share Buttons -->
+                    <div class="d-grid gap-2 mb-3">
+                        <a href="https://wa.me/?text=${whatsappMessage}"
+                           target="_blank"
+                           class="btn btn-success">
+                            <i class="iconoir-chat-bubble me-2"></i>
+                            Compartir por WhatsApp
+                        </a>
+                        <button type="button"
+                                class="btn btn-primary"
+                                onclick="copySuccessLink()">
+                            <i class="iconoir-copy me-2"></i>
+                            Copiar Link
+                        </button>
+                    </div>
+
+                    <!-- Email Notification -->
+                    ${linkData.customer_email ? `
+                        <div class="alert alert-success d-flex align-items-center mb-3">
+                            <i class="iconoir-check-circle me-2"></i>
+                            <span>Se envió por email a <strong>${linkData.customer_email}</strong></span>
+                        </div>
+                    ` : ''}
+
+                    <!-- QR Code Section (collapsible) -->
+                    <div class="text-center">
+                        <button class="btn btn-link text-muted"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#qrCodeSection"
+                                aria-expanded="false"
+                                aria-controls="qrCodeSection">
+                            <i class="iconoir-qr-code me-1"></i>
+                            Mostrar código QR
+                        </button>
+                        <div class="collapse mt-2" id="qrCodeSection">
+                            <div id="qr-code-container" class="d-inline-block p-3 bg-light rounded">
+                                <div id="qrcode"></div>
+                            </div>
+                            <p class="text-muted small mt-2">Escanea para abrir el link</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <a href="/enlaces/" class="btn btn-outline-secondary">
+                        Ver todos los links
+                    </a>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add CSS for animated checkmark
+    const style = document.createElement('style');
+    style.textContent = `
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto;
+        }
+        .check-icon {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            border-radius: 50%;
+            box-sizing: content-box;
+            border: 4px solid #10b981;
+        }
+        .check-icon::before {
+            top: 3px;
+            left: -2px;
+            width: 30px;
+            transform-origin: 100% 50%;
+            border-radius: 100px 0 0 100px;
+        }
+        .check-icon::after {
+            top: 0;
+            left: 30px;
+            width: 60px;
+            transform-origin: 0 50%;
+            border-radius: 0 100px 100px 0;
+            animation: rotate-circle 4.25s ease-in;
+        }
+        .icon-line {
+            height: 5px;
+            background-color: #10b981;
+            display: block;
+            border-radius: 2px;
+            position: absolute;
+            z-index: 10;
+        }
+        .icon-line.line-tip {
+            top: 46px;
+            left: 14px;
+            width: 25px;
+            transform: rotate(45deg);
+            animation: icon-line-tip 0.75s;
+        }
+        .icon-line.line-long {
+            top: 38px;
+            right: 8px;
+            width: 47px;
+            transform: rotate(-45deg);
+            animation: icon-line-long 0.75s;
+        }
+        .icon-circle {
+            top: -4px;
+            left: -4px;
+            z-index: 10;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: absolute;
+            box-sizing: content-box;
+            border: 4px solid rgba(16, 185, 129, 0.5);
+        }
+        .icon-fix {
+            top: 8px;
+            width: 5px;
+            left: 26px;
+            z-index: 1;
+            height: 85px;
+            position: absolute;
+            transform: rotate(-45deg);
+            background-color: white;
+        }
+        @keyframes icon-line-tip {
+            0% { width: 0; left: 1px; top: 19px; }
+            54% { width: 0; left: 1px; top: 19px; }
+            70% { width: 50px; left: -8px; top: 37px; }
+            84% { width: 17px; left: 21px; top: 48px; }
+            100% { width: 25px; left: 14px; top: 45px; }
+        }
+        @keyframes icon-line-long {
+            0% { width: 0; right: 46px; top: 54px; }
+            65% { width: 0; right: 46px; top: 54px; }
+            84% { width: 55px; right: 0px; top: 35px; }
+            100% { width: 47px; right: 8px; top: 38px; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(successModal);
+    const modal = new bootstrap.Modal(successModal);
+    modal.show();
+
+    // Generate QR code when section is expanded
+    const qrSection = document.getElementById('qrCodeSection');
+    if (qrSection) {
+        qrSection.addEventListener('shown.bs.collapse', function () {
+            const qrContainer = document.getElementById('qrcode');
+            if (qrContainer && qrContainer.innerHTML === '') {
+                // Check if QRCode library is available
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, {
+                        text: linkData.url,
+                        width: 200,
+                        height: 200,
+                        colorDark: '#111827',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } else {
+                    qrContainer.innerHTML = '<p class="text-muted">Librería QR no disponible</p>';
+                }
+            }
+        });
+    }
+
+    // Remove modal from DOM when hidden
+    successModal.addEventListener('hidden.bs.modal', function() {
+        document.body.removeChild(successModal);
+        // Also remove the style tag
+        document.head.removeChild(style);
+    });
+
+    // ✅ Update dashboard counts after creation
+    if (typeof updateDashboardCounts === 'function') {
+        updateDashboardCounts();
+    }
+}
+
+// Helper function to copy success link
+function copySuccessLink() {
+    const input = document.getElementById('success-link-url');
+    if (input) {
+        input.select();
+        input.setSelectionRange(0, 99999); // For mobile
+
+        navigator.clipboard.writeText(input.value).then(function() {
+            showToast('Link copiado al portapapeles', 'success');
+
+            // Change button text temporarily
+            const btn = event.target.closest('button');
+            if (btn) {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="iconoir-check me-2"></i>Copiado';
+                btn.classList.remove('btn-primary', 'btn-outline-secondary');
+                btn.classList.add('btn-success');
+
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-primary');
+                }, 2000);
+            }
+        }, function(err) {
+            showToast('Error al copiar. Intenta de nuevo.', 'error');
+        });
+    }
+}
+
+let isLoadingDetailPanel = false;
+const detailPanelCache = new Map();
+
+function showDetailPanel(type, id) {
+    // Prevent multiple simultaneous loads
+    if (isLoadingDetailPanel) {
+        console.log('[DetailPanel] Already loading, ignoring');
+        return;
+    }
+
+    const cacheKey = `${type}-${id}`;
+
+    // Check cache first
+    if (detailPanelCache.has(cacheKey)) {
+        document.getElementById('detail-panel-content').innerHTML = detailPanelCache.get(cacheKey);
+        const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailPanel'));
+        offcanvas.show();
+        return;
+    }
+
+    isLoadingDetailPanel = true;
+
+    // Show skeleton immediately
+    const skeleton = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary mb-3" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="text-muted">Cargando detalles...</p>
+        </div>
+    `;
+
+    document.getElementById('detail-panel-content').innerHTML = skeleton;
+
+    // Open offcanvas immediately with skeleton
+    const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailPanel'));
+    offcanvas.show();
+
+    // Load detail content
+    fetch(`/panel/detalle/${type}/${id}/`)  // 🇪🇸 Migrado - FIX: Panel lateral derecho
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return response.text();
+        })
+        .then(html => {
+            // Cache the content
+            detailPanelCache.set(cacheKey, html);
+
+            // Replace skeleton with real content
+            document.getElementById('detail-panel-content').innerHTML = html;
+        })
+        .catch(error => {
+            console.error('[DetailPanel] Load error:', error);
+            showToast('Error cargando detalles', 'error');
+            offcanvas.hide();
+        })
+        .finally(() => {
+            isLoadingDetailPanel = false;
+        });
+}
+
+/* ========================================
+   SIDEBAR OLD CODE - DEPRECATED
+   Replaced by sidebar-premium.js
+   Commented out to avoid conflicts
+   ======================================== */
+
+/*
+// Modern Sidebar Functionality (DEPRECATED)
+class KitaSidebar { ... }
+// Initialize sidebar on load (DEPRECATED)
+// Moved to sidebar-premium.js
+*/
+
+// Global function to update dashboard counts (MAINTAINED for compatibility)
+function updateDashboardCounts() {
+    // Call new sidebar premium updater
+    if (window.updateSidebarBadges) {
+        window.updateSidebarBadges();
+    } else if (window.kitaSidebar && window.kitaSidebar.updateBadgeCounts) {
+        window.kitaSidebar.updateBadgeCounts();
+    } else {
+        console.warn('[Dashboard] Sidebar not initialized, retrying...');
+        setTimeout(() => {
+            if (window.updateSidebarBadges) {
+                window.updateSidebarBadges();
+            }
+        }, 500);
+    }
+
+    // ✅ Actualizar quick stats y activity stream del dashboard
+    updateDashboardQuickStats();
+    updateDashboardActivityStream();
+}
+
+// ========================================
+// ACTUALIZAR QUICK STATS
+// ========================================
+function updateDashboardQuickStats() {
+    const statsElements = {
+        'active_links_count': document.getElementById('quick-stat-links'),
+        'pending_invoices_count': document.getElementById('quick-stat-invoices'),
+        'payments_today': document.getElementById('quick-stat-payments')
+    };
+
+    // Solo actualizar si estamos en el dashboard
+    if (!statsElements.active_links_count) {
+        console.log('[Dashboard] Quick stats elements not found (OK if not on dashboard)');
+        return;
+    }
+
+    fetch('/panel/ajax/estadisticas-rapidas/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.stats) {
+                // Actualizar cada stat con animación
+                Object.keys(data.stats).forEach(key => {
+                    const element = statsElements[key];
+                    if (element) {
+                        const oldValue = parseInt(element.textContent) || 0;
+                        const newValue = data.stats[key];
+
+                        if (oldValue !== newValue) {
+                            // Animación de cambio
+                            element.style.transform = 'scale(1.2)';
+                            element.style.color = '#15803d';
+
+                            setTimeout(() => {
+                                element.textContent = newValue;
+                                element.style.transform = 'scale(1)';
+                                element.style.color = '';
+                            }, 200);
+                        }
+                    }
+                });
+                console.log('[Dashboard] ✅ Quick stats updated');
+            }
+        })
+        .catch(error => {
+            console.log('[Dashboard] No se pudieron actualizar stats:', error);
+        });
+}
+
+// ========================================
+// ACTUALIZAR ACTIVITY STREAM
+// ========================================
+function updateDashboardActivityStream() {
+    const activityContainer = document.getElementById('activity-stream');
+
+    // Solo actualizar si estamos en el dashboard
+    if (!activityContainer) {
+        console.log('[Dashboard] Activity stream not found (OK if not on dashboard)');
+        return;
+    }
+
+    fetch('/panel/ajax/actividad/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.activities) {
+                if (data.activities.length === 0) {
+                    activityContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="iconoir-inbox"></i>
+                            <p>No hay actividad reciente</p>
+                        </div>
+                    `;
+                } else {
+                    const html = data.activities.map(activity => `
+                        <div class="activity-item">
+                            <div class="activity-icon bg-${activity.color}">
+                                <i class="${activity.icon}"></i>
+                            </div>
+                            <div class="activity-content">
+                                <h4 class="activity-title">${activity.title}</h4>
+                                <p class="activity-description">${activity.description}</p>
+                                <span class="activity-time">${timeAgo(activity.timestamp)}</span>
+                            </div>
+                            <div class="activity-action">
+                                <a href="javascript:void(0)"
+                                   onclick="showDetailPanel('${activity.detail_type}', '${activity.detail_id}')"
+                                   class="btn btn-sm btn-link">
+                                    Ver →
+                                </a>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    activityContainer.innerHTML = html;
+                }
+                console.log('[Dashboard] ✅ Activity stream updated');
+            }
+        })
+        .catch(error => {
+            console.log('[Dashboard] No se pudo actualizar actividad:', error);
+        });
+}
+
+// ========================================
+// DUPLICATE LINK - HELPER FUNCTIONS
+// ⚠️ DEPRECATED - Funciones removidas (feature duplicar eliminado)
+// ========================================
+/* CÓDIGO COMENTADO - Conservado por si se reactiva la feature
+
+function selectDuplicateValidity(days) { ... }
+function toggleCustomerWarning() { ... }
+function copyDuplicateUrl() { ... }
+function viewDuplicatedLink(linkId) { ... }
+function editDuplicatedLink(linkId) { ... }
+
+*/
+
+// Helper: Convertir timestamp ISO a "hace X minutos"
+function timeAgo(timestamp) {
+    const now = new Date();
+    const past = new Date(timestamp);
+    const diff = Math.floor((now - past) / 1000); // segundos
+
+    if (diff < 60) return 'hace un momento';
+    if (diff < 3600) {
+        const mins = Math.floor(diff / 60);
+        return `hace ${mins} minuto${mins > 1 ? 's' : ''}`;
+    }
+    if (diff < 86400) {
+        const hours = Math.floor(diff / 3600);
+        return `hace ${hours} hora${hours > 1 ? 's' : ''}`;
+    }
+    const days = Math.floor(diff / 86400);
+    return `hace ${days} día${days > 1 ? 's' : ''}`;
+}
+
+// Quick Period Navigation
+function setQuickPeriod(period) {
+    showRainbowPreloader();
+
+    const today = new Date();
+    let startDate, endDate;
+
+    switch(period) {
+        case 'today':
+            startDate = endDate = today;
+            break;
+        case 'week':
+            const startOfWeek = new Date(today);
+            const dayOfWeek = today.getDay();
+            const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // If Sunday (0), go back 6 days, else go back (dayOfWeek - 1)
+            startOfWeek.setDate(today.getDate() - daysFromMonday);
+            startDate = startOfWeek;
+            endDate = today;
+            break;
+        case 'month':
+            startDate = new Date(today.getFullYear(), today.getMonth(), 1);
+            endDate = today;
+            break;
+        case 'quarter':
+            const quarter = Math.floor(today.getMonth() / 3);
+            startDate = new Date(today.getFullYear(), quarter * 3, 1);
+            endDate = today;
+            break;
+        case 'year':
+            startDate = new Date(today.getFullYear(), 0, 1);
+            endDate = today;
+            break;
+    }
+
+    // Format dates
+    const startStr = startDate.toISOString().split('T')[0];
+    const endStr = endDate.toISOString().split('T')[0];
+
+    // Update inputs
+    document.getElementById('start_date').value = startStr;
+    document.getElementById('end_date').value = endStr;
+
+    // Update period indicator
+    updatePeriodIndicator(startStr, endStr);
+
+    // Mark active button
+    document.querySelectorAll('.quick-periods .btn-kita-sm').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+
+    // Update charts and stats
+    updateDashboardWithNewDates(startStr, endStr);
+
+    // Hide preloader after processing
+    setTimeout(hideRainbowPreloader, 1000);
+}
+
+function updatePeriodIndicator(startDate, endDate) {
+    const indicator = document.getElementById('current-period');
+    if (indicator) {
+        const start = new Date(startDate).toLocaleDateString('es-MX');
+        const end = new Date(endDate).toLocaleDateString('es-MX');
+        indicator.textContent = `${start} - ${end}`;
+    }
+}
+
+function updateDashboardWithNewDates(startDate, endDate) {
+    // Update URL params
+    const url = new URL(window.location);
+    url.searchParams.set('start_date', startDate);
+    url.searchParams.set('end_date', endDate);
+
+    // Update browser history without reload
+    window.history.pushState({}, '', url);
+
+    // Update charts if they exist
+    if (window.kitaCharts) {
+        window.kitaCharts.currentDateRange = { start_date: startDate, end_date: endDate };
+        window.kitaCharts.updateAllCharts();
+    }
+
+    // Update dashboard data
+    if (typeof KitaLinkActions !== 'undefined') {
+        KitaLinkActions.updateRelatedData();
+    }
+
+    hideRainbowPreloader();
+}
+
+// Global function referenced by link-actions.js
+window.updateDashboardWithNewDates = updateDashboardWithNewDates;
+
+// Custom form handling
+document.addEventListener('DOMContentLoaded', function() {
+    const dateForm = document.getElementById('date-filter-form');
+    if (dateForm) {
+        dateForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            showRainbowPreloader();
+
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            if (!startDate || !endDate) {
+                hideRainbowPreloader();
+                showToast('Por favor selecciona ambas fechas', 'warning');
+                return;
+            }
+
+            if (new Date(startDate) > new Date(endDate)) {
+                hideRainbowPreloader();
+                showToast('La fecha de inicio debe ser anterior a la fecha final', 'error');
+                return;
+            }
+
+            // Clear active period buttons when using custom dates
+            document.querySelectorAll('.quick-periods .btn-kita-sm').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            updatePeriodIndicator(startDate, endDate);
+            updateDashboardWithNewDates(startDate, endDate);
+        });
+    }
+});
+
+// Rainbow Preloader - ELIMINADO (no necesario)
+// Funciones vacías para compatibilidad con código existente
+function showRainbowPreloader() {
+    // No-op
+}
+
+function hideRainbowPreloader() {
+    // No-op
+}
+
+</script>
+
+<!-- Gradient Animation (inline - performance) -->
+<script>
+document.addEventListener('visibilitychange', () => {
+    const main = document.querySelector('.dashboard-main, #dashboardMain');
+    if (main) main.style.animationPlayState = document.hidden ? 'paused' : 'running';
+});
+</script>
+{% endblock %}

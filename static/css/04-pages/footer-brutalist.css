@@ -1,0 +1,126 @@
+/**
+ * FOOTER BRUTALIST - ULTRA COMPACTO
+ * Inline, sin columnas, padding mínimo
+ */
+
+/* ===== FOOTER BASE ===== */
+
+.footer-brutalist {
+    background: #111827;  /* Negro */
+    color: #9ca3af;  /* Gris claro */
+    padding: 2rem 0 1rem 0;  /* Reducido de 5rem */
+    position: relative;
+}
+
+/* Separador SVG punteado blanco arriba */
+.footer-brutalist::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 800px;
+    height: 1px;
+    background: url('data:image/svg+xml,<svg width="100%" height="1" xmlns="http://www.w3.org/2000/svg"><line x1="0" y1="0" x2="100%" y2="0" stroke="%23ffffff" stroke-width="1" stroke-dasharray="8,8"/></svg>');
+    background-repeat: repeat-x;
+    opacity: 0.2;
+}
+
+/* ===== BRAND ===== */
+
+.footer-brand {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.footer-logo-centered {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.footer-logo-centered img {
+    display: block;
+}
+
+.footer-tagline {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+/* ===== LINKS INLINE ===== */
+
+.footer-links-inline {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.footer-section {
+    display: inline-block;
+    margin: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.footer-section-label {
+    font-weight: 600;
+    color: #d1d5db;  /* Gris más claro */
+    margin-right: 0.5rem;
+}
+
+.footer-section a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-section a:hover {
+    color: #059669;  /* Verde accent */
+}
+
+.separator {
+    color: #6b7280;
+    margin: 0 0.5rem;
+}
+
+.footer-section .iconoir {
+    font-size: 1rem;
+    vertical-align: middle;
+}
+
+/* ===== COPYRIGHT ===== */
+
+.footer-copyright {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);  /* Separador sutil */
+}
+
+.footer-copyright p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.footer-copyright .kita-brand {
+    color: #ffffff;
+    font-size: inherit;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+    .footer-brutalist {
+        padding: 1.5rem 0 1rem 0;
+    }
+
+    .footer-section {
+        display: block;
+        margin: 0.75rem 0;
+    }
+
+    .footer-links-inline {
+        margin-bottom: 1.5rem;
+    }
+}

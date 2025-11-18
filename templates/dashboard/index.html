@@ -1,0 +1,372 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+
+{% block dashboard_content %}
+<!-- Dashboard Actions -->
+<div class="welcome-section-modern">
+    <div class="d-flex align-items-center justify-content-between flex-wrap">
+        <div class="welcome-content">
+            <h2 class="welcome-title">¡Hola, {{ user.first_name }}! 👋</h2>
+            <p class="welcome-subtitle">Aquí tienes el resumen de tu negocio</p>
+        </div>
+        <div class="action-buttons">
+            <button type="button" class="btn-kita-primary" onclick="showCreateLinkModal()">
+                <i class="iconoir-plus me-2"></i>
+                Crear Link de Pago
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Date Range Filter -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body py-3">
+                <!-- Current Period Indicator -->
+                <div class="text-center mb-3">
+                    <h6 class="mb-1">
+                        <i class="iconoir-calendar me-2 text-primary"></i>
+                        Período Actual
+                    </h6>
+                    <p class="text-muted mb-0" id="current-period">
+                        {{ start_date|date:"d/m/Y" }} - {{ end_date|date:"d/m/Y" }}
+                    </p>
+                </div>
+
+                <!-- Quick Period Buttons -->
+                <div class="d-flex justify-content-center mb-3 gap-2 flex-wrap quick-periods">
+                    <button type="button" class="btn-kita-outline btn-kita-sm" onclick="setQuickPeriod('today')">
+                        Hoy
+                    </button>
+                    <button type="button" class="btn-kita-outline btn-kita-sm" onclick="setQuickPeriod('week')">
+                        Esta Semana
+                    </button>
+                    <button type="button" class="btn-kita-outline btn-kita-sm" onclick="setQuickPeriod('month')">
+                        Este Mes
+                    </button>
+                    <button type="button" class="btn-kita-outline btn-kita-sm" onclick="setQuickPeriod('quarter')">
+                        Este Trimestre
+                    </button>
+                    <button type="button" class="btn-kita-outline btn-kita-sm" onclick="setQuickPeriod('year')">
+                        Este Año
+                    </button>
+                </div>
+
+                <!-- Custom Date Range -->
+                <form id="date-filter-form" method="get" class="row g-3 align-items-center justify-content-center">
+                    <div class="col-auto">
+                        <label class="form-label mb-0 text-muted">Personalizar:</label>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control form-control-sm" name="start_date" id="start_date"
+                               value="{{ start_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-auto">
+                        <span class="text-muted">a</span>
+                    </div>
+                    <div class="col-auto">
+                        <input type="date" class="form-control form-control-sm" name="end_date" id="end_date"
+                               value="{{ end_date|date:'Y-m-d' }}">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn-kita-primary btn-kita-sm">
+                            <i class="iconoir-filter me-1"></i>
+                            Filtrar
+                        </button>
+                    </div>
+                    <div class="col-auto">
+                        <a href="{% url 'dashboard:index' %}" class="btn-kita-outline btn-kita-sm">
+                            <i class="iconoir-refresh me-1"></i>
+                            Restablecer
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                            Total Cobrado
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-dark" data-metric="total_revenue">
+                            ${{ analytics.total_revenue|floatformat:2|default:"0.00" }} MXN
+                        </div>
+                        <div class="text-xs text-muted" data-metric="successful_payments">
+                            {{ analytics.successful_payments|default:0 }} pagos exitosos
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="iconoir-dollar fa-2x text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                            Links Creados
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-dark" data-metric="total_links">{{ analytics.total_links|default:0 }}</div>
+                        <div class="text-xs text-muted">
+                            {{ analytics.links_paid|default:0 }} pagados · {{ analytics.links_active|default:0 }} activos
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="iconoir-link fa-2x text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                            Facturas Emitidas
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-dark" data-metric="invoices_generated">{{ analytics.invoices_generated|default:0 }}</div>
+                        <div class="text-xs text-muted">
+                            {% if analytics.invoices_failed %}{{ analytics.invoices_failed }} fallidas{% endif %}
+                            {% if analytics.invoices_cancelled %}{{ analytics.invoices_cancelled }} canceladas{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="iconoir-page fa-2x text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                            Próximo Cobro
+                        </div>
+                        <div class="h5 mb-0 fw-bold text-dark">
+                            {% if tenant.is_trial %}
+                                {{ tenant.trial_ends_at|timeuntil }}
+                            {% else %}
+                                $299 MXN
+                            {% endif %}
+                        </div>
+                        <div class="text-xs text-muted">
+                            {% if tenant.is_trial %}Termina el trial{% else %}Mensualidad{% endif %}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="iconoir-calendar fa-2x text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="charts-section">
+    <!-- Row 1: Revenue Trends + Payment Success Rate -->
+    <div class="charts-row charts-row-1">
+        <!-- Revenue Trends Chart -->
+        <div class="card chart-card-dark">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="iconoir-trending-up me-2"></i>
+                    Tendencia de Ingresos
+                </h5>
+                <p class="card-subtitle mb-0">Ingresos brutos, netos y comisiones por período</p>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                    <div class="chart-loading" id="revenueLoading">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Success Rate Chart -->
+        <div class="card chart-card-dark">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="iconoir-check-circle me-2"></i>
+                    Tasa de Éxito
+                </h5>
+                <p class="card-subtitle mb-0">Conversión de intentos a pagos exitosos</p>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="successChart"></canvas>
+                    <div class="chart-loading" id="successLoading">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Row 2: Links Performance + Invoice Flow -->
+    <div class="charts-row charts-row-2">
+        <!-- Links Performance Chart -->
+        <div class="card chart-card-dark">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="iconoir-link me-2"></i>
+                    Rendimiento de Links
+                </h5>
+                <p class="card-subtitle mb-0">Estado y efectividad de tus links de pago</p>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="linksChart"></canvas>
+                    <div class="chart-loading" id="linksLoading">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Flow Chart -->
+        <div class="card chart-card-dark">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="iconoir-page me-2"></i>
+                    Flujo de Facturación
+                </h5>
+                <p class="card-subtitle mb-0">Proceso de pago a factura</p>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="invoiceChart"></canvas>
+                    <div class="chart-loading" id="invoiceLoading">
+                        <div class="chart-skeleton"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Recent Activity -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="iconoir-clock me-2"></i>
+                                Links Recientes
+                            </h6>
+                            <a href="/enlaces/" class="btn-kita-outline btn-kita-sm">
+                                Ver todos
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            {% if analytics.recent_links %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Título</th>
+                                                <th>Monto</th>
+                                                <th>Cliente</th>
+                                                <th>Estado</th>
+                                                <th>Creado</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for link in analytics.recent_links %}
+                                                <tr>
+                                                    <td>
+                                                        <a href="javascript:void(0)" onclick="showDetailPanel('link', '{{ link.id }}')"
+                                                           class="text-decoration-none">
+                                                            {{ link.title|truncatechars:30 }}
+                                                        </a>
+                                                    </td>
+                                                    <td>${{ link.amount }} MXN</td>
+                                                    <td>{{ link.customer_name|default:"-" }}</td>
+                                                    <td>
+                                                        <span class="badge bg-{% if link.status == 'paid' %}success{% elif link.status == 'active' %}primary{% elif link.status == 'expired' %}warning{% else %}secondary{% endif %}">
+                                                            {{ link.get_status_display }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ link.created_at|timesince }} ago</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="iconoir-link fa-3x text-gray-300 mb-3"></i>
+                                    <p class="text-muted">No hay links de pago creados</p>
+                                    <button class="btn-kita-primary" onclick="showCreateLinkModal()">
+                                        <i class="iconoir-plus me-2"></i>
+                                        Crear primer link
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="m-0 font-weight-bold text-success">
+                                <i class="iconoir-dollar me-2"></i>
+                                Pagos Recientes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if analytics.recent_payments %}
+                                {% for payment in analytics.recent_payments %}
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <div class="font-weight-bold">${{ payment.amount }} MXN</div>
+                                            <small class="text-muted">{{ payment.payer_name|default:"Cliente" }}</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="text-xs text-muted">{{ payment.created_at|timesince }} ago</div>
+                                            <span class="badge bg-success">{{ payment.get_status_display }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="iconoir-dollar fa-2x text-gray-300 mb-3"></i>
+                                    <p class="text-muted">No hay pagos recientes</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+<!-- Quick Actions Panel -->
+<div class="quick-actions">
+    <button type="button" class="btn-kita-primary" onclick="showCreateLinkModal()" title="Crear Link Rápido">
+        <i class="iconoir-plus fa-lg"></i>
+    </button>
+</div>
+{% endblock %}

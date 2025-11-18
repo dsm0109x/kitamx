@@ -1,0 +1,486 @@
+{% extends 'base_minimal.html' %}
+{% load static %}
+
+{% block title %}Términos de Servicio - Kita{% endblock %}
+
+{% block extra_head %}
+<!-- SEO: No indexar páginas legales -->
+<meta name="robots" content="noindex, follow">
+
+<!-- Legal Pages Styles -->
+<link rel="stylesheet" href="{% static 'css/04-pages/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+<main role="main" class="legal-page">
+    <div class="container py-5">
+        <div class="row">
+            <!-- Sidebar TOC - Colapsable (Desktop + Mobile) -->
+            <aside class="col-md-3">
+                <!-- Toggle Button (siempre visible) -->
+                <button class="legal-toc-toggle btn btn-outline-secondary btn-sm w-100 mb-3"
+                        type="button"
+                        id="legalTocToggle"
+                        aria-expanded="true"
+                        aria-controls="legalTocNav">
+                  <span class="iconoir-list me-2"></span>
+                  <span class="toggle-text-show" hidden>Mostrar índice</span>
+                  <span class="toggle-text-hide">Ocultar índice</span>
+                  <span class="iconoir-nav-arrow-down ms-auto toggle-icon"></span>
+                </button>
+
+                <nav class="legal-toc show"
+                     id="legalTocNav"
+                     aria-label="Tabla de contenidos">
+                    <h4 class="legal-toc-title d-none">
+                        <span class="iconoir-list me-2"></span>
+                        Contenido
+                    </h4>
+                    <ol class="legal-toc-list">
+                        <li><a href="#aceptacion" class="legal-toc-link">Aceptación</a></li>
+                        <li><a href="#descripcion" class="legal-toc-link">Descripción del Servicio</a></li>
+                        <li><a href="#cuenta" class="legal-toc-link">Cuenta y Seguridad</a></li>
+                        <li><a href="#catalogo" class="legal-toc-link">Planes, Precios y Catálogo</a></li>
+                        <li><a href="#ciclos" class="legal-toc-link">Ciclos de Servicio</a></li>
+                        <li><a href="#cambios" class="legal-toc-link">Cambios en Planes y Funciones</a></li>
+                        <li><a href="#facturacion-pagos" class="legal-toc-link">Facturación, Pagos y CFDI 4.0</a></li>
+                        <li><a href="#links" class="legal-toc-link">Links de Pago y Recordatorios</a></li>
+                        <li><a href="#terceros" class="legal-toc-link">Integraciones y Terceros</a></li>
+                        <li><a href="#uso-aceptable" class="legal-toc-link">Uso Aceptable</a></li>
+                        <li><a href="#disponibilidad" class="legal-toc-link">Disponibilidad y Soporte</a></li>
+                        <li><a href="#privacidad" class="legal-toc-link">Datos y Privacidad</a></li>
+                        <li><a href="#propiedad" class="legal-toc-link">Propiedad Intelectual</a></li>
+                        <li><a href="#terminos-cambios" class="legal-toc-link">Cambios a estos Términos</a></li>
+                        <li><a href="#terminacion" class="legal-toc-link">Suspensión y Terminación</a></li>
+                        <li><a href="#limitacion" class="legal-toc-link">Limitación de Responsabilidad</a></li>
+                        <li><a href="#indemnidad" class="legal-toc-link">Indemnidad</a></li>
+                        <li><a href="#ley" class="legal-toc-link">Ley y Jurisdicción</a></li>
+                        <li><a href="#comunicaciones" class="legal-toc-link">Comunicaciones</a></li>
+                        <li><a href="#miscelanea" class="legal-toc-link">Miscelánea</a></li>
+                        <li><a href="#contacto" class="legal-toc-link">Contacto</a></li>
+                    </ol>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+
+                <!-- Header -->
+                <div class="legal-header mb-5">
+                    <h1 class="section-heading display-5 mb-3">Términos de Servicio</h1>
+                    <p class="text-muted">
+                        <span class="iconoir-calendar me-1"></span>
+                        Última actualización: 17 de octubre de 2025
+                    </p>
+                </div>
+
+                <!-- Content -->
+                <div class="legal-content">
+
+                    <section class="legal-section" id="aceptacion">
+                        <h2>
+                            1) Aceptación
+                            <a href="#aceptacion" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Al crear una cuenta, acceder o utilizar <strong class="kita-brand">Kita</strong>, aceptas estos Términos de Servicio y nuestro
+                            <a href="{% url 'legal:privacy' %}">Aviso de Privacidad</a>. Si aceptas en nombre de un tercero, declaras contar con facultades suficientes.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="descripcion">
+                        <h2>
+                            2) Descripción del Servicio
+                            <a href="#descripcion" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Kita ofrece herramientas para <strong>cobro</strong> mediante <strong>Links de Pago</strong> (<code>/hola/{token}</code>),
+                            seguimiento de vencimientos y recordatorios, y, cuando corresponda, <strong>emisión de CFDI 4.0 (PUE)</strong> posterior a la confirmación del pago.
+                            Está orientado a Personas Físicas con Actividad Empresarial y prestadores de servicios sin operación contable compleja.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="cuenta">
+                        <h2>
+                            3) Cuenta y Seguridad
+                            <a href="#cuenta" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <ul>
+                            <li>Mantén la confidencialidad de tus credenciales y la veracidad de los datos (incluidos fiscales y CSD).</li>
+                            <li>Eres responsable de las actividades realizadas desde tu cuenta.</li>
+                            <li>Debes contar con RFC válido, CSD vigente y cuenta activa de Mercado Pago®.</li>
+                        </ul>
+                    </section>
+
+                    <section class="legal-section" id="catalogo">
+                        <h2>
+                            4) Planes, Precios y Catálogo
+                            <a href="#catalogo" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Publicamos un <strong>catálogo de planes y precios</strong> que podemos actualizar <em>de tiempo en tiempo</em>.
+                            Indicaremos el catálogo vigente en la interfaz y/o comunicaciones oficiales. Las actualizaciones aplican de forma <strong>prospectiva</strong>
+                            conforme a la sección “Cambios en Planes y Funciones”.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="ciclos">
+                        <h2>
+                            5) Ciclos de Servicio
+                            <a href="#ciclos" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            El acceso a funcionalidades de pago se otorga por <strong>Ciclos de Servicio</strong> con duración mensual.
+                            El <strong>inicio de un Ciclo</strong> se produce al liquidar las cuotas aplicables; el <strong>término</strong> del Ciclo ocurre al cumplirse el mes correspondiente.
+                            Al finalizar un Ciclo, el acceso cesa salvo que se <strong>cubran las cuotas</strong> del siguiente periodo.
+                            Salvo obligación legal, no hay prorrateos.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="cambios">
+                        <h2>
+                            6) Cambios en Planes, Funcionalidades y Precios
+                            <a href="#cambios" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Podemos introducir, modificar o descontinuar características, planes o precios.
+                            Los cambios serán efectivos para <strong>Ciclos de Servicio que inicien con posterioridad</strong> a:
+                            (i) su publicación en Kita y/o (ii) el envío de aviso por los canales habilitados (in-app, WhatsApp Cloud o correo).
+                            Si decides iniciar un Ciclo tras dicho aviso, se entenderá que <strong>aceptas</strong> el plan y precio vigentes en ese momento.
+                            Los cambios no afectan el Ciclo ya en curso.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="facturacion-pagos">
+                        <h2>
+                            7) Facturación, Pagos y CFDI 4.0
+                            <a href="#facturacion-pagos" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <ul>
+                            <li>Los pagos se procesan vía <strong>Mercado Pago®</strong> y se abonan a la cuenta de Kita.</li>
+                            <li>Si activas <code>requires_invoice</code>, y una vez <strong>confirmado</strong> el pago, timbraremos
+                                <strong>CFDI 4.0 (PUE)</strong> con tus datos fiscales.</li>
+                            <li>Si hay reembolso y procede normativamente, gestionaremos la <strong>cancelación del CFDI</strong> dentro del <strong>mes calendario</strong> correspondiente.</li>
+                            <li>Los precios pueden mostrarse <strong>IVA incluido</strong>; de lo contrario, se indicará el desglose aplicable.</li>
+                            <li>Salvo disposición legal, las <strong>cuotas son no reembolsables</strong> y los impuestos corren por tu cuenta.</li>
+                        </ul>
+                    </section>
+
+                    <section class="legal-section" id="links">
+                        <h2>
+                            8) Links de Pago, Vigencias y Recordatorios
+                            <a href="#links" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Puedes generar <strong>Links de Pago</strong> con vigencia de <strong>1/3/7 días</strong>. Durante su vigencia, Kita puede enviar
+                            <strong>recordatorios</strong> por <strong>WhatsApp Cloud</strong> (principal) y <strong>email (Postmark)</strong> (secundario).
+                            Al pagarse el link, te notificaremos el resultado y, cuando proceda, el timbrado del CFDI.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="terceros">
+                        <h2>
+                            9) Integraciones y Terceros
+                            <a href="#terceros" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            El uso de <strong>Mercado Pago®</strong>, <strong>WhatsApp Cloud</strong>, <strong>Postmark</strong> y otros proveedores se rige por sus propios términos y políticas.
+                            No controlamos sus actos u omisiones. Debes cumplir los términos de dichos terceros.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="uso-aceptable">
+                        <h2>
+                            10) Uso Aceptable
+                            <a href="#uso-aceptable" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <ul>
+                            <li>No uses Kita para fines ilícitos, fraude, evasión fiscal o violaciones a derechos de terceros.</li>
+                            <li>No intentes ingeniería inversa, sobrecarga de recursos, <strong>uso automatizado</strong> (bots, scrapers, scripts),
+                                ni evasión de sistemas de seguridad (incluyendo protección anti-bot Cloudflare Turnstile).</li>
+                            <li>Podemos <strong>suspender</strong> o <strong>limitar</strong> funciones ante riesgos operativos, de seguridad o incumplimientos.</li>
+                        </ul>
+
+                        <h3>10.1) Sistemas de Seguridad y Verificación</h3>
+                        <p>
+                            Implementamos medidas técnicas de seguridad que incluyen, sin limitarse a:
+                        </p>
+                        <ul>
+                            <li><strong>Verificación anti-bot (Cloudflare Turnstile):</strong> En formularios críticos (registro, autenticación, recuperación de contraseña)
+                                para distinguir usuarios humanos de accesos automatizados.</li>
+                            <li><strong>Rate limiting:</strong> Límites de solicitudes por IP/usuario para prevenir abuso.</li>
+                            <li><strong>CAPTCHA/Challenge:</strong> Cuando sea necesario para proteger la integridad de la plataforma.</li>
+                        </ul>
+                        <p>
+                            Al utilizar Kita, aceptas completar estas verificaciones cuando sean requeridas.
+                            Intentar evadir, manipular o automatizar el bypass de estos sistemas constituye <strong>incumplimiento grave</strong> de estos Términos
+                            y puede resultar en <strong>suspensión inmediata</strong> de tu cuenta sin previo aviso.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="disponibilidad">
+                        <h2>
+                            11) Disponibilidad y Soporte
+                            <a href="#disponibilidad" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Kita se presta bajo el principio de <em>mejor esfuerzo</em> (“as-is” / “as available”). No garantizamos disponibilidad ininterrumpida,
+                            resultados específicos ni compatibilidad con todos los dispositivos. Ofrecemos soporte en horarios y canales publicados.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="privacidad">
+                        <h2>
+                            12) Datos y Privacidad
+                            <a href="#privacidad" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Tratamos los datos conforme a nuestro <a href="{% url 'legal:privacy' %}">Aviso de Privacidad</a>.
+                            Debes contar con bases legales para tratar los datos de tus clientes (recordatorios, facturación).
+                            Implementamos medidas razonables de seguridad sin garantía absoluta.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="propiedad">
+                        <h2>
+                            13) Propiedad Intelectual
+                            <a href="#propiedad" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Kita y sus componentes (software, marcas, interfaces) son de nuestra titularidad o licencia.
+                            Te otorgamos una <strong>licencia limitada, no exclusiva e intransferible</strong> para usar el servicio durante el <strong>Ciclo de Servicio</strong> vigente, conforme a tu plan.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="terminos-cambios">
+                        <h2>
+                            14) Cambios a estos Términos
+                            <a href="#terminos-cambios" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Podemos modificar estos Términos. Publicaremos la versión actualizada con fecha de vigencia.
+                            Tu <strong>inicio de un nuevo Ciclo</strong> o el <strong>uso continuado</strong> de Kita tras la vigencia de cambios
+                            implica su aceptación. Si no estás de acuerdo, puedes <strong>no iniciar</strong> un nuevo Ciclo.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="terminacion">
+                        <h2>
+                            15) Suspensión y Terminación
+                            <a href="#terminacion" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <ul>
+                            <li><strong>Por Kita:</strong> suspensión o terminación por incumplimiento, riesgos operativos o legales, o a solicitud de autoridades.</li>
+                            <li><strong>Por ti:</strong> puedes dejar de usar Kita en cualquier momento; el acceso concluye al terminar el <strong>Ciclo</strong> en curso.</li>
+                            <li>No hay prorrateos salvo obligación legal imperativa.</li>
+                        </ul>
+                    </section>
+
+                    <section class="legal-section" id="limitacion">
+                        <h2>
+                            16) Limitación de Responsabilidad
+                            <a href="#limitacion" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            En la medida máxima permitida por la ley, nuestra responsabilidad total por cualquier reclamación relacionada con el servicio
+                            se <strong>limita al monto efectivamente pagado</strong> por ti a Kita durante los <strong>tres (3) meses</strong> previos al evento.
+                            No seremos responsables por <em>lucro cesante</em>, pérdida de datos, daños indirectos o punitivos.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="indemnidad">
+                        <h2>
+                            17) Indemnidad
+                            <a href="#indemnidad" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Nos mantendrás indemnes frente a reclamaciones de terceros derivadas de tu uso del servicio, incumplimientos legales o violaciones de estos Términos.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="ley">
+                        <h2>
+                            18) Ley Aplicable y Jurisdicción
+                            <a href="#ley" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Estos Términos se rigen por las leyes de los <strong>Estados Unidos Mexicanos</strong>.
+                            Para la interpretación y cumplimiento, las partes se someten a los <strong>tribunales competentes de la Ciudad de México</strong>,
+                            renunciando a cualquier otro fuero.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="comunicaciones">
+                        <h2>
+                            19) Comunicaciones
+                            <a href="#comunicaciones" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Podemos enviarte avisos y actualizaciones por los medios habilitados en Kita, incluyendo in-app, WhatsApp Cloud y correo electrónico.
+                            Debes mantener tus datos de contacto actualizados.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="miscelanea">
+                        <h2>
+                            20) Miscelánea
+                            <a href="#miscelanea" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <ul>
+                            <li><strong>Totalidad del acuerdo:</strong> estos Términos constituyen el acuerdo completo.</li>
+                            <li><strong>Divisibilidad:</strong> si alguna cláusula es inválida, las restantes conservarán su vigencia.</li>
+                            <li><strong>No renuncia:</strong> la falta de exigencia de un derecho no implica renuncia.</li>
+                            <li><strong>Cesión:</strong> no puedes ceder tu cuenta o derechos sin nuestro consentimiento por escrito.</li>
+                        </ul>
+                    </section>
+
+                    <section class="legal-section" id="contacto">
+                        <h2>
+                            21) Contacto
+                            <a href="#contacto" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Dudas sobre estos Términos:<br>
+                            <strong>Email:</strong> <a href="mailto:hola@kita.mx">hola@kita.mx</a><br>
+                        </p>
+                    </section>
+
+                </div>
+
+                <!-- Footer Navigation -->
+                <div class="legal-footer mt-5 pt-4 border-top">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <a href="{% url 'legal:privacy' %}"
+                               class="btn btn-outline-secondary"
+                               data-tracking="legal-to-privacy"
+                               aria-label="Ir a Aviso de Privacidad">
+                                <span class="iconoir-arrow-left me-2" aria-hidden="true"></span>
+                                <span class="btn-text">Aviso de Privacidad</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="{% url 'legal:cookies' %}"
+                               class="btn btn-outline-secondary"
+                               data-tracking="legal-to-cookies"
+                               aria-label="Ir a Política de Cookies">
+                                <span class="btn-text">Política de Cookies</span>
+                                <span class="iconoir-arrow-right ms-2" aria-hidden="true"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Legal Bundle - Loading states (sin ripple) -->
+<script src="{% static 'js/legal-bundle.js' %}?v=1.1" defer></script>
+
+<script>
+/* TOC Toggle (Mobile) */
+document.getElementById('legalTocToggle')?.addEventListener('click', function() {
+    const toc = document.getElementById('legalTocNav');
+    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+    // Toggle
+    this.setAttribute('aria-expanded', String(!isExpanded));
+    toc.classList.toggle('show');
+
+    // Toggle text
+    this.querySelector('.toggle-text-show').hidden = !isExpanded;
+    this.querySelector('.toggle-text-hide').hidden = isExpanded;
+});
+
+/**
+ * Legal TOC Scroll Spy
+ * Detecta la sección visible y marca el link correspondiente en el TOC
+ */
+(function() {
+    'use strict';
+
+    const sections = document.querySelectorAll('.legal-section[id]');
+    const tocLinks = document.querySelectorAll('.legal-toc-link');
+
+    if (!sections.length || !tocLinks.length) return;
+
+    // Crear mapa de href -> link element
+    const linkMap = new Map();
+    tocLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            linkMap.set(href, link);
+        }
+    });
+
+    // Función para activar link
+    function activateLink(id) {
+        tocLinks.forEach(link => link.classList.remove('active'));
+        const activeLink = linkMap.get('#' + id);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+    }
+
+    // IntersectionObserver para detectar sección visible
+    const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -50% 0px',
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                activateLink(entry.target.id);
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => observer.observe(section));
+
+    // Smooth scroll en clicks de TOC
+    tocLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    history.pushState(null, '', href);
+
+                    // En mobile, cerrar TOC después de click
+                    if (window.innerWidth < 768) {
+                        const toc = document.getElementById('legalTocNav');
+                        const toggle = document.getElementById('legalTocToggle');
+                        if (toc && toggle) {
+                            toc.classList.remove('show');
+                            toggle.setAttribute('aria-expanded', 'false');
+                            toggle.querySelector('.toggle-text-show').hidden = false;
+                            toggle.querySelector('.toggle-text-hide').hidden = true;
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    // Activar sección inicial
+    const hash = window.location.hash;
+    if (hash) {
+        const initialSection = document.querySelector(hash);
+        if (initialSection) {
+            activateLink(initialSection.id);
+        }
+    } else if (sections[0]) {
+        activateLink(sections[0].id);
+    }
+
+})();
+</script>
+{% endblock %}

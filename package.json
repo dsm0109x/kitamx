@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^7.0.2",
+    "purgecss": "^7.0.2"
+  }
+}

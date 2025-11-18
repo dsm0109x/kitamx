@@ -1,0 +1,30 @@
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+EMAIL ELIMINADO DE TU CUENTA
+
+Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+Este email ha sido eliminado de tu cuenta de Kita.
+
+EMAIL ELIMINADO:
+{{ email }}
+
+Ya no podras usar este email para iniciar sesion o recibir notificaciones.
+
+NO FUISTE TU?
+Si no eliminaste este email, tu cuenta podria estar comprometida.
+Cambia tu contrasena inmediatamente y contacta con soporte.
+
+¿Tienes dudas? Escribenos a hola@kita.mx
+
+--
+El equipo de Kita
+https://kita.mx
+hola@kita.mx
+
+--------------------------------------------------------------------------------
+Este email fue enviado porque se elimino de tu cuenta.
+Si no fuiste tu, contacta inmediatamente con hola@kita.mx
+================================================================================

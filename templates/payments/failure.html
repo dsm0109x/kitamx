@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago No Completado - {{ tenant.business_name }}</title>
+
+    <!-- SEO -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    {% load static %}
+    <!-- SPLIT SCREEN EDITORIAL CSS -->
+    <link rel="stylesheet" href="{% static 'css/public-payments-landing-style.css' %}?v=4.3">
+</head>
+<body class="payment-page">
+
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="payment-split-container">
+
+        <!-- LEFT PANEL - INFO STICKY (Navy-50) -->
+        <div class="left-panel-sticky">
+
+            <!-- Kita Branding -->
+            <div class="panel-section" style="margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" style="height: 32px; width: auto;">
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-black);">Kita</div>
+                </div>
+                <div style="font-size: 0.6875rem; color: var(--color-gray-500);">
+                    <i class="iconoir-lock"></i> Pago Seguro
+                </div>
+            </div>
+
+            <!-- Status Badge Error -->
+            <div class="panel-section" style="background: rgba(239, 68, 68, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #ef4444;">
+                <div style="font-size: 0.875rem; color: #991b1b; font-weight: 600;">
+                    × Pago no completado
+                </div>
+            </div>
+
+            <!-- Merchant Info -->
+            <div class="panel-section">
+                <div class="panel-label">PAGO A</div>
+                <div class="merchant-name-large">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc-large">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Amount HERO -->
+            <div class="panel-section amount-editorial">
+                <div class="panel-label">MONTO A PAGAR</div>
+                <div class="amount-hero-editorial">${{ payment_link.amount }}</div>
+                <span class="currency-editorial">{{ payment_link.currency }}</span>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Info -->
+            <div class="panel-section metadata-editorial">
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-info-circle"></i>
+                    Tu link sigue activo
+                </div>
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-clock"></i>
+                    Válido hasta: <strong>{{ payment_link.expires_at|date:"d/m/Y H:i" }}</strong>
+                </div>
+            </div>
+
+            <!-- Trust Badge -->
+            <div class="trust-badge-editorial">
+                <i class="iconoir-shield-check"></i>
+                <span>Procesado por Mercado Pago</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL - MESSAGE (White) -->
+        <div class="right-panel-action">
+
+            <div class="right-panel-section">
+                <div class="section-title-editorial">PAGO NO COMPLETADO</div>
+                <h1 class="payment-title-editorial">El pago no pudo procesarse</h1>
+                <p class="payment-description-editorial">
+                    No te preocupes, puedes intentar nuevamente con la misma tarjeta u otro método de pago.
+                </p>
+            </div>
+
+            <div class="right-panel-section">
+                <div class="state-message-editorial" style="background: #fef2f2; border-left-color: #ef4444; color: #991b1b;">
+                    <p><strong>¿Por qué falló el pago?</strong></p>
+                    <p>Los motivos más comunes son:</p>
+                    <ul>
+                        <li>Fondos insuficientes en la tarjeta</li>
+                        <li>Tarjeta rechazada por el banco</li>
+                        <li>Datos incorrectos ingresados</li>
+                        <li>Cancelación manual durante el proceso</li>
+                    </ul>
+                    <p><strong>Puedes intentar pagar nuevamente sin problema.</strong></p>
+                </div>
+            </div>
+
+            <div class="cta-editorial">
+                <a href="/hola/{{ payment_link.token }}/" class="btn-cta-editorial">
+                    Intentar Pagar Nuevamente →
+                </a>
+            </div>
+
+            <!-- FAQ -->
+            <div class="faq-editorial">
+                <div class="faq-title-editorial">¿NECESITAS AYUDA?</div>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Puedo usar otra tarjeta?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Sí, puedes intentar con la misma u otra tarjeta. Tu link de pago sigue activo.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Mi banco bloqueó el pago?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Algunos bancos bloquean compras en línea por seguridad. Contacta a tu banco para habilitar compras en internet.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>Contactar a {{ tenant.business_name }}</summary>
+                    <div class="faq-answer-editorial">
+                        {% if tenant.email %}
+                        <p><strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a></p>
+                        {% endif %}
+                        {% if tenant.phone %}
+                        <p><strong>Teléfono:</strong> {{ tenant.phone }}</p>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <!-- FOOTER (Spans both columns) -->
+        <footer class="payment-footer-editorial">
+            <div class="footer-branding">
+                Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+            </div>
+            <div class="footer-links">
+                <a href="/legal/privacidad/" target="_blank">Privacidad</a> ·
+                <a href="/legal/terminos/" target="_blank">Términos</a> ·
+                <a href="mailto:hola@kita.mx">Soporte</a>
+            </div>
+            <div class="trust-badges">
+                🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ Mercado Pago Oficial
+            </div>
+            <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+                © 2025 Kita
+            </div>
+        </footer>
+
+    </div>
+
+</body>
+</html>

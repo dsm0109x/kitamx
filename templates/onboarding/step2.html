@@ -1,0 +1,789 @@
+{% extends 'base_onboarding.html' %}
+{% load static %}
+
+{% block title %}{{ step_title }} - Kita{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+
+<style>
+/* Benefits Checklist */
+.benefits-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: #f9fafb;
+    border-left: 3px solid #15803d;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.benefit-item:hover {
+    background: #f0fdf4;
+    transform: translateX(4px);
+}
+
+.benefit-item .iconoir-check-circle {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.benefit-item span:last-child {
+    flex: 1;
+    line-height: 1.5;
+    color: #374151;
+}
+
+/* Trust Badges */
+.trust-badges-honest {
+    padding: 1.5rem 0;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.trust-badge-card {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.trust-badge-card:hover {
+    background: #f0f9ff;
+    border-color: #0284c7;
+    transform: translateY(-2px);
+}
+
+/* Permissions Card */
+.permissions-card {
+    background: #f9fafb;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 2rem;
+}
+
+.permission-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.permission-item.allowed {
+    border-left: 3px solid #15803d;
+}
+
+.permission-item.denied {
+    border-left: 3px solid #dc2626;
+    background: #fef2f2;
+}
+
+.permission-item .iconoir-check-circle,
+.permission-item .iconoir-xmark-circle {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.permission-item strong {
+    display: block;
+    color: #111827;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.permission-item p {
+    font-size: 0.85rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .benefit-item {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .trust-badge-card {
+        padding: 1rem 0.75rem;
+    }
+
+    .permissions-card {
+        padding: 1.5rem 1rem;
+    }
+
+    .permission-item {
+        padding: 0.75rem;
+    }
+}
+
+/* FAQ Styles (from home - minimal) */
+.faq-container {
+    margin: 0;
+}
+
+.faq-item {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    background: white;
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: #f9fafb;
+    padding: 1rem 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.faq-question:hover {
+    background: #f0f9ff;
+}
+
+.faq-question.active {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+
+.faq-arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.faq-question.active .faq-arrow {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding: 0 1.25rem;
+    background: white;
+}
+
+.faq-answer.active {
+    max-height: 1000px;
+    padding: 1.25rem;
+}
+
+.faq-answer ul {
+    margin: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.faq-answer li {
+    margin-bottom: 0.5rem;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .benefit-item:hover,
+    .trust-badge-card:hover {
+        transform: none;
+    }
+
+    .faq-arrow,
+    .faq-answer {
+        transition: none;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{# BUG FIX #81: CSRF token for AJAX requests #}
+{% csrf_token %}
+
+{# BUG FIX #64: Configuration data for external JavaScript #}
+<div id="onboarding-config"
+     data-step3-url="{% url 'onboarding:step3' %}"
+     data-disconnect-url="{% url 'onboarding:disconnect_mp' %}"
+     data-mp-connected="{{ mp_connected|yesno:'true,false' }}"
+     data-has-oauth-code="{% if 'code' in request.GET %}true{% else %}false{% endif %}"
+     style="display: none;">
+</div>
+
+<div class="onboarding-container-clean">
+    <div class="onboarding-content">
+        <div class="container-fluid px-4">
+            <div class="onboarding-layout-sidebar">
+
+                <!-- SIDEBAR -->
+                <aside class="onboarding-sidebar d-none d-lg-block">
+                    <!-- Logo -->
+                    <div class="sidebar-logo-container">
+                        <div class="d-flex align-items-center gap-2 justify-content-end">
+                            <img src="{% static logo_path %}"
+                                 alt=""
+                                 height="50"
+                                 class="sidebar-logo">
+                            <span class="kita-brand kita-brand-md mb-0">Kita</span>
+                        </div>
+                        <p class="kita-tagline small text-end mb-0 mt-1">Kit de Ayuda para Emprendedores</p>
+                    </div>
+
+                    <!-- Progress Tree -->
+                    <nav class="progress-tree" aria-label="Progreso de configuración">
+                        <div class="progress-tree-title">Progreso del Setup</div>
+
+                        <!-- Step 1: Completed -->
+                        <div class="tree-step completed">
+                            <a href="{% url 'onboarding:step1' %}" class="tree-step-link" aria-label="Paso 1: Identidad de tu Empresa (completado)">
+                                <div class="tree-step-icon" aria-hidden="true">✓</div>
+                                <div class="tree-step-title">Identidad de tu Empresa</div>
+                                <p class="tree-step-subtitle">Datos fiscales completados</p>
+                            </a>
+                        </div>
+
+                        <!-- Step 2: Active -->
+                        <div class="tree-step active">
+                            <a href="{% url 'onboarding:step2' %}" class="tree-step-link" aria-current="step" aria-label="Paso 2: Conectar Mercado Pago® (actual)">
+                                <div class="tree-step-icon" aria-hidden="true">2</div>
+                                <div class="tree-step-title">Conectar Mercado Pago®</div>
+                                <p class="tree-step-subtitle">Para recibir pagos</p>
+                            </a>
+                        </div>
+
+                        <!-- Step 3: Pending -->
+                        <div class="tree-step">
+                            {% if user.onboarding_step >= 3 %}
+                                <a href="{% url 'onboarding:step3' %}" class="tree-step-link" aria-label="Paso 3: Certificado Digital">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">3</div>
+                                <div class="tree-step-title">Certificado Digital</div>
+                                <p class="tree-step-subtitle">CSD para facturar</p>
+                            {% if user.onboarding_step >= 3 %}</a>{% else %}</span>{% endif %}
+                        </div>
+
+                        <!-- Step 4: Pending -->
+                        <div class="tree-step">
+                            {% if user.onboarding_step >= 4 %}
+                                <a href="{% url 'onboarding:step4' %}" class="tree-step-link" aria-label="Paso 4: Activar Trial">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">4</div>
+                                <div class="tree-step-title">Activar Trial</div>
+                                <p class="tree-step-subtitle">30 días gratis</p>
+                            {% if user.onboarding_step >= 4 %}</a>{% else %}</span>{% endif %}
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- MAIN CONTENT -->
+                <main class="onboarding-main">
+                    <div class="onboarding-card-modern">
+                        <!-- Header -->
+                        <div class="mb-5">
+                            <h1 class="h3 mb-2 fw-bold text-accent">{{ step_title }}</h1>
+                            <p class="text-muted mb-0">{{ step_description }}</p>
+                        </div>
+
+                        <!-- Step Progress (Mobile) - COMPONENT -->
+                        {% include 'onboarding/components/mobile_progress_indicator.html' %}
+
+                        {% if mp_app_id_configured %}
+                            {% if mp_connected %}
+                                <!-- ESTADO: YA CONECTADO -->
+                                <div class="mp-success-card">
+                                    <div class="d-flex align-items-start mb-4">
+                                        <div class="mp-status-icon connected me-3">
+                                            <span class="iconoir-check-circle"></span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <h5 class="mp-connected-title mb-0 me-2">Cuenta Conectada</h5>
+                                                <span class="badge bg-success-subtle text-success">
+                                                    <span class="iconoir-check me-1"></span>
+                                                    Activo
+                                                </span>
+                                            </div>
+                                            <p class="mp-connected-subtitle mb-0">Mercado Pago® listo para recibir pagos</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Primary Action -->
+                                    <div class="d-grid mb-3">
+                                        <a href="{% url 'onboarding:step3' %}"
+                                           class="btn btn-primary btn-lg"
+                                           id="continueToStep3Btn">
+                                            <span class="iconoir-arrow-right me-2"></span>
+                                            Continuar al Paso 3
+                                        </a>
+                                    </div>
+
+                                    <!-- Secondary Actions -->
+                                    {% if oauth_url %}
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <a href="{{ oauth_url }}" class="btn btn-secondary w-100" id="reconnectBtn">
+                                                    <span class="iconoir-refresh me-2"></span>
+                                                    Reconectar
+                                                </a>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button type="button" class="btn btn-secondary w-100" onclick="disconnectMP()">
+                                                    <span class="iconoir-xmark me-2"></span>
+                                                    Desconectar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            {% elif oauth_url %}
+                                <!-- ESTADO: NO CONECTADO -->
+
+                                <!-- Hero Copy Mejorado -->
+                                <div class="mb-4">
+                                    <h5 class="fw-bold mb-3 text-accent">
+                                        <span class="iconoir-wallet me-2"></span>
+                                        Empieza a Cobrar en Línea
+                                    </h5>
+
+                                    <p class="text-muted mb-3">
+                                        Conecta Mercado Pago® y crea links de pago profesionales para tus clientes.
+                                    </p>
+
+                                    <!-- Benefits Checklist -->
+                                    <div class="benefits-checklist mb-4">
+                                        <div class="benefit-item">
+                                            <span class="iconoir-check-circle text-success me-2"></span>
+                                            <span>Cobros en línea <strong>sin necesidad de sitio web</strong></span>
+                                        </div>
+                                        <div class="benefit-item">
+                                            <span class="iconoir-check-circle text-success me-2"></span>
+                                            <span>Links compartibles por <strong>WhatsApp, email o QR</strong></span>
+                                        </div>
+                                        <div class="benefit-item">
+                                            <span class="iconoir-check-circle text-success me-2"></span>
+                                            <span>Acepta <strong>tarjeta, OXXO, transferencias</strong></span>
+                                        </div>
+                                        <div class="benefit-item">
+                                            <span class="iconoir-check-circle text-success me-2"></span>
+                                            <span>Dinero va <strong>directo a tu cuenta</strong> (no pasa por Kita)</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- CTA Principal -->
+                                <div class="d-grid mb-2">
+                                    <a href="{{ oauth_url }}" class="btn btn-primary btn-lg" id="connectBtn">
+                                        <span class="iconoir-link me-2"></span>
+                                        Conectar mi Cuenta de Mercado Pago®
+                                    </a>
+                                </div>
+                                <p class="text-center mb-4">
+                                    <small class="text-muted">
+                                        🔐 Conexión segura  •  🚫 Sin tu contraseña  •  ⏱️ Setup en 2 minutos
+                                    </small>
+                                </p>
+
+                                <!-- Trust Badges (Honest) -->
+                                <div class="trust-badges-honest mb-5">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="trust-badge-card">
+                                                <span class="iconoir-shield-check text-success mb-2" style="font-size: 2rem;"></span>
+                                                <strong class="d-block mb-1">OAuth 2.0</strong>
+                                                <small class="text-muted">Mismo sistema de Google</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="trust-badge-card">
+                                                <span class="iconoir-lock text-success mb-2" style="font-size: 2rem;"></span>
+                                                <strong class="d-block mb-1">AES-256</strong>
+                                                <small class="text-muted">Encriptación de tokens</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="trust-badge-card">
+                                                <span class="iconoir-refresh-double text-success mb-2" style="font-size: 2rem;"></span>
+                                                <strong class="d-block mb-1">Revocable</strong>
+                                                <small class="text-muted">Desconecta cuando quieras</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Permissions Card -->
+                                <div class="permissions-card mb-5">
+                                    <h6 class="fw-bold mb-3">
+                                        <span class="iconoir-shield-check text-success me-2"></span>
+                                        Permisos Transparentes
+                                    </h6>
+
+                                    <p class="text-muted mb-3">
+                                        Al conectar, Kita podrá:
+                                    </p>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <div class="permission-item allowed">
+                                                <span class="iconoir-check-circle text-success me-2"></span>
+                                                <div>
+                                                    <strong>Crear links de pago</strong>
+                                                    <p class="text-muted mb-0 small">
+                                                        Para que cobres a tus clientes
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="permission-item allowed">
+                                                <span class="iconoir-check-circle text-success me-2"></span>
+                                                <div>
+                                                    <strong>Consultar pagos recibidos</strong>
+                                                    <p class="text-muted mb-0 small">
+                                                        Para mostrarte tu historial
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="permission-item allowed">
+                                                <span class="iconoir-check-circle text-success me-2"></span>
+                                                <div>
+                                                    <strong>Ver datos de tu cuenta</strong>
+                                                    <p class="text-muted mb-0 small">
+                                                        Email y nombre para facturas
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="permission-item denied">
+                                                <span class="iconoir-xmark-circle text-danger me-2"></span>
+                                                <div>
+                                                    <strong>Kita NUNCA puede</strong>
+                                                    <p class="text-muted mb-0 small">
+                                                        Retirar dinero ni ver tu contraseña
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="alert alert-info border-info mb-0">
+                                        <small>
+                                            <strong>
+                                                <span class="iconoir-info-circle me-1"></span>
+                                                Puedes revocar el acceso
+                                            </strong> en cualquier momento desde tu cuenta de Mercado Pago® o desde Mi Negocio en Kita.
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <!-- FAQ Section (usando estilos de home) -->
+                                <div class="mb-5">
+                                    <h6 class="fw-bold mb-4">Preguntas Frecuentes</h6>
+
+                                    <div class="faq-container">
+                                        <!-- BUG FIX #12: Primer FAQ con clase 'active' para auto-open -->
+                                        <!-- Q1: Comisiones -->
+                                        <div class="faq-item">
+                                            <button class="faq-question active" data-faq="comisiones-mp" aria-expanded="true" aria-controls="faq-comisiones-mp">
+                                                💰 ¿Cuánto me cobra Mercado Pago®?
+                                                <span class="iconoir-nav-arrow-down faq-arrow" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="faq-answer active" id="faq-comisiones-mp" role="region">
+                                                    <p>Mercado Pago® cobra sus <strong>comisiones estándar</strong>:</p>
+                                                    <ul>
+                                                        <li><strong>3.99% + IVA</strong> por pagos con tarjeta de crédito/débito</li>
+                                                        <li><strong>$8 MXN + IVA</strong> por pagos en OXXO o efectivo</li>
+                                                        <li>Sin costo por transferencias bancarias (dependiendo de tu cuenta MP)</li>
+                                                    </ul>
+                                                    <div class="alert alert-success mb-0">
+                                                        <small>
+                                                            <strong>✅ Kita NO cobra comisión adicional</strong> por esta integración.
+                                                            Solo pagas la suscripción mensual de Kita ($299 MXN).
+                                                        </small>
+                                                    </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Q2: Seguridad -->
+                                        <div class="faq-item">
+                                            <button class="faq-question" data-faq="seguridad-oauth" aria-expanded="false" aria-controls="faq-seguridad-oauth">
+                                                🔐 ¿Es seguro conectar mi cuenta?
+                                                <span class="iconoir-nav-arrow-down faq-arrow" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="faq-answer" id="faq-seguridad-oauth" role="region">
+                                                    <p><strong>Sí, es totalmente seguro.</strong> Usamos OAuth 2.0 con PKCE:</p>
+                                                    <ul>
+                                                        <li>Kita <strong>nunca</strong> tiene acceso a tu contraseña de Mercado Pago®</li>
+                                                        <li>Solo puede crear links de pago (no puede retirar dinero)</li>
+                                                        <li>Tokens almacenados con encriptación AES-256</li>
+                                                        <li>Puedes revocar el acceso en cualquier momento</li>
+                                                    </ul>
+                                                    <p class="mb-0">
+                                                        <small class="text-muted">
+                                                            OAuth 2.0 es el mismo sistema de autenticación que usan
+                                                            Google, Facebook, Dropbox y miles de aplicaciones confiables.
+                                                        </small>
+                                                    </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Q3: Desconectar -->
+                                        <div class="faq-item">
+                                            <button class="faq-question" data-faq="desconectar-mp" aria-expanded="false" aria-controls="faq-desconectar-mp">
+                                                🔌 ¿Puedo desconectar después?
+                                                <span class="iconoir-nav-arrow-down faq-arrow" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="faq-answer" id="faq-desconectar-mp" role="region">
+                                                    <p><strong>Sí, cuando quieras.</strong> Tienes 2 opciones:</p>
+
+                                                    <p><strong>Desde Kita:</strong></p>
+                                                    <ul>
+                                                        <li>Dashboard → Mi Negocio → Integraciones → Desconectar Mercado Pago®</li>
+                                                    </ul>
+
+                                                    <p><strong>Desde tu cuenta de Mercado Pago®:</strong></p>
+                                                    <ul>
+                                                        <li>Configuración → Seguridad → Aplicaciones conectadas → Revocar acceso a Kita</li>
+                                                    </ul>
+
+                                                    <div class="alert alert-warning mb-0">
+                                                        <small>
+                                                            <strong>⚠️ Importante:</strong> Al desconectar, tus links de pago
+                                                            activos dejarán de funcionar hasta que vuelvas a conectar.
+                                                        </small>
+                                                    </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Q4: Sin Mercado Pago -->
+                                        <div class="faq-item">
+                                            <button class="faq-question" data-faq="sin-mercadopago" aria-expanded="false" aria-controls="faq-sin-mercadopago">
+                                                🤔 ¿Puedo usar Kita sin Mercado Pago®?
+                                                <span class="iconoir-nav-arrow-down faq-arrow" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="faq-answer" id="faq-sin-mercadopago" role="region">
+                                                    <p><strong>Sí, pero con funcionalidad limitada:</strong></p>
+
+                                                    <p class="mb-2">✅ <strong>Sí puedes:</strong></p>
+                                                    <ul>
+                                                        <li>Generar facturas CFDI 4.0 manualmente</li>
+                                                        <li>Gestionar tu catálogo de productos/servicios</li>
+                                                        <li>Usar otras features de Kita</li>
+                                                    </ul>
+
+                                                    <p class="mb-2">❌ <strong>NO podrás:</strong></p>
+                                                    <ul>
+                                                        <li>Crear links de pago automáticos</li>
+                                                        <li>Cobrar en línea a clientes</li>
+                                                        <li>Generar facturas automáticamente al recibir pago</li>
+                                                    </ul>
+
+                                                    <div class="alert alert-success mb-0">
+                                                        <small>
+                                                            <strong>💡 Puedes saltar este paso</strong> y conectar Mercado Pago®
+                                                            después desde Mi Negocio cuando estés listo.
+                                                        </small>
+                                                    </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Q5: Tiempo -->
+                                        <div class="faq-item">
+                                            <button class="faq-question" data-faq="tiempo-conexion" aria-expanded="false" aria-controls="faq-tiempo-conexion">
+                                                ⏱️ ¿Cuánto tarda el proceso?
+                                                <span class="iconoir-nav-arrow-down faq-arrow" aria-hidden="true"></span>
+                                            </button>
+                                            <div class="faq-answer" id="faq-tiempo-conexion" role="region">
+                                                    <p><strong>Aproximadamente 2 minutos</strong> si ya tienes cuenta en Mercado Pago®:</p>
+                                                    <ol>
+                                                        <li>Click en "Conectar" (5 segundos)</li>
+                                                        <li>Login en Mercado Pago® (30 segundos)</li>
+                                                        <li>Revisar y autorizar permisos (45 segundos)</li>
+                                                        <li>Redirect automático a Kita (15 segundos)</li>
+                                                    </ol>
+                                                    <p class="mb-0">
+                                                        <small class="text-muted">
+                                                            Si no tienes cuenta en Mercado Pago®, crear una toma ~5 minutos
+                                                            (necesitas email, teléfono y una forma de pago para verificar tu identidad).
+                                                        </small>
+                                                    </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% else %}
+                                <!-- ERROR: Config -->
+                                <div class="mb-4">
+                                    <h6 class="fw-bold mb-2 text-danger">
+                                        <span class="iconoir-warning-triangle me-2"></span>
+                                        Problema de Configuración
+                                    </h6>
+                                    <p class="text-muted mb-0">La integración con Mercado Pago® no está configurada. Por favor contacta al administrador.</p>
+                                </div>
+                            {% endif %}
+
+                        {% else %}
+                            <!-- ERROR: Fatal -->
+                            <div class="mb-4">
+                                <h6 class="fw-bold mb-2 text-danger">
+                                    <span class="iconoir-xmark-circle me-2"></span>
+                                    Error de Configuración
+                                </h6>
+                                <p class="text-muted mb-0">La aplicación de Mercado Pago® no está configurada en el servidor. Por favor contacta al administrador.</p>
+                            </div>
+                        {% endif %}
+
+                        <!-- Navigation -->
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <a href="{% url 'onboarding:step1' %}" class="btn btn-link">
+                                <span class="iconoir-arrow-left me-2"></span>
+                                Paso Anterior
+                            </a>
+
+                            <button type="button" class="btn btn-link" onclick="showSkipModal()">
+                                Saltar por ahora
+                                <span class="iconoir-arrow-right"></span>
+                            </button>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mt-5 pt-4 border-top">
+                            <p class="text-muted mb-0" style="font-size: 0.85rem;">
+                                <strong>Paso {{ step }} de {{ total_steps }}</strong> •
+                                Conexión OAuth 2.0 con PKCE •
+                                Puedes conectar Mercado Pago® después desde Mi Negocio
+                            </p>
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Skip MP Modal - Redesigned -->
+<div class="modal fade" id="skipModal" tabindex="-1" aria-labelledby="skipModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-redesign">
+            <!-- Icon Header -->
+            <div class="modal-icon-header">
+                <div class="modal-icon modal-icon-warning">
+                    <span class="iconoir-warning-triangle"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="modal-body text-center px-4 pb-2">
+                <h5 class="modal-title-redesign" id="skipModalTitle">
+                    ¿Saltar Mercado Pago®?
+                </h5>
+
+                <p class="modal-description mb-3">
+                    Sin Mercado Pago® no podrás crear enlaces de pago ni cobrar en línea a tus clientes.
+                </p>
+
+                <p class="text-muted mb-0">
+                    <small>💡 Puedes conectarlo después desde Mi Negocio</small>
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary btn-modal-secondary" data-bs-dismiss="modal">
+                    <span class="iconoir-link me-2"></span>
+                    Conectar Ahora
+                </button>
+                <a href="{% url 'onboarding:step3' %}" class="btn btn-outline-secondary btn-modal-primary">
+                    Saltar por Ahora
+                    <span class="iconoir-arrow-right ms-2"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Disconnect MP Modal - Redesigned -->
+<div class="modal fade" id="disconnectModal" tabindex="-1" aria-labelledby="disconnectModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-redesign">
+            <!-- Icon Header -->
+            <div class="modal-icon-header">
+                <div class="modal-icon modal-icon-destructive">
+                    <span class="iconoir-xmark-circle"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="modal-body text-center px-4 pb-2">
+                <h5 class="modal-title-redesign" id="disconnectModalTitle">
+                    ¿Desconectar Mercado Pago®?
+                </h5>
+
+                <p class="modal-description mb-3">
+                    Tus enlaces de pago activos dejarán de funcionar. Tendrás que volver a conectar tu cuenta para usarlos.
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary btn-modal-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger btn-modal-destructive" onclick="confirmDisconnect()" id="confirmDisconnectBtn">
+                    <span class="iconoir-xmark me-2"></span>
+                    Desconectar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Loading System -->
+<div class="loading-topbar" id="loadingTopbar">
+    <div class="loading-topbar-progress"></div>
+</div>
+
+<div class="loading-message-card" id="loadingMessage">
+    <div class="d-flex align-items-center">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        <span id="loadingText">Conectando con Mercado Pago®...</span>
+    </div>
+</div>
+
+<!-- Mobile Navigation Components -->
+{% include 'onboarding/components/mobile_navigation.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{# BUG FIX #64: JavaScript moved to external file for better cacheability and maintainability #}
+<script src="{% static 'js/onboarding-step2.js' %}?v=1.0" defer></script>
+{% endblock %}

@@ -1,0 +1,591 @@
+{% extends 'base_onboarding.html' %}
+{% load static %}
+
+{% block title %}{{ step_title }} - Kita{% endblock %}
+
+{% block content %}
+<div class="onboarding-container-clean">
+    <div class="onboarding-content">
+        <div class="container-fluid px-4">
+            <div class="onboarding-layout-sidebar">
+
+                <!-- SIDEBAR -->
+                <aside class="onboarding-sidebar d-none d-lg-block">
+                    <!-- Logo -->
+                    <div class="sidebar-logo-container">
+                        <div class="d-flex align-items-center gap-2 justify-content-end">
+                            <img src="{% static logo_path %}"
+                                 alt=""
+                                 height="50"
+                                 class="sidebar-logo">
+                            <span class="kita-brand kita-brand-md mb-0">Kita</span>
+                        </div>
+                        <p class="kita-tagline small text-end mb-0 mt-1">Kit de Ayuda para Emprendedores</p>
+                    </div>
+
+                    <!-- Progress Tree -->
+                    <nav class="progress-tree" aria-label="Progreso de configuración">
+                        <div class="progress-tree-title">Progreso del Setup</div>
+
+                        <!-- Step 1: Business Identity -->
+                        <div class="tree-step {% if step == 1 %}active{% elif user.onboarding_step > 1 %}completed{% endif %}">
+                            {% if user.onboarding_step >= 1 %}
+                                <a href="{% url 'onboarding:step1' %}"
+                                   class="tree-step-link"
+                                   {% if step == 1 %}aria-current="step"{% endif %}
+                                   aria-label="Paso 1: Identidad de tu Empresa{% if step == 1 %} (actual){% endif %}">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">
+                                    {% if user.onboarding_step > 1 %}✓{% else %}1{% endif %}
+                                </div>
+                                <div class="tree-step-title">Identidad de tu Empresa</div>
+                                <p class="tree-step-subtitle">Datos fiscales y RFC</p>
+                            {% if user.onboarding_step >= 1 %}</a>{% else %}</span>{% endif %}
+                            <ul class="sub-steps">
+                                <li class="completed" id="substep-basic">Información básica</li>
+                                <li id="substep-fiscal">Datos fiscales</li>
+                                <li id="substep-address">Domicilio fiscal</li>
+                            </ul>
+                        </div>
+
+                        <!-- Step 2: Mercado Pago® -->
+                        <div class="tree-step {% if step == 2 %}active{% elif tenant.mercadopago_user_id %}completed{% endif %}">
+                            {% if user.onboarding_step >= 2 %}
+                                <a href="{% url 'onboarding:step2' %}"
+                                   class="tree-step-link"
+                                   {% if step == 2 %}aria-current="step"{% endif %}
+                                   aria-label="Paso 2: Conectar Mercado Pago®{% if step == 2 %} (actual){% endif %}">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">
+                                    {% if tenant.mercadopago_user_id %}✓{% else %}2{% endif %}
+                                </div>
+                                <div class="tree-step-title">Conectar Mercado Pago®</div>
+                                <p class="tree-step-subtitle">
+                                    {% if tenant.mercadopago_user_id %}Conectado{% else %}Opcional{% endif %}
+                                </p>
+                            {% if user.onboarding_step >= 2 %}</a>{% else %}</span>{% endif %}
+                        </div>
+
+                        <!-- Step 3: CSD Certificate -->
+                        {% with has_csd=tenant.csdcertificate_set.filter|yesno:"true,false" %}
+                        <div class="tree-step {% if step == 3 %}active{% elif tenant.csdcertificate_set.exists %}completed{% endif %}">
+                            {% if user.onboarding_step >= 3 %}
+                                <a href="{% url 'onboarding:step3' %}"
+                                   class="tree-step-link"
+                                   {% if step == 3 %}aria-current="step"{% endif %}
+                                   aria-label="Paso 3: Certificado Digital{% if step == 3 %} (actual){% endif %}">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">
+                                    {% if tenant.csdcertificate_set.exists %}✓{% else %}3{% endif %}
+                                </div>
+                                <div class="tree-step-title">Certificado Digital</div>
+                                <p class="tree-step-subtitle">
+                                    {% if tenant.csdcertificate_set.exists %}CSD subido{% else %}Opcional{% endif %}
+                                </p>
+                            {% if user.onboarding_step >= 3 %}</a>{% else %}</span>{% endif %}
+                        </div>
+                        {% endwith %}
+
+                        <!-- Step 4: Trial -->
+                        <div class="tree-step {% if step == 4 %}active{% endif %}">
+                            {% if user.onboarding_step >= 4 %}
+                                <a href="{% url 'onboarding:step4' %}"
+                                   class="tree-step-link"
+                                   {% if step == 4 %}aria-current="step"{% endif %}
+                                   aria-label="Paso 4: Activar Trial{% if step == 4 %} (actual){% endif %}">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">4</div>
+                                <div class="tree-step-title">Activar Trial</div>
+                                <p class="tree-step-subtitle">30 días gratis</p>
+                            {% if user.onboarding_step >= 4 %}</a>{% else %}</span>{% endif %}
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- MAIN CONTENT -->
+                <main class="onboarding-main">
+                    <div class="onboarding-card-modern">
+                        <!-- Header -->
+                        <div class="mb-4">
+                            <h1 class="h3 mb-2 fw-bold text-accent">{{ step_title }}</h1>
+                            <p class="text-muted mb-0">{{ step_description }}</p>
+                        </div>
+
+                        <!-- Step Progress (Mobile) - COMPONENT -->
+                        {% include 'onboarding/components/mobile_progress_indicator.html' %}
+
+                        <!-- Form -->
+                        <form method="post" id="step1Form">
+                            {% csrf_token %}
+
+                            <!-- Section 1: Información Básica -->
+                            <div class="mb-5" data-section="basic">
+                                <h5 class="section-title">Información Básica</h5>
+
+                                <!-- Nombre Comercial -->
+                                <div class="mb-3">
+                                    <label for="id_name" class="form-label">
+                                        Nombre Comercial
+                                        <!-- BUG FIX #17: Help icon con padding extra en mobile para touch target 48x48px -->
+                                        <span class="iconoir-info-circle tooltip-icon tooltip-icon-mobile"
+                                              data-bs-toggle="tooltip"
+                                              data-bs-placement="top"
+                                              title="El nombre con el que tus clientes te conocen. Puede ser diferente a tu razón social."></span>
+                                    </label>
+                                    <input type="text"
+                                           class="form-control {% if form.name.errors %}is-invalid{% endif %}"
+                                           name="name"
+                                           id="id_name"
+                                           value="{{ form.name.value|default:'' }}"
+                                           placeholder="Ej: Mi Consultorio Médico"
+                                           required
+                                           minlength="2"
+                                           maxlength="255"
+                                           autocomplete="organization"
+                                           data-tip="name">
+                                    {% if form.name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.name.errors|join:", " }}
+                                        </div>
+                                    {% else %}
+                                        <small class="form-text text-muted">El nombre que usas para tu negocio</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <!-- Email (readonly - verificado) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_email" class="form-label">
+                                            Email de Contacto
+                                        </label>
+                                        <input type="email"
+                                               class="form-control is-valid"
+                                               name="email"
+                                               id="id_email"
+                                               value="{{ user.email }}"
+                                               readonly
+                                               autocomplete="email"
+                                               data-tip="email">
+                                        <small class="form-text text-muted">
+                                            <span class="iconoir-shield-check me-1"></span>
+                                            Email de tu cuenta verificada
+                                        </small>
+                                    </div>
+
+                                    <!-- Teléfono con bandera México -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_phone" class="form-label">
+                                            Teléfono <span class="text-muted small">(opcional)</span>
+                                        </label>
+                                        <div class="phone-input-wrapper">
+                                            <div class="phone-prefix">
+                                                <span class="phone-flag">🇲🇽</span>
+                                                <span class="phone-code">+52</span>
+                                            </div>
+                                            <input type="tel"
+                                                   class="form-control phone-input {% if form.phone.errors %}is-invalid{% endif %}"
+                                                   name="phone"
+                                                   id="id_phone"
+                                                   value="{{ form.phone.value|default:'' }}"
+                                                   placeholder="55 1234 5678"
+                                                   maxlength="10"
+                                                   inputmode="numeric"
+                                                   autocomplete="tel"
+                                                   data-tip="phone">
+                                        </div>
+                                        {% if form.phone.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.phone.errors|join:", " }}
+                                            </div>
+                                        {% else %}
+                                            <small class="form-text text-muted">
+                                                <span class="iconoir-phone me-1"></span>
+                                                10 dígitos (sin espacios ni guiones)
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Datos Fiscales -->
+                            <div class="mb-5" data-section="fiscal">
+                                <h5 class="section-title">Datos Fiscales</h5>
+
+                                <!-- Razón Social -->
+                                <div class="mb-3">
+                                    <label for="id_business_name" class="form-label">
+                                        Razón Social
+                                        <span class="iconoir-info-circle tooltip-icon"
+                                              data-bs-toggle="tooltip"
+                                              data-bs-placement="top"
+                                              title="Tu nombre fiscal legal exactamente como aparece en tu Constancia de Situación Fiscal del SAT."></span>
+                                    </label>
+                                    <input type="text"
+                                           class="form-control {% if form.business_name.errors %}is-invalid{% endif %}"
+                                           name="business_name"
+                                           id="id_business_name"
+                                           value="{{ form.business_name.value|default:'' }}"
+                                           placeholder="Ej: Consultoría Médica López S.C."
+                                           required
+                                           maxlength="255"
+                                           minlength="3"
+                                           autocomplete="organization-title"
+                                           data-tip="business_name">
+                                    {% if form.business_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.business_name.errors|join:", " }}
+                                        </div>
+                                    {% else %}
+                                        <small class="form-text text-muted">Razón social como aparece en tu RFC</small>
+                                    {% endif %}
+                                </div>
+
+                                <div class="row">
+                                    <!-- RFC -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_rfc" class="form-label">
+                                            RFC
+                                            <span class="iconoir-info-circle tooltip-icon"
+                                                  data-bs-toggle="tooltip"
+                                                  data-bs-placement="top"
+                                                  data-bs-custom-class="tooltip-mobile-rich"
+                                                  data-bs-html="true"
+                                                  title="<strong>🆔 RFC - Registro Federal de Contribuyentes</strong><br><br>Lo encuentras en tu Constancia de Situación Fiscal del SAT.<br><br>• <strong>13 caracteres</strong> (Solo personas físicas)<br><br>Formato: 4 letras + 6 dígitos (fecha) + 3 caracteres<br><br>Validamos formato y que no esté registrado.<br><br><em>Ejemplo: XAXX010101000</em>"></span>
+                                        </label>
+                                        <input type="text"
+                                               class="form-control text-uppercase {% if form.rfc.errors %}is-invalid{% endif %}"
+                                               name="rfc"
+                                               id="id_rfc"
+                                               value="{{ form.rfc.value|default:'' }}"
+                                               placeholder="Ej: XAXX010101000"
+                                               minlength="13"
+                                               maxlength="13"
+                                               pattern="[A-ZÑ&]{4}[0-9]{6}[A-Z0-9]{3}"
+                                               required
+                                               inputmode="text"
+                                               autocapitalize="characters"
+                                               autocomplete="off"
+                                               data-tip="rfc"
+                                               data-help-target="rfcHelp"
+                                               title="RFC de 13 caracteres para personas físicas (ejemplo: XAXX010101000)">
+                                        <div class="valid-feedback" id="rfcValidFeedback">
+                                            RFC válido y disponible
+                                        </div>
+                                        {% if form.rfc.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.rfc.errors|join:", " }}
+                                            </div>
+                                        {% else %}
+                                            <div class="invalid-feedback" id="rfcInvalidFeedback"></div>
+                                            <small class="form-text text-muted">13 caracteres - Solo personas físicas</small>
+                                        {% endif %}
+
+                                        <!-- Help expandible (solo mobile) -->
+                                        <div class="help-expandable d-lg-none" id="rfcHelp">
+                                            <div class="alert">
+                                                <strong>💡 Sobre el RFC:</strong><br>
+                                                Lo encuentras en tu Constancia de Situación Fiscal. Validamos que no esté duplicado en nuestro sistema.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Régimen Fiscal -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_fiscal_regime" class="form-label">
+                                            Régimen Fiscal
+                                            <span class="iconoir-info-circle tooltip-icon"
+                                                  data-bs-toggle="tooltip"
+                                                  data-bs-placement="top"
+                                                  data-bs-custom-class="tooltip-mobile-rich"
+                                                  data-bs-html="true"
+                                                  title="<strong>💼 Régimen Fiscal del SAT</strong><br><br>Determina cómo declaras tus impuestos.<br><br><strong>Más comunes:</strong><br>• <strong>612</strong> - Freelancers y profesionistas<br>• <strong>626</strong> - RESICO (nuevos emprendedores)<br><br>Consulta tu Constancia de Situación Fiscal si no estás seguro."></span>
+                                        </label>
+                                        {{ form.fiscal_regime }}
+                                        {% if form.fiscal_regime.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.fiscal_regime.errors|join:", " }}
+                                            </div>
+                                        {% else %}
+                                            <small class="form-text text-muted">Regímenes más comunes</small>
+                                        {% endif %}
+
+                                        <!-- Help expandible (solo mobile) -->
+                                        <div class="help-expandable d-lg-none" id="regimeHelp">
+                                            <div class="alert">
+                                                <strong>💡 Régimen Fiscal:</strong><br>
+                                                <strong>612</strong> es el más común para freelancers y profesionistas.<br>
+                                                <strong>626 (RESICO)</strong> para nuevos emprendedores con ingresos < 3.5M.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Domicilio Fiscal -->
+                            <div class="mb-5" data-section="address">
+                                <h5 class="section-title">Domicilio Fiscal</h5>
+
+                                <div class="row">
+                                    <!-- Código Postal con autocomplete -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_codigo_postal" class="form-label">
+                                            Código Postal
+                                            <span class="iconoir-info-circle tooltip-icon"
+                                                  data-bs-toggle="tooltip"
+                                                  title="Autocompleta municipio, estado y colonias"></span>
+                                        </label>
+                                        <input type="text"
+                                               class="form-control {% if form.codigo_postal.errors %}is-invalid{% endif %}"
+                                               name="codigo_postal"
+                                               id="id_codigo_postal"
+                                               value="{{ form.codigo_postal.value|default:'' }}"
+                                               placeholder="06600"
+                                               minlength="5"
+                                               maxlength="5"
+                                               pattern="[0-9]{5}"
+                                               inputmode="numeric"
+                                               required
+                                               autocomplete="postal-code"
+                                               data-tip="codigo_postal">
+                                        {% if form.codigo_postal.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.codigo_postal.errors|join:", " }}
+                                            </div>
+                                        {% else %}
+                                            <small class="form-text text-muted">5 dígitos</small>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Colonia (select dinámico con opción custom) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_colonia" class="form-label">
+                                            Colonia *
+                                        </label>
+                                        <select class="form-select {% if form.colonia.errors %}is-invalid{% endif %}"
+                                                id="id_colonia_select"
+                                                required
+                                                disabled
+                                                data-tip="colonia">
+                                            <option value="">Primero ingresa tu código postal</option>
+                                        </select>
+
+                                        <!-- Input custom (hidden inicialmente) -->
+                                        <input type="text"
+                                               class="form-control mt-2 {% if form.colonia.errors %}is-invalid{% endif %}"
+                                               id="id_colonia_custom"
+                                               placeholder="Escribe el nombre de tu colonia"
+                                               style="display: none;"
+                                               maxlength="255">
+
+                                        <!-- Hidden field para enviar el valor -->
+                                        <input type="hidden"
+                                               name="colonia"
+                                               id="id_colonia"
+                                               value="{{ form.colonia.value|default:'' }}">
+
+                                        {% if form.colonia.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.colonia.errors|join:", " }}
+                                            </div>
+                                        {% else %}
+                                            <small class="form-text text-muted" id="coloniaHelpText">Selecciona de la lista</small>
+                                        {% endif %}
+
+                                        <!-- Link para volver a select -->
+                                        <button type="button"
+                                                class="btn btn-link btn-sm mt-1"
+                                                id="btnBackToSelect"
+                                                style="display: none; padding: 0;">
+                                            ← Volver a lista de colonias
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <!-- Municipio (readonly, auto-filled) -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_municipio" class="form-label">
+                                            Municipio
+                                        </label>
+                                        <input type="text"
+                                               class="form-control {% if form.municipio.errors %}is-invalid{% endif %}"
+                                               name="municipio"
+                                               id="id_municipio"
+                                               value="{{ form.municipio.value|default:'' }}"
+                                               readonly
+                                               required
+                                               placeholder="Se llena automáticamente"
+                                               data-tip="municipio"
+                                               title="Este campo se llena automáticamente desde el código postal">
+                                        {% if form.municipio.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.municipio.errors|join:", " }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Estado (readonly, auto-filled) -->
+                                    <div class="col-md-6 mb-3">
+                                    <label for="id_estado" class="form-label">
+                                        Estado
+                                    </label>
+                                    <input type="text"
+                                           class="form-control {% if form.estado.errors %}is-invalid{% endif %}"
+                                           name="estado"
+                                           id="id_estado"
+                                           value="{{ form.estado.value|default:'' }}"
+                                           readonly
+                                           required
+                                           placeholder="Se llena automáticamente"
+                                           data-tip="estado"
+                                           title="Este campo se llena automáticamente desde el código postal">
+                                    {% if form.estado.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.estado.errors|join:", " }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                                <div class="row">
+                                    <!-- Calle -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_calle" class="form-label">
+                                            Calle
+                                        </label>
+                                        <input type="text"
+                                               class="form-control {% if form.calle.errors %}is-invalid{% endif %}"
+                                               name="calle"
+                                               id="id_calle"
+                                               value="{{ form.calle.value|default:'' }}"
+                                               placeholder="Paseo de la Reforma"
+                                               minlength="3"
+                                               maxlength="255"
+                                               required
+                                               autocomplete="street-address"
+                                               data-tip="calle">
+                                        {% if form.calle.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.calle.errors|join:", " }}
+                                            </div>
+                                        {% else %}
+                                            <small class="form-text text-muted">Nombre de la vía</small>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Número Exterior -->
+                                    <div class="col-md-3 mb-3">
+                                        <label for="id_numero_exterior" class="form-label">
+                                            Num. Ext.
+                                        </label>
+                                        <input type="text"
+                                               class="form-control {% if form.numero_exterior.errors %}is-invalid{% endif %}"
+                                               name="numero_exterior"
+                                               id="id_numero_exterior"
+                                               value="{{ form.numero_exterior.value|default:'' }}"
+                                               placeholder="250"
+                                               maxlength="20"
+                                               pattern="[A-Za-z0-9\-]+"
+                                               required
+                                               autocomplete="off"
+                                               data-tip="numero_exterior"
+                                               title="Número oficial del domicilio">
+                                        {% if form.numero_exterior.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.numero_exterior.errors|join:", " }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Número Interior (opcional) -->
+                                    <div class="col-md-3 mb-3">
+                                        <label for="id_numero_interior" class="form-label">
+                                            Num. Int. <span class="text-muted small">(opc)</span>
+                                        </label>
+                                        <input type="text"
+                                               class="form-control {% if form.numero_interior.errors %}is-invalid{% endif %}"
+                                               name="numero_interior"
+                                               id="id_numero_interior"
+                                               value="{{ form.numero_interior.value|default:'' }}"
+                                               placeholder="501"
+                                               maxlength="50"
+                                               autocomplete="off"
+                                               data-tip="numero_interior">
+                                        {% if form.numero_interior.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.numero_interior.errors|join:", " }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-2 mt-5">
+                                <button type="submit" class="btn btn-accent btn-lg" id="submitBtn">
+                                    <span class="btn-content">
+                                        <span class="iconoir-arrow-right me-2"></span>
+                                        Continuar al Paso 2
+                                    </span>
+                                    <span class="btn-loading d-none">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                        Guardando...
+                                    </span>
+                                </button>
+                                <a href="{% url 'home' %}" class="btn btn-link">
+                                    <span class="iconoir-log-out me-2"></span>
+                                    Salir del Onboarding
+                                </a>
+                            </div>
+                        </form>
+
+                        <!-- Footer -->
+                        <div class="mt-5 pt-4 border-top">
+                            <p class="text-muted mb-0" style="font-size: 0.85rem;">
+                                <strong>Paso {{ step }} de {{ total_steps }}</strong> •
+                                Configuración estimada: 8-10 minutos •
+                                Todos los datos se transmiten por HTTPS •
+                                <span id="autoSaveIndicator" class="auto-save-indicator"></span>
+                            </p>
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Loading System -->
+<div class="loading-topbar" id="loadingTopbar">
+    <div class="loading-topbar-progress"></div>
+</div>
+
+<div class="loading-message-card" id="loadingMessage">
+    <div class="d-flex align-items-center">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        <span id="loadingText">Guardando tu información...</span>
+    </div>
+</div>
+
+<!-- Mobile Navigation Components -->
+{% include 'onboarding/components/mobile_navigation.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<!-- Address Autocomplete System - SEPOMEX only (no OSM) -->
+<script src="{% static 'js/address-autocomplete.js' %}?v=1.3" defer></script>
+
+<!-- Onboarding Step 1 Enhanced - AJAX + Validación tiempo real + Unified UX -->
+<script src="{% static 'js/onboarding-step1-enhanced.js' %}?v=2.5" defer></script>
+{% endblock %}

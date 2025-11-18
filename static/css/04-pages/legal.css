@@ -1,0 +1,593 @@
+/**
+ * Legal Pages Styles - BRUTALIST MINIMAL
+ * Clean, breathable, coherent with home
+ *
+ * Design Principles:
+ * - LESS BORDERS: Solo estructurales, no decorativos
+ * - LESS PADDING: Más breathable
+ * - NO CARD-ON-CARD: Jerarquía plana
+ * - Typography: DM Serif Display + Inter
+ * - Palette: Negro + Grises + Verde accent
+ *
+ * @version 3.1 - Border-radius unificado (6px botones navegación)
+ * Changelog: Agregado border-radius 6px a botones footer, loading states, tracking
+ */
+
+/* ========================================
+   BASE LAYOUT
+   ======================================== */
+
+.legal-page {
+    background: #fafbfc; /* Muy claro - casi blanco */
+    min-height: 100vh;
+}
+
+/* ========================================
+   HEADER - SIMPLE
+   ======================================== */
+
+.legal-header {
+    text-align: center;
+    padding-bottom: 1.25rem; /* Reducido */
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 2rem; /* Reducido */
+}
+
+.legal-header h1 {
+    font-family: 'DM Serif Display', serif;
+    color: #111827;
+    font-weight: 700;
+    font-size: 2.25rem; /* Más pequeño */
+    margin-bottom: 0.5rem;
+}
+
+.legal-header .text-muted {
+    color: #6b7280;
+    font-size: 0.85rem; /* Más pequeño */
+}
+
+/* ========================================
+   MAIN CONTENT - SIN CARD (FLAT)
+   ======================================== */
+
+.legal-content {
+    background: transparent; /* SIN background - flat sobre fondo */
+    border: none; /* SIN borders */
+    border-radius: 0;
+    padding: 0; /* SIN padding extra */
+    box-shadow: none; /* SIN shadow */
+}
+
+/* ========================================
+   SECTIONS
+   ======================================== */
+
+.legal-section {
+    margin-bottom: 1.2rem; /* Más compacto */
+}
+
+.legal-section:last-child {
+    margin-bottom: 0;
+}
+
+.legal-section h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem; /* Más pequeño */
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 0rem; /* Reducido */
+    padding-bottom: 0rem;
+    position: relative;
+    scroll-margin-top: 100px;
+}
+
+.legal-section h3 {
+    font-size: 1.05rem; /* Más pequeño */
+    font-weight: 700;
+    color: #111827;
+    margin-top: 1.25rem; /* Reducido */
+    margin-bottom: 0.5rem; /* Reducido */
+}
+
+.legal-section p {
+    color: #374151;
+    line-height: 1.5; /* Más compacto, profesional */
+    margin-bottom: 0.75rem; /* Reducido */
+}
+
+.legal-section ul,
+.legal-section ol {
+    color: #374151;
+    line-height: 1.5; /* Más compacto */
+    margin-bottom: 0.75rem; /* Reducido */
+    padding-left: 1.5rem;
+}
+
+.legal-section li {
+    margin-bottom: 0.25rem; /* Reducido significativamente */
+}
+
+.legal-section strong {
+    color: #111827;
+    font-weight: 700;
+}
+
+.legal-section a {
+    color: #047857;
+    text-decoration: underline;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.legal-section a:hover {
+    color: #059669;
+}
+
+.legal-section code {
+    background: #f3f4f6;
+    padding: 0.2rem 0.4rem; /* Reducido */
+    border-radius: 0;
+    border: 1px solid #d1d5db;
+    font-size: 0.9em;
+    color: #111827;
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+}
+
+/* ========================================
+   HEADER ANCHOR LINKS (#)
+   ======================================== */
+
+.header-link {
+    opacity: 0;
+    margin-left: 0.5rem;
+    color: #6b7280; /* Gris más sutil */
+    text-decoration: none;
+    font-size: 0.7em;
+    font-weight: 400;
+    transition: opacity 0.2s ease;
+}
+
+.legal-section h2:hover .header-link {
+    opacity: 0.5;
+}
+
+.header-link:hover {
+    opacity: 1 !important;
+}
+
+/* ========================================
+   TABLES - MINIMAL
+   ======================================== */
+
+.legal-table {
+    overflow-x: auto;
+    margin: 1rem 0; /* Reducido */
+}
+
+.legal-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem; /* Más pequeño */
+    border-top: 1px solid #d1d5db;
+    border-bottom: 1px solid #d1d5db;
+    border-radius: 0;
+}
+
+.legal-table thead {
+    background: #f3f4f6;
+    border-bottom: 2px solid #d1d5db;
+}
+
+.legal-table th {
+    padding: 0.625rem 0.75rem; /* Padding vertical reducido */
+    text-align: left;
+    font-weight: 700;
+    color: #111827;
+    font-size: 0.8rem; /* Más pequeño */
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.legal-table td {
+    padding: 0.625rem 0.75rem; /* Padding vertical reducido */
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+    font-weight: 400;
+    line-height: 1.5; /* Compacto */
+}
+
+.legal-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.legal-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* ========================================
+   COOKIE CATEGORIES - MINIMAL CARDS
+   ======================================== */
+
+.cookie-category {
+    background: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 1rem; /* Reducido */
+    margin-bottom: 1.25rem; /* Reducido */
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.cookie-category h3 {
+    margin-top: 0;
+    font-size: 1rem; /* Reducido */
+    font-weight: 700;
+    color: #111827;
+    display: flex;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 0.5rem; /* Reducido */
+}
+
+.cookie-category .iconoir {
+    color: #6b7280;
+}
+
+/* ========================================
+   HIGHLIGHT BOXES - MINIMAL
+   ======================================== */
+
+/* Info - Gris mínimo */
+.legal-highlight {
+    background: #f3f4f6;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 1rem; /* Padding vertical reducido */
+    margin: 1rem 0; /* Margen reducido */
+}
+
+.legal-highlight .iconoir {
+    color: #6b7280;
+}
+
+/* Importante - Amarillo sutil */
+.legal-important {
+    background: #fef3c7;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 1rem; /* Padding vertical reducido */
+    margin: 1rem 0; /* Margen reducido */
+}
+
+.legal-important .iconoir {
+    color: #d97706;
+}
+
+/* Warning - Rojo mínimo */
+.legal-warning {
+    background: #fee2e2;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 1rem; /* Padding vertical reducido */
+    margin: 1rem 0; /* Margen reducido */
+}
+
+.legal-warning .iconoir {
+    color: #dc2626;
+}
+
+/* ========================================
+   TOC SIDEBAR - CLEAN
+   ======================================== */
+
+.legal-toc {
+    position: sticky;
+    top: 150px; /* Debajo del botón toggle (100px + 50px aprox) */
+    background: transparent; /* Sin card, fondo transparente */
+    border: none; /* Sin borders */
+    border-left: 2px solid #e5e7eb; /* Solo borde izquierdo sutil */
+    border-radius: 0;
+    padding: 0 0 0 1rem; /* Padding solo izquierdo */
+    max-height: calc(100vh - 170px); /* Ajustado para el botón */
+    overflow-y: auto;
+    box-shadow: none; /* Sin shadow */
+}
+
+/* Collapsible behavior (all screen sizes) */
+.legal-toc {
+    transition: all 0.3s ease;
+}
+
+.legal-toc:not(.show) {
+    display: none;
+}
+
+.legal-toc.show {
+    display: block;
+}
+
+/* Desktop: Different styling when expanded */
+@media (min-width: 768px) {
+    .legal-toc.show {
+        /* Mantener estilo minimalista */
+    }
+}
+
+/* Mobile: Card style when expanded */
+@media (max-width: 767px) {
+    .legal-toc {
+        position: static;
+        border-left: none;
+        padding: 0;
+        max-height: none;
+    }
+
+    .legal-toc.show {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+        border-left: 2px solid #e5e7eb;
+    }
+}
+
+/* Toggle Button - Sticky */
+.legal-toc-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    position: sticky;
+    top: 100px;
+    z-index: 10;
+    background: #ffffff;
+    border-radius: 6px;
+}
+
+.legal-toc-toggle .toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.legal-toc-toggle[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+}
+
+.legal-toc-title {
+    font-size: 0.75rem; /* Más pequeño, minimalista */
+    font-weight: 600;
+    color: #6b7280; /* Gris más suave */
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    padding-bottom: 0;
+    border-bottom: none; /* Sin border */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.legal-toc-title .iconoir {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+/* Listas numeradas */
+.legal-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: section;
+}
+
+.legal-toc-list > li {
+    counter-increment: section;
+    margin-bottom: 0.5rem; /* Reducido de 0.6rem */
+}
+
+.legal-toc-list > li::before {
+    content: counter(section) ". ";
+    font-weight: 700;
+    color: #111827;
+    margin-right: 0.35rem; /* Reducido */
+    font-size: 0.8rem; /* Reducido de 0.9rem */
+}
+
+.legal-toc-sublist {
+    list-style: none;
+    padding-left: 1rem; /* Reducido de 1.25rem */
+    margin-top: 0.35rem; /* Reducido */
+    counter-reset: subsection;
+}
+
+.legal-toc-sublist > li {
+    counter-increment: subsection;
+    margin-bottom: 0.35rem; /* Reducido de 0.4rem */
+    font-size: 0.75rem; /* Reducido de 0.85rem */
+}
+
+.legal-toc-sublist > li::before {
+    content: counter(section) "." counter(subsection) " ";
+    font-weight: 600;
+    color: #9ca3af;
+    margin-right: 0.35rem; /* Reducido */
+    font-size: 0.75rem; /* Reducido */
+}
+
+/* TOC Links */
+.legal-toc-link {
+    color: #4b5563;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-block;
+    padding: 0.1rem 0;
+    font-weight: 500;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    position: relative;
+}
+
+.legal-toc-link:hover {
+    color: #047857;
+}
+
+.legal-toc-link:focus-visible {
+    outline: 2px solid #047857;
+    outline-offset: 2px;
+}
+
+/* Active state - Sección actual visible */
+.legal-toc-link.active {
+    color: #047857; /* Verde bosque */
+    font-weight: 700; /* Bold */
+}
+
+/* Sub-items activos */
+.legal-toc-sublist .legal-toc-link.active {
+    color: #047857;
+    font-weight: 600;
+}
+
+/* ========================================
+   FOOTER NAVIGATION
+   ======================================== */
+
+.legal-footer {
+    margin-top: 2.5rem; /* Reducido */
+    padding-top: 1.5rem; /* Reducido */
+    border-top: 1px solid #e5e7eb; /* Border más sutil */
+}
+
+/* Botones footer - Consistente con sistema global */
+.legal-footer .btn {
+    border-radius: 6px !important;  /* Consistente con sistema UI (navegación = 6px) */
+    font-weight: 600;
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.legal-footer .btn-outline-secondary {
+    background: #f3f4f6;
+    border: none;
+    color: #111827;
+}
+
+.legal-footer .btn-outline-secondary:hover {
+    background: #e5e7eb;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
+/* btn-outline-primary en legal ahora usa sistema global */
+/* Ver buttons.css - ya no necesita override aquí */
+
+/* Loading state para botones legales */
+.legal-footer .btn.is-loading,
+.legal-footer .btn-outline-secondary.is-loading,
+.legal-footer .btn-accent.is-loading {
+    pointer-events: none;
+    opacity: 0.85;
+    cursor: wait;
+}
+
+.legal-footer .btn.is-loading::before,
+.legal-footer .btn-accent.is-loading::before {
+    content: '';
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: btn-spinner-spin 0.6s linear infinite;
+    margin-right: 0;
+    flex-shrink: 0;
+}
+
+/* Spinner oscuro para botones claros */
+.legal-footer .btn-outline-secondary.is-loading::before {
+    border: 3px solid rgba(17, 24, 39, 0.2);
+    border-top-color: #111827;
+}
+
+.legal-footer .btn.is-loading .btn-text {
+    opacity: 0.7;
+    margin-left: 8px;
+}
+
+.legal-footer .btn.is-loading .iconoir:not(.btn-text *) {
+    display: none;
+}
+
+@keyframes btn-spinner-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   SMOOTH SCROLLING
+   ======================================== */
+
+html {
+    scroll-behavior: smooth;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .legal-content {
+        padding: 1.5rem; /* Reducido en mobile */
+        border-left-width: 3px;
+    }
+
+    .legal-header h1 {
+        font-size: 2rem;
+    }
+
+    .legal-section h2 {
+        font-size: 1.4rem;
+    }
+
+    .legal-section h3 {
+        font-size: 1.05rem;
+    }
+
+    .legal-table {
+        font-size: 0.85rem;
+    }
+
+    .legal-table th,
+    .legal-table td {
+        padding: 0.6rem;
+    }
+
+    .cookie-category {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .legal-content {
+        padding: 1.25rem;
+    }
+
+    .legal-section h2 {
+        font-size: 1.3rem;
+        border-bottom-width: 1px;
+    }
+
+    .legal-header {
+        border-bottom-width: 1px;
+    }
+
+    .cookie-category {
+        padding: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .legal-important,
+    .legal-warning,
+    .legal-highlight {
+        padding: 0.85rem;
+    }
+}

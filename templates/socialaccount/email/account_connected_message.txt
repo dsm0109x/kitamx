@@ -1,0 +1,30 @@
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+CUENTA DE GOOGLE CONECTADA
+
+Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+Has conectado exitosamente tu cuenta de Google con tu cuenta de Kita.
+
+AHORA PUEDES INICIAR SESION DE 2 FORMAS:
+• Con tu email y contrasena
+• Con el boton "Continuar con Google"
+
+PARA TU SEGURIDAD:
+• Puedes desconectar Google en cualquier momento desde Configuracion
+• Si no reconoces esta actividad, cambia tu contrasena inmediatamente
+• Contacta con soporte si tienes dudas: hola@kita.mx
+
+Accede a tu dashboard en: https://kita.mx/ingresar/
+
+--
+El equipo de Kita
+https://kita.mx
+hola@kita.mx
+
+--------------------------------------------------------------------------------
+Este email fue enviado porque conectaste tu cuenta de Google.
+Si no fuiste tu, contacta inmediatamente con hola@kita.mx
+================================================================================

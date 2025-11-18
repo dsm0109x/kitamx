@@ -1,0 +1,94 @@
+version: 2.1
+
+# ============================================
+# WORKFLOWS
+# Test and deploy pipeline with correct SSH config
+# ============================================
+workflows:
+  test-and-deploy:
+    jobs:
+      # Corre tests en todas las branches
+      - test:
+          filters:
+            branches:
+              only: /.*/
+
+      # Deploy solo en production branch (después de tests)
+      - deploy:
+          requires:
+            - test
+          filters:
+            branches:
+              only: production
+
+# ============================================
+# JOBS
+# ============================================
+jobs:
+  # --------------------------------------------
+  # JOB: Test (Lightweight - solo syntax check)
+  # --------------------------------------------
+  test:
+    machine:
+      image: ubuntu-2204:2024.01.1
+
+    steps:
+      - checkout
+
+      # Verificación básica: Python syntax check
+      - run:
+          name: Python syntax check
+          command: |
+            python3 -m py_compile kita/settings.py
+            python3 -m py_compile manage.py
+            echo "✅ Python syntax OK"
+
+      # Verificar que requirements.txt es válido
+      - run:
+          name: Check requirements.txt
+          command: |
+            if [ ! -f requirements.txt ]; then
+              echo "❌ requirements.txt not found"
+              exit 1
+            fi
+            echo "✅ requirements.txt exists"
+
+      # Verificar archivos críticos
+      - run:
+          name: Verify critical files
+          command: |
+            test -f deployment/deploy.sh || (echo "❌ deploy.sh missing" && exit 1)
+            test -f manage.py || (echo "❌ manage.py missing" && exit 1)
+            test -d kita || (echo "❌ kita/ directory missing" && exit 1)
+            echo "✅ All critical files present"
+
+  # --------------------------------------------
+  # JOB: Deploy
+  # --------------------------------------------
+  deploy:
+    machine:
+      image: ubuntu-2204:2024.01.1
+
+    steps:
+      - checkout
+
+      # Deploy via SSH usando clave desde variable de entorno
+      - run:
+          name: Deploy to production server
+          command: |
+            # Crear archivo de clave SSH desde variable de entorno
+            mkdir -p ~/.ssh
+            echo -e "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+            chmod 600 ~/.ssh/deploy_key
+
+            # Conectar usando la clave específica
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no kita@159.203.124.1 \
+              'bash -s' < deployment/deploy.sh
+
+      # Health check post-deploy
+      - run:
+          name: Health check
+          command: |
+            echo "⏳ Waiting for services to restart..."
+            sleep 10
+            curl -f https://kita.mx/health/ && echo "✅ Health check passed" || echo "⚠️  Health check failed"

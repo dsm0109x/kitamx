@@ -1,0 +1,979 @@
+<!-- Link Detail Panel -->
+<div class="d-flex align-items-center mb-3">
+    <div class="bg-primary rounded-circle p-2 me-3">
+        <i class="iconoir-link text-white"></i>
+    </div>
+    <div>
+        <h6 class="mb-0">{{ link.title }}</h6>
+        <small class="text-muted">Token: {{ link.token }}</small>
+    </div>
+</div>
+
+<!-- Conversion Funnel (NEW - Replacing Views Timeline) -->
+<div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <div>
+            <h6 class="mb-0">
+                <i class="iconoir-stats-report me-2"></i>
+                Embudo de Conversión
+            </h6>
+            <p class="card-subtitle mb-0 small text-muted">Cómo los visitantes interactúan con tu link</p>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary"
+                onclick="refreshLinkMetrics('{{ link.id }}')"
+                title="Refrescar métricas">
+            <i class="iconoir-refresh"></i>
+        </button>
+    </div>
+    <div class="card-body">
+        {% if funnel_data.views > 0 %}
+        <div class="funnel-container">
+            <!-- Vistas -->
+            <div class="funnel-step">
+                <div class="funnel-bar funnel-bar-views" style="width: 100%;">
+                    <span class="funnel-label">
+                        <i class="iconoir-eye me-1"></i>
+                        Vistas
+                    </span>
+                    <span class="funnel-count">{{ funnel_data.views }}</span>
+                </div>
+                <span class="funnel-percent">100%</span>
+            </div>
+
+            <!-- Clics -->
+            <div class="funnel-step">
+                <div class="funnel-bar funnel-bar-clicks" style="width: {{ funnel_data.clicks_percent }}%;">
+                    <span class="funnel-label">
+                        <i class="iconoir-mouse me-1"></i>
+                        Clics "Pagar"
+                    </span>
+                    <span class="funnel-count">{{ funnel_data.clicks }}</span>
+                </div>
+                <span class="funnel-percent">{{ funnel_data.clicks_percent }}%</span>
+            </div>
+
+            <!-- Intentos -->
+            {% if funnel_data.attempts > 0 %}
+            <div class="funnel-step">
+                <div class="funnel-bar funnel-bar-attempts" style="width: {{ funnel_data.attempts_percent }}%;">
+                    <span class="funnel-label">
+                        <i class="iconoir-credit-card me-1"></i>
+                        Intentos Pago
+                    </span>
+                    <span class="funnel-count">{{ funnel_data.attempts }}</span>
+                </div>
+                <span class="funnel-percent">{{ funnel_data.attempts_percent }}%</span>
+            </div>
+            {% endif %}
+
+            <!-- Exitosos -->
+            {% if funnel_data.successful > 0 %}
+            <div class="funnel-step">
+                <div class="funnel-bar funnel-bar-success" style="width: {{ funnel_data.success_percent }}%;">
+                    <span class="funnel-label">
+                        <i class="iconoir-check-circle me-1"></i>
+                        Pagos Exitosos
+                    </span>
+                    <span class="funnel-count">{{ funnel_data.successful }}</span>
+                </div>
+                <span class="funnel-percent">{{ funnel_data.success_percent }}%</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Insight -->
+        <div class="funnel-insight mt-3 p-2" style="background: var(--bg-secondary); border-left: 4px solid var(--color-forest-700);">
+            <strong>💡 Tasa de Conversión: {{ funnel_data.conversion_rate }}%</strong>
+            <p class="mb-0 small text-muted">
+                {% if funnel_data.conversion_rate > 12 %}
+                    ¡Excelente! Por encima del promedio de la industria (8-12%)
+                {% elif funnel_data.conversion_rate > 8 %}
+                    Dentro del promedio de la industria (8-12%)
+                {% elif funnel_data.conversion_rate > 0 %}
+                    Considera optimizar: precio, descripción o vigencia
+                {% else %}
+                    Todavía no hay conversiones. Comparte más el link.
+                {% endif %}
+            </p>
+        </div>
+        {% else %}
+        <div class="text-center py-4 text-muted">
+            <i class="iconoir-eye" style="font-size: 2.5rem; opacity: 0.3;"></i>
+            <p class="mb-0 mt-2">Sin vistas aún. Comparte el link con tus clientes.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.funnel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.funnel-step {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.funnel-bar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 140px;
+    box-shadow: var(--shadow-xs);
+}
+
+.funnel-bar-views {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.funnel-bar-clicks {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+.funnel-bar-attempts {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.funnel-bar-success {
+    background: linear-gradient(90deg, var(--color-forest-700), var(--color-forest-500));
+}
+
+.funnel-label {
+    display: flex;
+    align-items: center;
+}
+
+.funnel-count {
+    font-weight: 700;
+    font-size: 1.125rem;
+}
+
+.funnel-percent {
+    font-weight: 700;
+    color: var(--text-secondary);
+    min-width: 50px;
+    text-align: right;
+    font-size: 0.875rem;
+}
+</style>
+
+<!-- Engagement Metrics (NEW) -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-activity me-2"></i>
+            Engagement del Link
+        </h6>
+        <p class="card-subtitle mb-0 small text-muted">Comportamiento de los visitantes</p>
+    </div>
+    <div class="card-body">
+        {% if engagement.clicks > 0 or engagement.paid > 0 %}
+        <div class="engagement-breakdown">
+            <!-- Clicks -->
+            <div class="engagement-item mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">
+                        <i class="iconoir-mouse me-1"></i>
+                        Hicieron clic en "Pagar"
+                    </span>
+                    <strong class="text-primary">{{ engagement.clicks }} ({{ engagement.clicks_percent }}%)</strong>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-primary" role="progressbar"
+                         style="width: {{ engagement.clicks_percent }}%;"
+                         aria-valuenow="{{ engagement.clicks_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+
+            <!-- Pagos exitosos -->
+            {% if engagement.paid > 0 %}
+            <div class="engagement-item mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">
+                        <i class="iconoir-check-circle me-1"></i>
+                        Completaron el pago
+                    </span>
+                    <strong class="text-success">{{ engagement.paid }} ({{ engagement.paid_percent }}%)</strong>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-success" role="progressbar"
+                         style="width: {{ engagement.paid_percent }}%;"
+                         aria-valuenow="{{ engagement.paid_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Abandonados -->
+            {% if engagement.abandoned > 0 %}
+            <div class="engagement-item mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">
+                        <i class="iconoir-xmark me-1"></i>
+                        Abandonaron el proceso
+                    </span>
+                    <strong class="text-warning">{{ engagement.abandoned }} ({{ engagement.abandoned_percent }}%)</strong>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-warning" role="progressbar"
+                         style="width: {{ engagement.abandoned_percent }}%;"
+                         aria-valuenow="{{ engagement.abandoned_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Solo vieron -->
+            {% if engagement.only_viewed > 0 %}
+            <div class="engagement-item">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small">
+                        <i class="iconoir-eye me-1"></i>
+                        Solo vieron (no hicieron clic)
+                    </span>
+                    <strong class="text-muted">{{ engagement.only_viewed }} ({{ engagement.only_viewed_percent }}%)</strong>
+                </div>
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar bg-secondary" role="progressbar"
+                         style="width: {{ engagement.only_viewed_percent }}%;"
+                         aria-valuenow="{{ engagement.only_viewed_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Engagement insight -->
+        <div class="alert alert-info mt-3 mb-0" style="border-left: 4px solid #0ea5e9;">
+            <small>
+                <strong>💡 Insight:</strong>
+                {% if engagement.clicks_percent > 50 %}
+                    {{ engagement.clicks_percent }}% de visitantes hacen clic. ¡Tu llamada a acción es muy efectiva! ✅
+                {% elif engagement.clicks_percent > 30 %}
+                    {{ engagement.clicks_percent }}% de visitantes hacen clic. CTR saludable.
+                {% elif engagement.clicks_percent > 0 %}
+                    Solo {{ engagement.clicks_percent }}% hacen clic. Considera mejorar el título o descripción.
+                {% else %}
+                    Ningún visitante ha hecho clic aún. Verifica que el link funcione correctamente.
+                {% endif %}
+            </small>
+        </div>
+        {% else %}
+        <div class="text-center py-3 text-muted">
+            <i class="iconoir-activity" style="font-size: 2.5rem; opacity: 0.3;"></i>
+            <p class="mb-0 mt-2 small">Sin interacciones aún</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Email Notifications Section -->
+{% if link.notifications_enabled %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-bell me-2"></i>
+            Notificaciones por Email
+        </h6>
+        <p class="card-subtitle mb-0 small text-muted">
+            Configuración y tracking de emails enviados
+        </p>
+    </div>
+    <div class="card-body">
+
+        <!-- Resumen Rápido -->
+        {% if link.notification_count > 0 %}
+        <div class="row text-center g-2 mb-3">
+            <div class="col-4">
+                <div class="stat-box">
+                    <div class="stat-value text-primary">{{ link.notification_count }}</div>
+                    <div class="stat-label">Enviados</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-box">
+                    <div class="stat-value text-success">{{ notifications.delivered_count }}</div>
+                    <div class="stat-label">Entregados</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="stat-box">
+                    <div class="stat-value text-info">{{ notifications.opened_count }}</div>
+                    <div class="stat-label">Abiertos</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Configuración del Link -->
+        <div class="alert alert-light border mb-3">
+            <small class="d-block mb-1"><strong>Configuración:</strong></small>
+            <ul class="small mb-0 ps-3">
+                {% if link.notify_on_create %}
+                <li>📧 Email al crear link</li>
+                {% endif %}
+                {% if link.send_reminders %}
+                <li>⏰ Recordatorio ({{ link.reminder_hours_before }}h antes)
+                    {% if link.reminder_sent %}
+                        <span class="badge bg-success">Enviado</span>
+                    {% else %}
+                        <span class="badge bg-warning">Pendiente</span>
+                    {% endif %}
+                </li>
+                {% endif %}
+                {% if link.notify_on_expiry %}
+                <li>📭 Email si expira sin pagar</li>
+                {% endif %}
+                <li class="text-muted">✅ Confirmación de pago (automática)</li>
+                {% if link.requires_invoice %}
+                <li class="text-muted">📄 Formulario facturación (automática)</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <!-- Timeline de Emails Enviados -->
+        {% if notifications.sent %}
+        <h6 class="mb-2 small text-muted">
+            <i class="iconoir-timeline me-1"></i>
+            Timeline de Emails
+        </h6>
+
+        <div class="email-timeline">
+            {% for notification in notifications.sent %}
+                {% with event=notification.get_email_event %}
+                <div class="email-event-card mb-2">
+                    <div class="d-flex align-items-start">
+                        <!-- Icono de estado -->
+                        <div class="email-status-icon me-2">
+                            {% if event.bounced %}
+                                <i class="iconoir-xmark-circle text-danger"></i>
+                            {% elif event.opened %}
+                                <i class="iconoir-check-circle text-success"></i>
+                            {% elif event.delivered %}
+                                <i class="iconoir-send text-primary"></i>
+                            {% else %}
+                                <i class="iconoir-mail text-muted"></i>
+                            {% endif %}
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <!-- Título y tipo -->
+                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                <strong class="small">
+                                    {% if notification.notification_type == 'link_created' %}
+                                        📧 Link Creado
+                                    {% elif notification.notification_type == 'payment_reminder' %}
+                                        ⏰ Recordatorio
+                                    {% elif notification.notification_type == 'payment_received' %}
+                                        ✅ Confirmación de Pago
+                                    {% elif notification.notification_type == 'link_expired' %}
+                                        📭 Link Expirado
+                                    {% else %}
+                                        📧 {{ notification.get_notification_type_display }}
+                                    {% endif %}
+                                </strong>
+                                <small class="text-muted">
+                                    {{ notification.sent_at|date:"d/m H:i" }}
+                                </small>
+                            </div>
+
+                            <!-- Destinatario -->
+                            <div class="small text-muted">
+                                Para: {{ notification.recipient_email }}
+                            </div>
+
+                            <!-- Estados del email -->
+                            {% if event %}
+                                <div class="email-status-badges mt-2">
+                                    {% if event.delivered %}
+                                        <span class="badge bg-success bg-opacity-10 text-success">
+                                            ✓ Entregado
+                                        </span>
+                                    {% endif %}
+
+                                    {% if event.opened %}
+                                        <span class="badge bg-info bg-opacity-10 text-info">
+                                            👁️ Abierto {% if event.open_count > 1 %}{{ event.open_count }}x{% endif %}
+                                        </span>
+                                    {% endif %}
+
+                                    {% if event.bounced %}
+                                        <span class="badge bg-danger bg-opacity-10 text-danger">
+                                            ❌ Rebotó
+                                        </span>
+                                    {% endif %}
+
+                                    {% if event.spam_complaint %}
+                                        <span class="badge bg-warning bg-opacity-10 text-warning">
+                                            ⚠️ Spam
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Detalles expandibles -->
+                                {% if event.opened or event.bounced %}
+                                <div class="email-details mt-2">
+                                    <button class="btn btn-link btn-sm p-0 text-decoration-none small"
+                                            type="button"
+                                            data-bs-toggle="collapse"
+                                            data-bs-target="#email-detail-{{ event.id }}"
+                                            aria-expanded="false">
+                                        <i class="iconoir-nav-arrow-down me-1"></i>
+                                        Ver detalles
+                                    </button>
+
+                                    <div class="collapse mt-2" id="email-detail-{{ event.id }}">
+                                        <div class="small p-2 bg-light rounded">
+                                            {% if event.opened %}
+                                                <div class="mb-1">
+                                                    <strong>Primera apertura:</strong>
+                                                    {{ event.first_opened_at|date:"d/m/Y H:i" }}
+                                                </div>
+                                                {% if event.time_to_open_display %}
+                                                <div class="mb-1">
+                                                    <strong>Tiempo de respuesta:</strong>
+                                                    <span class="text-success">{{ event.time_to_open_display }}</span>
+                                                </div>
+                                                {% endif %}
+                                                {% if event.last_opened_at and event.open_count > 1 %}
+                                                <div>
+                                                    <strong>Última apertura:</strong>
+                                                    {{ event.last_opened_at|date:"d/m/Y H:i" }}
+                                                </div>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {% if event.bounced %}
+                                                <div class="text-danger mb-1">
+                                                    <strong>Estado:</strong> Email no entregado
+                                                </div>
+                                                <div class="text-danger">
+                                                    <strong>Motivo:</strong> {{ event.bounce_type }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="small text-muted mt-1">
+                                    <i class="iconoir-hourglass me-1"></i>
+                                    Esperando confirmación...
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Emails Programados -->
+        {% if notifications.pending %}
+        <hr class="my-3">
+        <h6 class="mb-2 small text-muted">
+            <i class="iconoir-clock me-1"></i>
+            Emails Programados
+        </h6>
+
+        {% for scheduled in notifications.pending %}
+        <div class="alert alert-info p-2 mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <small>
+                    <strong>{{ scheduled.type_display }}</strong>
+                </small>
+                <small class="text-muted">
+                    {{ scheduled.scheduled_for|date:"d/m H:i" }}
+                </small>
+            </div>
+            <small class="text-muted d-block mt-1">
+                Para: {{ link.customer_email }}
+            </small>
+        </div>
+        {% endfor %}
+        {% elif link.status != 'active' and link.send_reminders %}
+        <hr class="my-3">
+        <div class="alert alert-secondary p-2 mb-0">
+            <i class="iconoir-info-circle me-1"></i>
+            <small>
+                {% if link.status == 'paid' %}
+                    <strong>Link pagado:</strong> Los recordatorios programados se cancelaron automáticamente.
+                {% elif link.status == 'expired' %}
+                    <strong>Link expirado:</strong> Los recordatorios no se enviarán.
+                {% elif link.status == 'cancelled' %}
+                    <strong>Link cancelado:</strong> Los recordatorios fueron cancelados.
+                {% endif %}
+            </small>
+        </div>
+        {% endif %}
+
+        <!-- Email Analytics -->
+        {% if link.notification_count > 0 %}
+        <hr class="my-3">
+        <h6 class="mb-2 small text-muted">
+            <i class="iconoir-stats-report me-1"></i>
+            Email Analytics
+        </h6>
+
+        <div class="row g-2">
+            <div class="col-6">
+                <div class="metric-card p-2 border rounded text-center">
+                    <div class="metric-value {% if notifications.delivery_rate >= 95 %}text-success{% elif notifications.delivery_rate >= 85 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ notifications.delivery_rate|floatformat:0 }}%
+                    </div>
+                    <div class="metric-label">Entrega</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="metric-card p-2 border rounded text-center">
+                    <div class="metric-value {% if notifications.open_rate >= 50 %}text-success{% elif notifications.open_rate >= 30 %}text-info{% else %}text-warning{% endif %}">
+                        {{ notifications.open_rate|floatformat:0 }}%
+                    </div>
+                    <div class="metric-label">Apertura</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="metric-card p-2 border rounded text-center">
+                    <div class="metric-value {% if notifications.bounce_rate == 0 %}text-success{% elif notifications.bounce_rate < 5 %}text-warning{% else %}text-danger{% endif %}">
+                        {{ notifications.bounce_rate|floatformat:0 }}%
+                    </div>
+                    <div class="metric-label">Rebotes</div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="metric-card p-2 border rounded text-center">
+                    <div class="metric-value {% if notifications.spam_rate == 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ notifications.spam_rate|floatformat:0 }}%
+                    </div>
+                    <div class="metric-label">Spam</div>
+                </div>
+            </div>
+        </div>
+
+        {% if notifications.avg_time_to_open %}
+        <div class="alert alert-success p-2 mt-2 mb-0">
+            <i class="iconoir-timer me-1"></i>
+            <small>
+                <strong>Tiempo promedio hasta abrir:</strong> {{ notifications.avg_time_to_open }}
+            </small>
+        </div>
+        {% endif %}
+        {% endif %}
+
+        <!-- Si no hay emails enviados -->
+        {% if link.notification_count == 0 %}
+        <div class="text-center py-3 text-muted">
+            <i class="iconoir-mail" style="font-size: 2rem; opacity: 0.3;"></i>
+            <p class="mb-0 mt-2 small">
+                {% if link.customer_email %}
+                    No se han enviado emails aún
+                {% else %}
+                    Falta email del cliente para enviar notificaciones
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% else %}
+<!-- Notificaciones desactivadas -->
+<div class="card mb-3">
+    <div class="card-body text-center py-4">
+        <i class="iconoir-bell-off" style="font-size: 2.5rem; opacity: 0.3;"></i>
+        <p class="mb-0 mt-2 text-muted">
+            <strong>Notificaciones desactivadas</strong>
+        </p>
+        <small class="text-muted">
+            No se enviarán emails opcionales para este link
+        </small>
+    </div>
+</div>
+{% endif %}
+
+<!-- Estilos para Email Tracking -->
+<style>
+.email-timeline {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+.email-event-card {
+    padding: 0.75rem;
+    background: #fafbfc;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.email-event-card:hover {
+    border-color: #046865;
+    background: #f0fdf4;
+}
+
+.email-status-icon {
+    font-size: 1.25rem;
+}
+
+.email-status-badges {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+}
+
+.email-status-badges .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+}
+
+.stat-box {
+    padding: 0.75rem 0.5rem;
+    background: #f9fafb;
+    border-radius: 6px;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s;
+}
+
+.stat-box:hover {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.metric-card {
+    background: #fafbfc;
+    transition: all 0.2s;
+}
+
+.metric-card:hover {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.metric-label {
+    font-size: 0.7rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+.email-details .btn-link {
+    color: #046865;
+    font-size: 0.8rem;
+}
+
+.email-details .btn-link:hover {
+    color: #0a9488;
+}
+</style>
+
+<!-- Public URL (Moved up - more important) -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-globe me-2"></i>
+            URL Pública
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="input-group">
+            <input type="text" class="form-control" readonly
+                   value="https://kita.mx/hola/{{ link.token }}/"
+                   id="public-url-{{ link.id }}">
+            <button class="btn btn-outline-secondary"
+                    onclick="copyToClipboard(document.getElementById('public-url-{{ link.id }}').value, 'URL copiada al portapapeles')"
+                    title="Copiar al portapapeles">
+                <i class="iconoir-copy"></i>
+            </button>
+            <a href="{% url 'payments:public_link' link.token %}" target="_blank"
+               class="btn btn-outline-primary" title="Abrir en nueva pestaña">
+                <i class="iconoir-open-in-new"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Link Information -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-info-empty me-2"></i>
+            Información del Link
+        </h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm mb-0">
+            <tr>
+                <td class="text-muted"><strong>Monto:</strong></td>
+                <td class="text-end">${{ link.amount|floatformat:2 }} {{ link.currency }}</td>
+            </tr>
+            <tr>
+                <td class="text-muted"><strong>Estado:</strong></td>
+                <td class="text-end">
+                    <span class="badge bg-{% if link.status == 'paid' %}success{% elif link.status == 'active' %}primary{% elif link.status == 'expired' %}warning{% else %}secondary{% endif %}">
+                        {{ link.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td class="text-muted"><strong>Creado:</strong></td>
+                <td class="text-end">{{ link.created_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+            <tr>
+                <td class="text-muted"><strong>Expira:</strong></td>
+                <td class="text-end">
+                    {{ link.expires_at|date:"d/m/Y H:i" }}
+                    {% if time_left_hours < 0 %}
+                        <span class="badge bg-danger ms-1">Expirado</span>
+                    {% elif time_left_hours < 24 %}
+                        <span class="badge bg-warning ms-1">¡Expira hoy!</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td class="text-muted"><strong>Usos:</strong></td>
+                <td class="text-end">{{ link.uses_count }} / {{ link.max_uses }}</td>
+            </tr>
+            <tr>
+                <td class="text-muted"><strong>Factura:</strong></td>
+                <td class="text-end">
+                    {% if link.requires_invoice %}
+                        <span class="badge bg-info">Requerida</span>
+                    {% else %}
+                        <span class="text-muted">No requerida</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        {% if link.description %}
+            <div class="mt-3 pt-3 border-top">
+                <strong class="small text-muted">Descripción:</strong>
+                <p class="text-muted mb-0 mt-1 small">{{ link.description }}</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Customer Information -->
+{% if link.customer_name or link.customer_email %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-user me-2"></i>
+            Información del Cliente
+        </h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm mb-0">
+            {% if link.customer_name %}
+                <tr>
+                    <td class="text-muted"><strong>Nombre:</strong></td>
+                    <td class="text-end">{{ link.customer_name }}</td>
+                </tr>
+            {% endif %}
+            {% if link.customer_email %}
+                <tr>
+                    <td class="text-muted"><strong>Email:</strong></td>
+                    <td class="text-end">{{ link.customer_email }}</td>
+                </tr>
+            {% endif %}
+            {% if link.customer_rfc %}
+                <tr>
+                    <td class="text-muted"><strong>RFC:</strong></td>
+                    <td class="text-end">{{ link.customer_rfc }}</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- Payments History -->
+{% if payments %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-dollar me-2"></i>
+            Historial de Pagos ({{ payments.count }})
+        </h6>
+    </div>
+    <div class="card-body">
+        {% for payment in payments %}
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 {% if not forloop.last %}border-bottom{% endif %}">
+                <div>
+                    <div class="fw-bold">${{ payment.amount|floatformat:2 }} {{ payment.currency }}</div>
+                    <small class="text-muted">{{ payment.payer_name|default:"Cliente" }}</small>
+                    <br><small class="text-muted">ID: {{ payment.mp_payment_id }}</small>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-{% if payment.status == 'approved' %}success{% elif payment.status == 'pending' %}warning{% else %}danger{% endif %}">
+                        {{ payment.get_status_display }}
+                    </span>
+                    <br><small class="text-muted">{{ payment.created_at|date:"d/m/Y H:i" }}</small>
+                    {% if payment.invoice %}
+                        <br><small><a href="javascript:void(0)" onclick="showDetailPanel('invoice', '{{ payment.invoice.id }}')">
+                            <i class="iconoir-page me-1"></i>Ver factura
+                        </a></small>
+                    {% else %}
+                        <br><small><a href="javascript:void(0)" onclick="showDetailPanel('payment', '{{ payment.id }}')">
+                            <i class="iconoir-eye me-1"></i>Ver pago
+                        </a></small>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Quick Stats (Simplified) -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-stats-up me-2"></i>
+            Métricas Rápidas
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row text-center g-3">
+            <div class="col-4">
+                <div class="h4 text-primary mb-0">{{ link.get_views_count }}</div>
+                <small class="text-muted">Vistas</small>
+            </div>
+            <div class="col-4">
+                <div class="h4 text-info mb-0">{{ link.get_clicks_count }}</div>
+                <small class="text-muted">Clics</small>
+            </div>
+            <div class="col-4">
+                <div class="h4 text-warning mb-0">{{ link.get_reminders_count }}</div>
+                <small class="text-muted">Recordatorios</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payments List (if any) -->
+{% if payments %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-dollar me-2"></i>
+            Pagos Recibidos
+            <span class="badge bg-success ms-2">{{ payments.count }}</span>
+        </h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            {% for payment in payments|slice:":5" %}
+            <div class="list-group-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong class="d-block">${{ payment.amount|floatformat:2 }} MXN</strong>
+                        <small class="text-muted">{{ payment.payer_email }}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-{{ payment.status|yesno:'success,warning,danger' }}">
+                            {{ payment.get_status_display }}
+                        </span>
+                        <small class="d-block text-muted">{{ payment.created_at|date:"d/m/Y H:i" }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if payments.count > 5 %}
+        <div class="card-footer text-center">
+            <small class="text-muted">Mostrando 5 de {{ payments.count }} pagos</small>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Actions -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-flash me-2"></i>
+            Acciones Rápidas
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="d-grid gap-2">
+            {% if link.status == 'active' %}
+                <button class="btn btn-outline-info position-relative"
+                        onclick="copyToClipboard(document.getElementById('public-url-{{ link.id }}').value, 'URL copiada al portapapeles')">
+                    <i class="iconoir-copy me-2"></i>
+                    Copiar Enlace
+                    {% if link.get_views_count > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="font-size: 0.65rem;">
+                        {{ link.get_views_count }} vistas
+                    </span>
+                    {% endif %}
+                </button>
+
+                <button class="btn btn-outline-secondary" onclick="showLinkQR('{{ link.token }}', '{{ link.title }}')">
+                    <i class="iconoir-qr-code me-2"></i>
+                    Ver QR
+                </button>
+
+                <button class="btn btn-outline-primary position-relative" onclick="showEditLinkModal('{{ link.id }}')">
+                    <i class="iconoir-edit-pencil me-2"></i>
+                    Editar Link
+                    {% if time_left_hours < 24 and time_left_hours > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning" style="font-size: 0.65rem;">
+                        ¡Expira hoy!
+                    </span>
+                    {% endif %}
+                </button>
+
+                <button class="btn btn-outline-danger" onclick="cancelLink('{{ link.id }}')">
+                    <i class="iconoir-xmark me-2"></i>
+                    Cancelar Link
+                </button>
+
+            {% elif link.status == 'paid' %}
+                {% with first_payment=link.payments.first %}
+                <button class="btn btn-outline-success" onclick="showDetailPanel('payment', '{{ first_payment.id }}')">
+                    <i class="iconoir-dollar me-2"></i>
+                    Ver Pago
+                </button>
+                {% if first_payment.invoice %}
+                    <button class="btn btn-outline-info" onclick="showDetailPanel('invoice', '{{ first_payment.invoice.id }}')">
+                        <i class="iconoir-page me-2"></i>
+                        Ver Factura
+                    </button>
+                {% endif %}
+                {% endwith %}
+
+            {% else %}
+                <!-- Sin acciones para links expirados/cancelados -->
+            {% endif %}
+        </div>
+    </div>
+</div>

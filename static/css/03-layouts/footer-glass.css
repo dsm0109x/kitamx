@@ -1,0 +1,236 @@
+/**
+ * FOOTER GLASS - BRUTALIST MINIMAL
+ * ==================================
+ *
+ * Footer glass para dashboard coherente con topbar y sidebar.
+ * Propuesta 4: "Brutalist Glass" - Single line ultra-clean.
+ *
+ * Features:
+ * - ✅ Glass effect (blur 12px)
+ * - ✅ Border-top sólido verde (1px)
+ * - ✅ Single line compacto (48px)
+ * - ✅ Solo info esencial
+ * - ✅ Responsive (desktop/tablet/mobile)
+ * - ✅ Coherente con sistema glass
+ *
+ * @version 1.0
+ * @created 2025-10-21
+ */
+
+/* ========================================
+   FOOTER CONTAINER
+   ======================================== */
+
+.app-footer-glass {
+    position: relative;
+    width: 100%;
+    margin-top: 0;                        /* ✅ SIN ESPACIO - pegado al contenido */
+    margin-left: 0;                       /* ✅ SIN OFFSET - alineado con main-content */
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cuando sidebar collapsed - sin cambio necesario */
+body.sidebar-collapsed .app-footer-glass {
+    margin-left: 0;
+}
+
+/* ========================================
+   GLASS INNER - PREMIUM EFFECT
+   ======================================== */
+
+.footer-glass-inner {
+    background: transparent;              /* ✅ TRANSPARENTE - se funde con el body */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-top: none;                     /* ✅ SIN BORDE */
+    box-shadow: none;
+    padding: 0.75rem 1.5rem;
+}
+
+/* ========================================
+   FOOTER CONTENT LAYOUT
+   ======================================== */
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Collapsed: Max-width mayor */
+body.sidebar-collapsed .footer-content {
+    max-width: 1400px;
+}
+
+/* ========================================
+   FOOTER LEFT - COPYRIGHT + LINKS
+   ======================================== */
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+/* Logo Kita en footer */
+.footer-kita-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 1rem;
+}
+
+.footer-kita-logo {
+    height: 24px;
+    width: auto;
+    filter: grayscale(100%) opacity(0.5);  /* ✅ Escala de grises + sutil */
+    transition: filter 0.2s ease;
+}
+
+.footer-kita-brand:hover .footer-kita-logo {
+    filter: grayscale(100%) opacity(0.7);  /* Más visible en hover */
+}
+
+.footer-kita-name {
+    /* La tipografía se aplica desde .kita-brand */
+    font-size: 1rem;
+    color: #9ca3af;                       /* Gris sutil */
+    transition: color 0.2s ease;
+}
+
+.footer-kita-brand:hover .footer-kita-name {
+    color: #6b7280;                       /* Más oscuro en hover */
+}
+
+.footer-copyright {
+    font-size: 0.85rem;
+    color: #6b7280;                       /* Gray-500 */
+    margin: 0;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.footer-separator {
+    color: #d1d5db;                       /* Gray-300 */
+    font-weight: 300;
+    user-select: none;
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footer-link {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.15s ease;
+    white-space: nowrap;
+}
+
+.footer-link:hover {
+    color: #15803d;                       /* Verde accent */
+}
+
+/* ========================================
+   FOOTER RIGHT - REMOVIDO
+   ======================================== */
+/* Status indicator removido - no funcional */
+
+/* ========================================
+   RESPONSIVE - TABLET (768-1199px)
+   ======================================== */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    /* ✅ REMOVIDO margin-left (ya lo tiene .dashboard-main) */
+
+    .footer-glass-inner {
+        padding: 0.75rem 1.25rem;
+    }
+
+    .footer-content {
+        max-width: 100%;                  /* Usar todo el ancho */
+    }
+
+    /* Ocultar tercer link (Contacto) */
+    .footer-links .footer-link:nth-child(3) {
+        display: none;
+    }
+
+    .footer-links .footer-separator:nth-child(4) {
+        display: none;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE (<768px)
+   ======================================== */
+
+@media (max-width: 767px) {
+    .app-footer-glass {
+        margin-left: 0;                   /* Sin sidebar */
+    }
+
+    .footer-glass-inner {
+        padding: 0.75rem 1rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+
+    .footer-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    /* Logo Kita más pequeño en mobile */
+    .footer-kita-logo {
+        height: 20px;
+    }
+
+    .footer-kita-name {
+        font-size: 0.9rem;
+    }
+
+    /* Ocultar links (están en drawer) */
+    .footer-links,
+    .footer-separator {
+        display: none;
+    }
+
+    .footer-copyright {
+        font-size: 0.8rem;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.footer-link:focus-visible {
+    outline: 3px solid #15803d;
+    outline-offset: 2px;
+}
+
+/* ========================================
+   PREFERS REDUCED MOTION
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .app-footer-glass,
+    .footer-glass-inner {
+        transition: none;
+    }
+}

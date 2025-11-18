@@ -1,0 +1,1123 @@
+{% extends 'base_onboarding.html' %}
+{% load static %}
+
+{% block title %}{{ step_title }} - Kita{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css"
+      integrity="sha512-jU/7UFiaW5UBGODEopEqnbIAHOI8fO6T99m7Tsmqs2gkdujByJfkCbbfPSN4Wlqlb9TGnsuC0YgUgWkRBK7B9A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer">
+
+<style>
+/* Dropzone limpio sin cards */
+.dropzone-clean {
+    border: 2px dashed #d1d5db !important;
+    border-radius: 12px !important;
+    background: #f9fafb !important;
+    min-height: 180px !important;
+    padding: 2rem !important;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.dropzone-clean:hover {
+    border-color: var(--color-accent) !important;
+    background: rgba(13, 148, 136, 0.03) !important;
+    transform: scale(1.01);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+}
+
+.dropzone-clean.dz-drag-hover {
+    border-color: var(--color-accent) !important;
+    background: rgba(13, 148, 136, 0.06) !important;
+    border-style: solid !important;
+}
+
+.dropzone-clean.file-ready {
+    border-color: var(--color-success) !important;
+    border-style: solid !important;
+    background: rgba(16, 185, 129, 0.03) !important;
+}
+
+.dropzone-clean .dz-message {
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+/* BUG FIX: Estilos para iconos de Dropzone */
+.dropzone-clean .dz-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.dropzone-clean .dropzone-icon {
+    font-size: 3rem !important;
+    color: var(--color-accent, #15803d);
+    display: inline-block;
+}
+
+.dropzone-clean .dz-preview .dz-progress .dz-upload {
+    background: var(--color-accent);
+}
+
+/* Validation results limpio */
+.validation-results {
+    display: none;
+}
+
+.validation-results.show {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Upload progress */
+.upload-progress {
+    display: none;
+}
+
+.upload-progress.active {
+    display: block;
+}
+
+.progress-step {
+    padding: 0.75rem 1rem;
+    border-left: 3px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.progress-step.active {
+    border-color: var(--color-accent);
+    background: rgba(13, 148, 136, 0.05);
+}
+
+.progress-step.completed {
+    border-color: var(--color-success);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.progress-step.error {
+    border-color: #dc2626;
+    background: rgba(220, 38, 38, 0.05);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="onboarding-container-clean">
+    <div class="onboarding-content">
+        <div class="container-fluid px-4">
+            <div class="onboarding-layout-sidebar">
+
+                <!-- SIDEBAR -->
+                <aside class="onboarding-sidebar d-none d-lg-block">
+                    <div class="sidebar-logo-container">
+                        <div class="d-flex align-items-center gap-2 justify-content-end">
+                            <img src="{% static logo_path %}"
+                                 alt=""
+                                 height="50"
+                                 class="sidebar-logo">
+                            <span class="kita-brand kita-brand-md mb-0">Kita</span>
+                        </div>
+                        <p class="kita-tagline small text-end mb-0 mt-1">Kit de Ayuda para Emprendedores</p>
+                    </div>
+
+                    <nav class="progress-tree" aria-label="Progreso de configuración">
+                        <div class="progress-tree-title">Progreso del Setup</div>
+
+                        <!-- Step 1: Completed -->
+                        <div class="tree-step completed">
+                            <a href="{% url 'onboarding:step1' %}" class="tree-step-link" aria-label="Paso 1: Identidad de tu Empresa (completado)">
+                                <div class="tree-step-icon" aria-hidden="true">✓</div>
+                                <div class="tree-step-title">Identidad de tu Empresa</div>
+                                <p class="tree-step-subtitle">Datos fiscales completados</p>
+                            </a>
+                        </div>
+
+                        <!-- Step 2: Status varies -->
+                        <div class="tree-step {% if tenant.mercadopago_user_id %}completed{% endif %}">
+                            <a href="{% url 'onboarding:step2' %}" class="tree-step-link" aria-label="Paso 2: Conectar Mercado Pago®">
+                                <div class="tree-step-icon" aria-hidden="true">
+                                    {% if tenant.mercadopago_user_id %}✓{% else %}2{% endif %}
+                                </div>
+                                <div class="tree-step-title">Conectar Mercado Pago®</div>
+                                <p class="tree-step-subtitle">
+                                    {% if tenant.mercadopago_user_id %}Conectado{% else %}Opcional{% endif %}
+                                </p>
+                            </a>
+                        </div>
+
+                        <!-- Step 3: Active -->
+                        <div class="tree-step active">
+                            <a href="{% url 'onboarding:step3' %}" class="tree-step-link" aria-current="step" aria-label="Paso 3: Certificado Digital (actual)">
+                                <div class="tree-step-icon" aria-hidden="true">3</div>
+                                <div class="tree-step-title">Certificado Digital</div>
+                                <p class="tree-step-subtitle">CSD para facturar</p>
+                            </a>
+                        </div>
+
+                        <!-- Step 4: Pending -->
+                        <div class="tree-step">
+                            {% if user.onboarding_step >= 4 %}
+                                <a href="{% url 'onboarding:step4' %}" class="tree-step-link" aria-label="Paso 4: Activar Trial">
+                            {% else %}
+                                <span class="tree-step-link disabled" aria-disabled="true">
+                            {% endif %}
+                                <div class="tree-step-icon" aria-hidden="true">4</div>
+                                <div class="tree-step-title">Activar Trial</div>
+                                <p class="tree-step-subtitle">30 días gratis</p>
+                            {% if user.onboarding_step >= 4 %}</a>{% else %}</span>{% endif %}
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- MAIN CONTENT -->
+                <main class="onboarding-main">
+                    <div class="onboarding-card-modern">
+                        {% csrf_token %}
+
+                        <div class="mb-5">
+                            <h1 class="h3 mb-2 fw-bold text-accent">{{ step_title }}</h1>
+                            <p class="text-muted mb-0">{{ step_description }}</p>
+                        </div>
+
+                        <!-- Step Progress (Mobile) - COMPONENT -->
+                        {% include 'onboarding/components/mobile_progress_indicator.html' %}
+
+                        <!-- Info Card: ¿Qué es el CSD? -->
+                        <div class="alert alert-info border-info mb-4">
+                            <h6 class="fw-bold mb-2">
+                                <span class="iconoir-info-circle me-2"></span>
+                                ¿Qué es el Certificado de Sello Digital (CSD)?
+                            </h6>
+                            <p class="mb-2">
+                                Es tu <strong>"firma digital"</strong> oficial del SAT que necesitas para
+                                generar facturas electrónicas válidas (CFDI 4.0).
+                            </p>
+                            <p class="mb-0">
+                                <strong>¿Cómo obtenerlo?</strong><br>
+                                <small>
+                                    Portal del SAT → Trámites → Generar Certificado de Sello Digital
+                                    (Requiere e.firma vigente)
+                                </small>
+                            </p>
+                        </div>
+
+                        <!-- Dropzones sin cards -->
+                        <div class="row mb-4">
+                            <div class="col-lg-6 mb-4 mb-lg-0">
+                                <label class="form-label fw-bold mb-2">
+                                    Certificado (.cer)
+                                </label>
+                                <div id="certificate-dropzone" class="dropzone dropzone-clean">
+                                    <div class="dz-message">
+                                        <div class="dz-icon">
+                                            <span class="iconoir-page-star dropzone-icon"></span>
+                                        </div>
+                                        <p class="dropzone-label mb-1">Certificado .cer</p>
+                                        <small class="text-muted">Arrastra o haz clic para seleccionar</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <label class="form-label fw-bold mb-2">
+                                    Llave Privada (.key)
+                                </label>
+                                <div id="privatekey-dropzone" class="dropzone dropzone-clean">
+                                    <div class="dz-message">
+                                        <div class="dz-icon">
+                                            <span class="iconoir-key dropzone-icon"></span>
+                                        </div>
+                                        <p class="dropzone-label mb-1">Llave Privada .key</p>
+                                        <small class="text-muted">Arrastra o haz clic para seleccionar</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="mb-5">
+                            <label for="csd-password" class="form-label">
+                                Contraseña del Certificado
+                                <span class="iconoir-info-circle tooltip-icon"
+                                      data-bs-toggle="tooltip"
+                                      title="La contraseña que estableciste al generar tu CSD en el portal del SAT."></span>
+                            </label>
+                            <div class="position-relative">
+                                <input type="password"
+                                       class="form-control"
+                                       id="csd-password"
+                                       placeholder="Contraseña de tu CSD"
+                                       minlength="8"
+                                       required
+                                       autocomplete="off"
+                                       aria-describedby="passwordHelp">
+                                <button type="button"
+                                        class="btn-password-toggle"
+                                        onclick="togglePasswordVisibility()"
+                                        aria-label="Mostrar u ocultar contraseña"
+                                        tabindex="-1">
+                                    <span class="iconoir-eye" id="passwordToggleIcon"></span>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback" id="passwordError"></div>
+                            <small id="passwordHelp" class="form-text text-muted">
+                                Mínimo 8 caracteres. Encriptada con AES-256.
+                            </small>
+                        </div>
+
+                        <!-- Validation Results -->
+                        <div class="validation-results mb-4" id="validationResults" role="status" aria-live="polite">
+                            <div class="d-flex mb-3">
+                                <div class="csd-validation-icon me-3">
+                                    <span class="iconoir-check"></span>
+                                </div>
+                                <div>
+                                    <h6 class="csd-validation-title mb-1">Certificado Validado</h6>
+                                    <p class="csd-validation-subtitle mb-0">Los archivos son correctos y la contraseña funciona</p>
+                                </div>
+                            </div>
+
+                            <div class="row cert-info">
+                                <div class="col-md-6 mb-2">
+                                    <strong class="text-muted">Serie:</strong>
+                                    <code id="cert-serial" class="cert-serial">-</code>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <strong class="text-muted">Válido hasta:</strong>
+                                    <span id="cert-valid-to" class="d-block">-</span>
+                                </div>
+                                <div class="col-12">
+                                    <strong class="text-muted">Titular:</strong>
+                                    <span id="cert-subject" class="d-block">-</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div class="upload-progress mb-4" id="uploadProgress" role="status" aria-live="polite" aria-atomic="true">
+                            <h6 class="fw-bold mb-3">Guardando certificado:</h6>
+                            <div class="progress-step" id="step-validate">
+                                <div class="d-flex align-items-center">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-validate"></span>
+                                    <span class="iconoir-check-circle me-2 text-success d-none" id="check-validate"></span>
+                                    <span>1. Validando...</span>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-upload">
+                                <div class="d-flex align-items-center">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-upload"></span>
+                                    <span class="iconoir-check-circle me-2 text-success d-none" id="check-upload"></span>
+                                    <span>2. Encriptando AES-256...</span>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-encrypt">
+                                <div class="d-flex align-items-center">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-encrypt"></span>
+                                    <span class="iconoir-check-circle me-2 text-success d-none" id="check-encrypt"></span>
+                                    <span>3. Guardado...</span>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-pac">
+                                <div class="d-flex align-items-center">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-pac"></span>
+                                    <span class="iconoir-check-circle me-2 text-success d-none" id="check-pac"></span>
+                                    <span>4. Conectando con proveedor de facturación...</span>
+                                </div>
+                            </div>
+                            <div class="progress-step" id="step-complete">
+                                <div class="d-flex align-items-center">
+                                    <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-complete"></span>
+                                    <span class="iconoir-check-circle me-2 text-success d-none" id="check-complete"></span>
+                                    <span>5. Finalizando...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2 mb-5">
+                            <button type="button"
+                                    class="btn btn-secondary btn-lg"
+                                    id="validateBtn"
+                                    onclick="validateCSD()"
+                                    disabled>
+                                <span class="btn-content">
+                                    <span class="iconoir-check me-2"></span>
+                                    Validar Certificados
+                                </span>
+                                <span class="btn-loading d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Validando...
+                                </span>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-primary btn-lg"
+                                    id="saveBtn"
+                                    onclick="saveCSD()"
+                                    class="d-none">
+                                <span class="btn-content">
+                                    <span class="iconoir-arrow-right me-2"></span>
+                                    Guardar y Continuar
+                                </span>
+                                <span class="btn-loading d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Guardando...
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- Help Simplificado -->
+                        <div class="mb-4">
+                            <p class="text-muted mb-0 cert-info">
+                                <strong>¿Dónde conseguir archivos?</strong>
+                                Portal del SAT → Trámites → Certificados de Sello Digital
+                            </p>
+                        </div>
+
+                        <!-- Navigation -->
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <a href="{% url 'onboarding:step2' %}" class="btn btn-link">
+                                <span class="iconoir-arrow-left me-2"></span>
+                                Paso Anterior
+                            </a>
+                            <button type="button" class="btn btn-link" onclick="showSkipModal()">
+                                Saltar por ahora
+                                <span class="iconoir-arrow-right"></span>
+                            </button>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mt-5 pt-4 border-top">
+                            <p class="text-muted mb-0 small">
+                                <strong>Paso {{ step }} de {{ total_steps }}</strong> •
+                                Encriptación AES-256-GCM con envelope encryption •
+                                <span id="rateLimitCounter"></span>
+                            </p>
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Navigation Components -->
+{% include 'onboarding/components/mobile_navigation.html' %}
+
+<!-- Skip CSD Modal - Redesigned -->
+<div class="modal fade" id="skipModal" tabindex="-1" aria-labelledby="skipModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-redesign">
+            <!-- Icon Header -->
+            <div class="modal-icon-header">
+                <div class="modal-icon modal-icon-warning">
+                    <span class="iconoir-warning-triangle"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="modal-body text-center px-4 pb-2">
+                <h5 class="modal-title-redesign" id="skipModalTitle">
+                    ¿Saltar Certificado CSD?
+                </h5>
+
+                <p class="modal-description mb-3">
+                    Sin CSD no podrás generar facturas CFDI 4.0 válidas ni timbrarlas con PAC autorizado.
+                </p>
+
+                <p class="text-muted mb-0">
+                    <small>⚖️ El CSD es requerido por ley para facturar electrónicamente</small>
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary btn-modal-secondary" data-bs-dismiss="modal">
+                    <span class="iconoir-upload me-2"></span>
+                    Subir Ahora
+                </button>
+                <a href="{% url 'onboarding:step4' %}" class="btn btn-outline-secondary btn-modal-primary">
+                    Saltar por Ahora
+                    <span class="iconoir-arrow-right ms-2"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Loading System -->
+<div class="loading-topbar" id="loadingTopbar">
+    <div class="loading-topbar-progress"></div>
+</div>
+
+<div class="loading-message-card" id="loadingMessage">
+    <div class="d-flex align-items-center">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        <span id="loadingText">Procesando certificados...</span>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"
+        integrity="sha512-U2WE1ktpMTuRBPoCFDzomoIorbOyUv0sP8B+INA3EzNAhehbzED1rOJg6bCqPf/Tuposxb5ja/MAUnC8THSbLQ=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+<script>
+Dropzone.autoDiscover = false;
+
+let uploadedFiles = {
+    certificateFile: null,
+    privateKeyFile: null,
+    validationData: null
+};
+
+const uploadSession = '{{ upload_session }}' || generateUUID();
+
+function generateUUID() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+{# BUG FIX #25: getCsrfToken() moved to onboarding-common.js (loaded from base_onboarding.html) #}
+
+function showSkipModal() {
+    // ✅ Check si ya skipeó antes (localStorage memory)
+    const skipMemoryKey = 'kita_skip_csd_confirmed';
+    const alreadySkipped = localStorage.getItem(skipMemoryKey);
+
+    if (alreadySkipped === 'true') {
+        // Ya confirmó skip antes, ir directo al siguiente step
+        console.log('✅ Skip CSD remembered, going to step 4');
+        window.location.href = '{% url "onboarding:step4" %}';
+        return;
+    }
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById('skipModal'));
+    modal.show();
+
+    // ✅ Guardar decisión cuando confirma skip
+    const skipLink = document.querySelector('#skipModal [href*="step4"]');
+    if (skipLink) {
+        skipLink.addEventListener('click', function() {
+            localStorage.setItem(skipMemoryKey, 'true');
+            console.log('✅ Skip CSD decision saved');
+        });
+    }
+
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'csd_skip_modal_shown', {
+            'event_category': 'onboarding',
+            'event_label': 'step3_csd'
+        });
+    }
+}
+
+function togglePasswordVisibility() {
+    const passwordField = document.getElementById('csd-password');
+    const toggleIcon = document.getElementById('passwordToggleIcon');
+
+    if (!passwordField || !toggleIcon) return;
+
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('iconoir-eye');
+        toggleIcon.classList.add('iconoir-eye-off');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('iconoir-eye-off');
+        toggleIcon.classList.add('iconoir-eye');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
+    // Rate limit counter (tracking local)
+    const rateLimitKey = 'csd_validations_count';
+    const rateLimitWindow = 3600000; // 1 hora en ms
+    const rateLimitMax = 10;
+
+    function updateRateLimitCounter() {
+        const data = localStorage.getItem(rateLimitKey);
+        let validations = data ? JSON.parse(data) : { count: 0, resetAt: Date.now() + rateLimitWindow };
+
+        // Reset si pasó la hora
+        if (Date.now() > validations.resetAt) {
+            validations = { count: 0, resetAt: Date.now() + rateLimitWindow };
+        }
+
+        const remaining = rateLimitMax - validations.count;
+        const minutesLeft = Math.ceil((validations.resetAt - Date.now()) / 60000);
+
+        const counter = document.getElementById('rateLimitCounter');
+        if (counter && remaining < rateLimitMax) {
+            counter.innerHTML = `<span class="text-warning">⚠️ ${remaining} validaciones restantes (se reinicia en ${minutesLeft} min)</span>`;
+        } else if (counter) {
+            counter.textContent = 'Puedes validar tu certificado';
+        }
+
+        return validations;
+    }
+
+    function incrementRateLimitCounter() {
+        const validations = updateRateLimitCounter();
+        validations.count++;
+        localStorage.setItem(rateLimitKey, JSON.stringify(validations));
+        updateRateLimitCounter();
+    }
+
+    // Actualizar contador al cargar
+    updateRateLimitCounter();
+
+    // Exponer para uso en validateCSD()
+    window.updateRateLimitCounter = updateRateLimitCounter;
+    window.incrementRateLimitCounter = incrementRateLimitCounter;
+
+    // BUG FIX #8: Guardar referencias de files en sessionStorage para persistir en refresh
+    // Certificate Dropzone
+    const certDropzone = new Dropzone('#certificate-dropzone', {
+        url: '/facturas/subir/',  // 🇪🇸 Migrado
+        acceptedFiles: '.cer,.pem,.crt',
+        maxFiles: 1,
+        maxFilesize: 10,
+        autoProcessQueue: false,
+        addRemoveLinks: true,
+        dictDefaultMessage: "",
+        dictRemoveFile: "Eliminar",
+        params: { file_type: 'csd_certificate', upload_session: uploadSession },
+        headers: { 'X-CSRFToken': getCsrfToken() },
+        init: function() {
+            this.on("addedfile", file => {
+                if (this.files.length > 1) this.removeFile(this.files[0]);
+                uploadedFiles.certificateFile = file;
+
+                // BUG FIX #8: Guardar metadata en sessionStorage
+                sessionStorage.setItem('csd_cert_file', JSON.stringify({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified
+                }));
+
+                document.getElementById('certificate-dropzone').classList.add('file-ready');
+                checkValidationReady();
+
+                // Analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'csd_file_added', {
+                        'event_category': 'onboarding',
+                        'event_label': 'certificate',
+                        'file_type': file.name.split('.').pop()
+                    });
+                }
+            });
+            this.on("removedfile", () => {
+                uploadedFiles.certificateFile = null;
+                sessionStorage.removeItem('csd_cert_file');
+                document.getElementById('certificate-dropzone').classList.remove('file-ready');
+                checkValidationReady();
+                resetValidation();
+            });
+        }
+    });
+
+    // BUG FIX #8: Private Key Dropzone con sessionStorage
+    const keyDropzone = new Dropzone('#privatekey-dropzone', {
+        url: '/facturas/subir/',  // 🇪🇸 Migrado
+        acceptedFiles: '.key,.pem',
+        maxFiles: 1,
+        maxFilesize: 10,
+        autoProcessQueue: false,
+        addRemoveLinks: true,
+        dictDefaultMessage: "",
+        dictRemoveFile: "Eliminar",
+        params: { file_type: 'csd_private_key', upload_session: uploadSession },
+        headers: { 'X-CSRFToken': getCsrfToken() },
+        init: function() {
+            this.on("addedfile", file => {
+                if (this.files.length > 1) this.removeFile(this.files[0]);
+                uploadedFiles.privateKeyFile = file;
+
+                // BUG FIX #8: Guardar metadata en sessionStorage
+                sessionStorage.setItem('csd_key_file', JSON.stringify({
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified
+                }));
+
+                document.getElementById('privatekey-dropzone').classList.add('file-ready');
+                checkValidationReady();
+
+                // Analytics
+                if (typeof gtag !== 'undefined') {
+                    gtag('event', 'csd_file_added', {
+                        'event_category': 'onboarding',
+                        'event_label': 'private_key',
+                        'file_type': file.name.split('.').pop()
+                    });
+                }
+            });
+            this.on("removedfile", () => {
+                uploadedFiles.privateKeyFile = null;
+                sessionStorage.removeItem('csd_key_file');
+                document.getElementById('privatekey-dropzone').classList.remove('file-ready');
+                checkValidationReady();
+                resetValidation();
+            });
+        }
+    });
+
+    window.certDropzone = certDropzone;
+    window.keyDropzone = keyDropzone;
+
+    document.getElementById('csd-password').addEventListener('input', function() {
+        checkValidationReady();
+        resetValidation();
+    });
+});
+
+function checkValidationReady() {
+    const validateBtn = document.getElementById('validateBtn');
+    const passwordInput = document.getElementById('csd-password');
+    const password = passwordInput.value;
+    const passwordError = document.getElementById('passwordError');
+
+    // Validar contraseña
+    let passwordValid = true;
+    if (password.length > 0 && password.length < 8) {
+        passwordValid = false;
+        passwordInput.classList.add('is-invalid');
+        passwordError.textContent = 'La contraseña debe tener al menos 8 caracteres';
+        passwordError.style.display = 'block';
+    } else if (password.length >= 8) {
+        passwordInput.classList.remove('is-invalid');
+        passwordInput.classList.add('is-valid');
+        passwordError.style.display = 'none';
+    } else {
+        passwordInput.classList.remove('is-invalid', 'is-valid');
+        passwordError.style.display = 'none';
+    }
+
+    validateBtn.disabled = !(
+        uploadedFiles.certificateFile &&
+        uploadedFiles.privateKeyFile &&
+        password.length >= 8 &&
+        passwordValid
+    );
+}
+
+function resetValidation() {
+    document.getElementById('validationResults').classList.remove('show');
+    document.getElementById('saveBtn').style.display = 'none';
+    uploadedFiles.validationData = null;
+}
+
+async function validateCSD() {
+    const password = document.getElementById('csd-password').value;
+    const validateBtn = document.getElementById('validateBtn');
+
+    if (!uploadedFiles.certificateFile || !uploadedFiles.privateKeyFile || !password) {
+        showToast('Selecciona ambos archivos e ingresa la contraseña', 'error');
+        return;
+    }
+
+    validateBtn.querySelector('.btn-content').classList.add('d-none');
+    validateBtn.querySelector('.btn-loading').classList.remove('d-none');
+    validateBtn.disabled = true;
+
+    // Use Loading Progress System
+    if (typeof loading !== 'undefined' && loading.start) {
+        loading.start([
+            'Validando certificados...',
+            'Verificando contraseña...',
+            'Procesando datos...'
+        ]);
+    }
+
+    const formData = new FormData();
+    formData.append('certificate_file', uploadedFiles.certificateFile);
+    formData.append('private_key_file', uploadedFiles.privateKeyFile);
+    formData.append('password', password);
+
+    const requestData = {
+        url: '/facturas/csd/validar-local/',  // 🇪🇸 Migrado
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrfToken() },
+        body: formData
+    };
+
+    try {
+        // Stage 1 → 2
+        if (typeof loading !== 'undefined' && loading.next) {
+            loading.next();
+        }
+
+        // BUG FIX #20: Timeout dinámico basado en file size
+        // Base 30s + (fileSize/1MB * 10s)
+        const certSize = uploadedFiles.certificateFile ? uploadedFiles.certificateFile.size : 0;
+        const keySize = uploadedFiles.privateKeyFile ? uploadedFiles.privateKeyFile.size : 0;
+        const totalSizeMB = (certSize + keySize) / (1024 * 1024);
+        const dynamicTimeout = 30000 + (totalSizeMB * 10000); // 30s base + 10s por MB
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), dynamicTimeout);
+
+        const response = await fetch(requestData.url, {
+            method: requestData.method,
+            headers: requestData.headers,
+            body: requestData.body,
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        // Stage 2 → 3
+        if (typeof loading !== 'undefined' && loading.next) {
+            loading.next();
+        }
+
+        const result = await response.json();
+
+        if (!result.valid) {
+            throw new Error(result.error || 'Error validando certificados');
+        }
+
+        uploadedFiles.validationData = result;
+
+        // Complete loading
+        if (typeof loading !== 'undefined' && loading.done) {
+            loading.done();
+        }
+
+        document.getElementById('cert-serial').textContent = result.serial_number;
+        document.getElementById('cert-subject').textContent = result.subject_name;
+        document.getElementById('cert-valid-to').textContent = new Date(result.valid_to).toLocaleDateString('es-MX', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        document.getElementById('validationResults').classList.add('show');
+        document.getElementById('saveBtn').style.display = 'block';
+
+        showToast('¡Certificados validados correctamente! 🎉', 'success');
+
+        // ✅ NUEVO: Check certificate expiry
+        const validTo = new Date(result.valid_to);
+        const today = new Date();
+        const daysUntilExpiry = Math.floor((validTo - today) / (1000 * 60 * 60 * 24));
+
+        if (daysUntilExpiry < 30 && daysUntilExpiry > 0) {
+            // Advertencia: Expira pronto
+            setTimeout(() => {
+                showToast(`⚠️ Tu CSD expira en ${daysUntilExpiry} días. Considera renovarlo pronto.`, 'warning');
+
+                // Mostrar advertencia visual
+                const expiryWarning = document.createElement('div');
+                expiryWarning.className = 'alert alert-warning mt-3';
+                expiryWarning.innerHTML = `
+                    <strong>⏰ Certificado próximo a expirar:</strong><br>
+                    Tu CSD vence el <strong>${validTo.toLocaleDateString('es-MX')}</strong> (${daysUntilExpiry} días).
+                    Puedes usarlo ahora, pero considera renovarlo en el portal del SAT pronto.
+                `;
+                document.getElementById('validationResults').appendChild(expiryWarning);
+            }, 2000);
+        } else if (daysUntilExpiry <= 0) {
+            // Error: Ya expiró
+            setTimeout(() => {
+                showToast('❌ Este certificado ya expiró. Necesitas renovarlo en el portal del SAT.', 'error');
+
+                // Deshabilitar botón de guardar
+                const saveBtn = document.getElementById('saveBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.innerHTML = '<span class="iconoir-warning-triangle me-2"></span>Certificado Expirado';
+                }
+
+                // Mostrar error visual
+                const expiryError = document.createElement('div');
+                expiryError.className = 'alert alert-danger mt-3';
+                expiryError.innerHTML = `
+                    <strong>❌ Certificado expirado:</strong><br>
+                    Este CSD venció el <strong>${validTo.toLocaleDateString('es-MX')}</strong>.
+                    No podrás usarlo para facturar. Por favor renuévalo en el portal del SAT.
+                `;
+                document.getElementById('validationResults').appendChild(expiryError);
+            }, 2000);
+        }
+
+        // Incrementar contador de validaciones
+        if (typeof window.incrementRateLimitCounter === 'function') {
+            window.incrementRateLimitCounter();
+        }
+
+        // Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'csd_validation_success', {
+                'event_category': 'onboarding',
+                'event_label': 'step3_csd',
+                'days_until_expiry': daysUntilExpiry
+            });
+        }
+
+        document.getElementById('validationResults').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch (error) {
+        console.error('[CSD] Validation error:', error);
+
+        // Manejar timeout específicamente
+        if (error.name === 'AbortError') {
+            if (typeof loading !== 'undefined' && loading.cancel) {
+                loading.cancel();
+            }
+            showToast('⏱️ Validación interrumpida (timeout 30s). El servidor puede estar lento, intenta de nuevo.', 'error');
+        } else if (typeof window.ErrorRecovery !== 'undefined') {
+            // Use Error Recovery System
+            window.ErrorRecovery.handleError(error, requestData, {
+                context: 'validate_csd',
+                autoRetry: true
+            });
+        } else {
+            // Fallback
+            if (typeof loading !== 'undefined' && loading.cancel) {
+                loading.cancel();
+            }
+            showToast(error.message || 'Error validando certificados', 'error');
+        }
+
+        // Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'csd_validation_error', {
+                'event_category': 'errors',
+                'event_label': 'csd_validation',
+                'error_type': window.ErrorRecovery?.getErrorType(error) || 'unknown'
+            });
+        }
+    } finally {
+        validateBtn.querySelector('.btn-content').classList.remove('d-none');
+        validateBtn.querySelector('.btn-loading').classList.add('d-none');
+        validateBtn.disabled = false;
+    }
+}
+
+async function saveCSD() {
+    const password = document.getElementById('csd-password').value;
+    const saveBtn = document.getElementById('saveBtn');
+    const uploadProgress = document.getElementById('uploadProgress');
+
+    if (!uploadedFiles.validationData) {
+        showToast('Por favor valida los certificados primero', 'error');
+        return;
+    }
+
+    // Use Loading Progress System (nueva API)
+    if (typeof loading !== 'undefined' && loading.start) {
+        loading.start([
+            'Preparando archivos...',
+            'Subiendo certificados...',
+            'Guardando de forma segura...'
+        ]);
+    } else {
+        // Fallback a old API
+        const loadingTopbar = document.getElementById('loadingTopbar');
+        const loadingMessage = document.getElementById('loadingMessage');
+        if (loadingTopbar) loadingTopbar.classList.add('active');
+        if (loadingMessage) loadingMessage.classList.add('active');
+    }
+
+    uploadProgress.classList.add('active');
+    saveBtn.querySelector('.btn-content').classList.add('d-none');
+    saveBtn.querySelector('.btn-loading').classList.remove('d-none');
+    saveBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append('certificate_file', uploadedFiles.certificateFile);
+    formData.append('private_key_file', uploadedFiles.privateKeyFile);
+    formData.append('password', password);
+    formData.append('upload_session', uploadSession);
+
+    const requestData = {
+        url: '/facturas/csd/guardar-completo/',  // 🇪🇸 Migrado
+        method: 'POST',
+        headers: { 'X-CSRFToken': getCsrfToken() },
+        body: formData
+    };
+
+    try {
+        // ✅ Step 1: Validando (instantáneo, solo visual)
+        setStepActive('validate');
+        setStepCompleted('validate');
+
+        // Stage 1 → 2
+        if (typeof loading !== 'undefined' && loading.next) {
+            loading.next();
+        }
+
+        // ✅ Step 2: Upload REAL (único step real con network)
+        setStepActive('upload');
+
+        // BUG FIX #20: Timeout dinámico basado en file size
+        const certSize = uploadedFiles.certificateFile ? uploadedFiles.certificateFile.size : 0;
+        const keySize = uploadedFiles.privateKeyFile ? uploadedFiles.privateKeyFile.size : 0;
+        const totalSizeMB = (certSize + keySize) / (1024 * 1024);
+        const dynamicTimeout = 30000 + (totalSizeMB * 10000); // 30s base + 10s por MB
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), dynamicTimeout);
+
+        const response = await fetch(requestData.url, {
+            method: requestData.method,
+            headers: requestData.headers,
+            body: requestData.body,
+            signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.error || 'Error guardando certificado');
+        }
+
+        setStepCompleted('upload');
+
+        // Stage 2 → 3
+        if (typeof loading !== 'undefined' && loading.next) {
+            loading.next();
+        }
+
+        // BUG FIX #6: Simplificar steps 3-5 a mostrar solo después del response real
+        // Ya no usamos steps fake instantáneos, solo mostramos cuando el backend confirme
+        if (result.status_steps) {
+            // Si el backend devuelve steps completados, mostrarlos
+            if (result.status_steps.encrypt) {
+                setStepActive('encrypt');
+                setStepCompleted('encrypt');
+            }
+            if (result.status_steps.pac) {
+                setStepActive('pac');
+                setStepCompleted('pac');
+            }
+            if (result.status_steps.complete) {
+                setStepActive('complete');
+                setStepCompleted('complete');
+            }
+        } else {
+            // Fallback: marcar todos como completados si no hay detalle
+            setStepActive('encrypt');
+            setStepCompleted('encrypt');
+            setStepActive('pac');
+            setStepCompleted('pac');
+            setStepActive('complete');
+            setStepCompleted('complete');
+        }
+
+        // Complete loading
+        if (typeof loading !== 'undefined' && loading.done) {
+            loading.done();
+        }
+
+        showToast('¡Certificado guardado exitosamente! 🎉', 'success');
+
+        // Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'csd_save_success', {
+                'event_category': 'onboarding',
+                'event_label': 'step3_csd'
+            });
+        }
+
+        setTimeout(() => {
+            window.location.href = '/incorporacion/paso4/';
+        }, 1500);
+
+    } catch (error) {
+        console.error('[CSD] Save error:', error);
+
+        // Cancel loading
+        if (typeof loading !== 'undefined' && loading.cancel) {
+            loading.cancel();
+        } else {
+            const loadingTopbar = document.getElementById('loadingTopbar');
+            const loadingMessage = document.getElementById('loadingMessage');
+            if (loadingTopbar) loadingTopbar.classList.remove('active');
+            if (loadingMessage) loadingMessage.classList.remove('active');
+        }
+
+        uploadProgress.classList.remove('active');
+        saveBtn.querySelector('.btn-content').classList.remove('d-none');
+        saveBtn.querySelector('.btn-loading').classList.add('d-none');
+        saveBtn.disabled = false;
+
+        // Mark progress step as error
+        const activeStep = document.querySelector('.progress-step.active');
+        if (activeStep) {
+            activeStep.classList.remove('active');
+            activeStep.classList.add('error');
+        }
+
+        // Manejar timeout específicamente
+        if (error.name === 'AbortError') {
+            showToast('⏱️ Guardado interrumpido (timeout 30s). Los certificados pueden ser grandes, intenta de nuevo.', 'error');
+        } else if (typeof window.ErrorRecovery !== 'undefined') {
+            // Use Error Recovery System
+            window.ErrorRecovery.handleError(error, requestData, {
+                context: 'save_csd',
+                autoRetry: true
+            });
+        } else {
+            showToast(error.message || 'Error guardando certificado', 'error');
+        }
+
+        // Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'csd_save_error', {
+                'event_category': 'errors',
+                'event_label': 'csd_save',
+                'error_type': window.ErrorRecovery?.getErrorType(error) || 'unknown'
+            });
+        }
+    }
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function setStepActive(stepName) {
+    const step = document.getElementById(`step-${stepName}`);
+    step.classList.add('active');
+    step.querySelector(`#spinner-${stepName}`).classList.remove('d-none');
+}
+
+function setStepCompleted(stepName) {
+    const step = document.getElementById(`step-${stepName}`);
+    step.classList.remove('active');
+    step.classList.add('completed');
+    step.querySelector(`#spinner-${stepName}`).classList.add('d-none');
+    step.querySelector(`#check-${stepName}`).classList.remove('d-none');
+}
+</script>
+{% endblock %}

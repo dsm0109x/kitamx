@@ -1,0 +1,125 @@
+/**
+ * PRICING SINGLE CARD - BRUTALIST PREMIUM
+ * Solo Kita, precio gigante verde, micro-animaciones
+ */
+
+/* ===== CARD ÚNICA CENTRADA ===== */
+
+.pricing-card-single {
+    background: #ffffff;
+    border: 3px solid #111827;  /* Border negro prominente */
+    border-radius: 0;  /* Angular */
+    padding: 3rem 2.5rem;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+/* ===== BADGE "30 DÍAS GRATIS" ===== */
+
+.trial-badge-large {
+    background: #059669;  /* Verde accent */
+    color: #ffffff;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;  /* Sutilmente redondeado */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    animation: badge-pulse 3s ease-in-out infinite;
+}
+
+.trial-badge-large .iconoir {
+    font-size: 1.3rem;
+}
+
+@keyframes badge-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ===== PRECIO GIGANTE ===== */
+
+.price-display-huge {
+    margin: 2rem 0;
+}
+
+.currency-symbol {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #059669;  /* Verde */
+    vertical-align: super;
+    margin-right: 0.25rem;
+}
+
+.price-number-huge {
+    font-size: 6rem;  /* Gigante */
+    font-weight: 700;
+    color: #059669;  /* Verde accent */
+    line-height: 1;
+    display: inline-block;
+    font-variant-numeric: tabular-nums;
+}
+
+.price-period {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+/* ===== FEATURES LIST ===== */
+
+.features-list-compact {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.feature-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.feature-item:last-child {
+    border-bottom: none;
+}
+
+.feature-item .iconoir {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.feature-item strong {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+    .pricing-card-single {
+        padding: 2rem 1.5rem;
+    }
+
+    .price-number-huge {
+        font-size: 4.5rem;
+    }
+
+    .currency-symbol {
+        font-size: 2rem;
+    }
+}

@@ -1,0 +1,203 @@
+<!-- Invoice Detail Panel - SAT Receipt Style -->
+
+<!-- Header -->
+<div style="padding: 1rem 1.25rem; border-bottom: 2px solid #111827;">
+    <h1 style="font-family: 'Inter', sans-serif; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; color: #111827; margin: 0;">
+        CFDI {{ invoice.serie_folio }}
+    </h1>
+</div>
+
+<!-- Receptor -->
+<div style="padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 0.75rem; letter-spacing: 0.05em;">
+        RECEPTOR
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+        <div style="font-size: 0.9375rem; font-weight: 600; color: #111827;">
+            {{ invoice.customer_name }}
+        </div>
+        <div style="font-family: 'SF Mono', Monaco, monospace; font-size: 0.8125rem; color: #6b7280;">
+            {{ invoice.customer_rfc }}
+        </div>
+        <div style="font-size: 0.875rem; color: #6b7280;">
+            {{ invoice.customer_email }}
+        </div>
+    </div>
+</div>
+
+<!-- Monto -->
+<div style="padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 0.75rem; letter-spacing: 0.05em;">
+        MONTO
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #6b7280;">Subtotal</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                ${{ invoice.subtotal|floatformat:2 }}
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #6b7280;">IVA (16%)</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                ${{ invoice.tax_amount|floatformat:2 }}
+            </td>
+        </tr>
+        <tr style="border-top: 2px solid #e5e7eb;">
+            <td style="padding: 0.75rem 0 0.25rem 0; font-size: 0.875rem; font-weight: 600; color: #111827;">Total</td>
+            <td style="padding: 0.75rem 0 0.25rem 0; text-align: right;">
+                <div style="font-family: 'DM Serif Display', Georgia, serif !important; font-size: 2rem !important; font-weight: 400 !important; color: #111827; line-height: 1; letter-spacing: -0.02em;">
+                    ${{ invoice.total|floatformat:2 }}
+                </div>
+                <div style="font-size: 0.75rem; color: #9ca3af; margin-top: 0.25rem;">
+                    {{ invoice.currency }}
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Timbrado -->
+<div style="padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 0.75rem; letter-spacing: 0.05em;">
+        TIMBRADO
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af; width: 35%;">Estado</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                <span style="background: transparent; border: 1px solid #e5e7eb; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 500;">
+                    {{ invoice.get_status_display }}
+                </span>
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af;">Creado</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                {{ invoice.created_at|date:"d/m/Y H:i" }}
+            </td>
+        </tr>
+        {% if invoice.stamped_at %}
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af;">Timbrado</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                {{ invoice.stamped_at|date:"d/m/Y H:i" }}
+            </td>
+        </tr>
+        {% endif %}
+        {% if invoice.cancelled_at %}
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af;">Cancelado</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                {{ invoice.cancelled_at|date:"d/m/Y H:i" }}
+            </td>
+        </tr>
+        {% endif %}
+        {% if invoice.uuid %}
+        <tr>
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af;">UUID</td>
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #111827; text-align: right; font-family: 'SF Mono', Monaco, monospace; word-break: break-all; line-height: 1.4;">
+                {{ invoice.uuid }}
+            </td>
+        </tr>
+        {% endif %}
+    </table>
+</div>
+
+<!-- Datos Fiscales -->
+<div style="padding: 1rem 1.25rem; border-bottom: 1px solid #f3f4f6;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 0.75rem; letter-spacing: 0.05em;">
+        DATOS FISCALES
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af; width: 40%;">Método de Pago</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                {{ invoice.payment_method }}
+            </td>
+        </tr>
+        <tr style="border-bottom: 1px solid #f9fafb;">
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af;">Forma de Pago</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                {{ invoice.payment_form }}
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 0.5rem 0; font-size: 0.75rem; color: #9ca3af;">Uso de CFDI</td>
+            <td style="padding: 0.5rem 0; font-size: 0.875rem; color: #111827; text-align: right;">
+                {{ invoice.cfdi_use }}
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Acciones -->
+<div style="padding: 1rem 1.25rem;">
+    <div style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #9ca3af; margin-bottom: 0.75rem; letter-spacing: 0.05em;">
+        ACCIONES
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 0;">
+        {% if invoice.xml_file %}
+        <a href="javascript:void(0)" onclick="downloadFile('{{ invoice.id }}', 'xml')" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; color: #111827; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: all 0.2s;">
+            <span>Descargar XML</span>
+            <span style="color: #9ca3af;">→</span>
+        </a>
+        {% endif %}
+
+        {% if invoice.pdf_file %}
+        <a href="javascript:void(0)" onclick="downloadFile('{{ invoice.id }}', 'pdf')" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; color: #111827; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: all 0.2s;">
+            <span>Descargar PDF</span>
+            <span style="color: #9ca3af;">→</span>
+        </a>
+        {% endif %}
+
+        {% if invoice.status == 'stamped' or invoice.status == 'sent' %}
+        <a href="javascript:void(0)" onclick="showResendModal('{{ invoice.id }}', '{{ invoice.serie_folio }}')" style="display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #f3f4f6; color: #111827; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: all 0.2s;">
+            <span>Reenviar por Email</span>
+            <span style="color: #9ca3af;">→</span>
+        </a>
+        {% endif %}
+
+        {% if invoice.is_valid_for_cancellation %}
+        <a href="javascript:void(0)" onclick="showCancelModal('{{ invoice.id }}', '{{ invoice.serie_folio }}')" style="display: flex; justify-content: space-between; padding: 0.75rem 0; color: #111827; text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: all 0.2s;">
+            <span>Cancelar Factura</span>
+            <span style="color: #9ca3af;">→</span>
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Hover en acciones */
+[onclick*="downloadFile"]:hover,
+[onclick*="showResendModal"]:hover,
+[onclick*="showCancelModal"]:hover {
+    color: #15803d !important;
+    padding-left: 0.5rem !important;
+}
+
+[onclick*="downloadFile"]:hover span:last-child,
+[onclick*="showResendModal"]:hover span:last-child,
+[onclick*="showCancelModal"]:hover span:last-child {
+    transform: translateX(4px);
+    color: #15803d !important;
+}
+
+[onclick*="showCancelModal"]:hover {
+    color: #ef4444 !important;
+}
+
+[onclick*="showCancelModal"]:hover span:last-child {
+    color: #ef4444 !important;
+}
+</style>
+
+<script>
+function downloadFile(invoiceId, fileType) {
+    window.open(`{% url "invoicing:download_file" "00000000-0000-0000-0000-000000000000" "xml" %}`.replace('00000000-0000-0000-0000-000000000000', invoiceId).replace('xml', fileType), '_blank');
+}
+</script>

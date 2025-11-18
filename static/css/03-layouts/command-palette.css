@@ -1,0 +1,538 @@
+/**
+ * COMMAND PALETTE - PREMIUM v2.0
+ * ==========================
+ *
+ * Sistema de comando rápido (Cmd+K / Ctrl+K).
+ * Inspirado en: Linear, Raycast, Vercel.
+ *
+ * Features:
+ * - ✅ Fuzzy search
+ * - ✅ Keyboard navigation (↑↓ Enter Esc)
+ * - ✅ Categorías agrupadas
+ * - ✅ Shortcuts visibles
+ * - ✅ Animación smooth
+ * - ✅ WCAG 2.1 Level AA compliant
+ * - ✅ Focus trap
+ * - ✅ Screen reader friendly
+ *
+ * @version 2.0
+ * @created 2025-10-21
+ * @updated 2025-01-13
+ */
+
+/* ========================================
+   ACCESSIBILITY HELPERS
+   ======================================== */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ========================================
+   OVERLAY
+   ======================================== */
+
+.command-palette-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 15vh;                    /* Offset from top */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.command-palette-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ========================================
+   PALETTE CONTAINER
+   ======================================== */
+
+.command-palette {
+    width: 90%;
+    max-width: 640px;
+    max-height: 70vh;
+    background: #ffffff;
+    border: 2px solid #e5e7eb;            /* Gray-200 brutalist */
+    border-radius: 0;                     /* Brutalist */
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2),
+                0 12px 32px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transform: scale(0.95) translateY(-20px);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.command-palette-overlay.show .command-palette {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* ========================================
+   PALETTE HEADER (Search Input)
+   ======================================== */
+
+.command-palette-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.command-palette-input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: #111827;                       /* Gray-900 */
+    font-size: 1.125rem;
+    font-weight: 500;
+    padding: 0;
+}
+
+.command-palette-input::placeholder {
+    color: #9ca3af;                       /* Gray-400 */
+}
+
+/* ========================================
+   PALETTE RESULTS
+   ======================================== */
+
+.command-palette-results {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0.75rem 0;
+}
+
+/* Scrollbar styling */
+.command-palette-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.command-palette-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.command-palette-results::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+}
+
+/* ========================================
+   COMMAND CATEGORY
+   ======================================== */
+
+.command-category {
+    margin-bottom: 1rem;
+}
+
+.command-category:last-child {
+    margin-bottom: 0;
+}
+
+.command-category-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6b7280;                       /* Gray-500 */
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+/* ========================================
+   COMMAND ITEMS
+   ======================================== */
+
+.command-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+    position: relative;                   /* For absolute badges */
+}
+
+.command-icon {
+    font-size: 1.25rem;
+    color: #6b7280;                       /* Gray-500 */
+    min-width: 20px;
+    transition: all 0.15s ease;
+}
+
+.command-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.command-title {
+    color: #111827;                       /* Gray-900 */
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1.3;
+    margin-bottom: 0.125rem;
+}
+
+.command-subtitle {
+    color: #6b7280;                       /* Gray-500 */
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.command-shortcut {
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;                  /* Gray-100 */
+    border: 1px solid #d1d5db;            /* Gray-300 */
+    border-radius: 4px;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    min-width: 44px;
+    text-align: center;
+}
+
+/* ========================================
+   COMMAND ITEM STATES
+   ======================================== */
+
+/* HOVER */
+.command-item:hover {
+    background: #f9fafb;                  /* Gray-50 */
+    border-left-color: #15803d;           /* Verde accent */
+}
+
+.command-item:hover .command-icon {
+    color: #15803d;
+    transform: scale(1.08);
+}
+
+/* SELECTED (Keyboard Nav) */
+.command-item.selected {
+    background: #f0fdf4;                  /* Verde muy claro */
+    border-left-color: #15803d;
+    border-left-width: 4px;
+    padding-left: calc(1.5rem - 1px);     /* Compensate extra px */
+}
+
+.command-item.selected .command-icon {
+    color: #15803d;
+}
+
+.command-item.selected .command-title {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* ACTIVE (Click feedback) */
+.command-item:active {
+    transform: scale(0.98);
+    background: #dcfce7;                  /* Verde más fuerte */
+}
+
+/* ========================================
+   QUERY HIGHLIGHT & BADGES
+   ======================================== */
+
+/* Highlight estilo Google - MÁS VISIBLE */
+mark.query-highlight {
+    background: #fef08a !important;       /* Yellow-200 - More contrast */
+    color: #111827 !important;
+    font-weight: 700 !important;          /* Bold para mejor visibilidad */
+    padding: 0.15rem 0.3rem;
+    border-radius: 3px;
+    border: 1px solid #fde047;            /* Yellow-300 border */
+    box-shadow: 0 0 0 2px rgba(254, 240, 138, 0.2);  /* Glow effect */
+}
+
+/* Reset default mark styles */
+mark {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+}
+
+/* Badges in command items */
+.command-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.command-badge.badge-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.command-badge.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+.command-badge.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.command-badge.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.command-badge.badge-secondary {
+    background: #f3f4f6;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+
+/* ========================================
+   PALETTE FOOTER
+   ======================================== */
+
+.command-palette-footer {
+    padding: 0.875rem 1.5rem;
+    border-top: 2px solid #e5e7eb;
+    background: #f9fafb;                  /* Gray-50 */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.palette-hint {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.palette-hint kbd {
+    padding: 0.25rem 0.5rem;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    color: #374151;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Results Counter */
+.palette-results-count {
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.palette-results-count.searching {
+    color: #15803d;                       /* Verde accent */
+}
+
+.palette-results-count.empty {
+    color: #9ca3af;                       /* Gray-400 */
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+.command-loading {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    color: #6b7280;
+}
+
+.loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #15803d;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loading-spinner {
+        animation: spin 1.5s linear infinite; /* Slower for reduced motion */
+    }
+}
+
+.command-loading p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+
+.command-empty {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: #6b7280;
+}
+
+.command-empty i {
+    font-size: 2.5rem;
+    color: #d1d5db;
+    margin-bottom: 0.5rem;
+}
+
+.command-empty .empty-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.command-empty .empty-hint {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #9ca3af;
+    max-width: 300px;
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
+@media (max-width: 767px) {
+    .command-palette-overlay {
+        padding-top: 10vh;
+    }
+
+    .command-palette {
+        width: 95%;
+        max-height: 80vh;
+    }
+
+    .command-palette-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .command-palette-input {
+        font-size: 1rem;
+    }
+
+    .command-item {
+        padding: 0.75rem 1.25rem;
+    }
+
+    .command-shortcut {
+        display: none;                    /* Hide shortcuts en mobile */
+    }
+
+    .command-palette-footer {
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+    }
+
+    .palette-hint {
+        font-size: 0.75rem;
+        gap: 0.75rem;
+        order: 2;                         /* Mover hints abajo */
+    }
+
+    .palette-results-count {
+        order: 1;                         /* Mover contador arriba */
+        font-size: 0.75rem;
+    }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+/* Palette appear */
+@keyframes palette-appear {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Focus visible */
+.command-item:focus-visible {
+    outline: 3px solid #15803d;
+    outline-offset: -3px;
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .command-palette-overlay,
+    .command-palette,
+    .command-item {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* High contrast */
+@media (prefers-contrast: high) {
+    .command-palette {
+        border-width: 3px;
+    }
+
+    .command-item.selected {
+        border-left-width: 5px;
+    }
+}

@@ -1,0 +1,30 @@
+/* Inter Font Override - MUST be loaded LAST */
+/* This file overrides ALL other font declarations */
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+    background-color: red !important;
+}
+
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+}
+
+/* Force Inter on ALL elements that might have font declarations */
+h1, h2, h3, h4, h5, h6,
+p, span, div, a, button, input, select, textarea, label,
+.btn, .nav-link, .form-control, .form-select, .form-label,
+.card, .card-title, .card-text, .badge, .alert,
+.table, .table th, .table td,
+.sidebar, .sidebar *,
+.dropdown-item, .dropdown-menu,
+.modal, .modal *,
+.toast, .toast * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+}
+
+/* Override Bootstrap variables */
+:root {
+    --bs-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+    --bs-body-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;
+}

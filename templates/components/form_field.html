@@ -1,0 +1,106 @@
+{#
+    FORM FIELD COMPONENT - UNIFIED VALIDATION (BACKWARD-COMPATIBLE)
+    ================================================================
+
+    Componente reutilizable para campos de formulario con validación estandarizada.
+    100% compatible con código legacy (.form-error y .invalid-feedback)
+
+    Usage:
+        {% include 'components/form_field.html' with field=form.email %}
+
+    Optional parameters:
+        - field: Django form field (required)
+        - help_text: Custom help text (overrides field.help_text)
+        - placeholder: Custom placeholder
+        - input_class: Additional CSS classes for input
+        - show_label: Boolean, default True
+        - required_indicator: Boolean, default True
+        - autocomplete: HTML autocomplete attribute
+        - error_style: 'bootstrap' (uses .invalid-feedback) or 'legacy' (uses .form-error), default 'bootstrap'
+        - wrapper_class: Additional classes for form-group wrapper
+
+    Features:
+        ✅ Consistent error/success styling
+        ✅ WCAG compliant (aria-describedby, role=alert)
+        ✅ Accessible labels
+        ✅ Help text support
+        ✅ Auto-generated IDs for aria
+        ✅ Backward compatible with .form-error and .invalid-feedback
+        ✅ JavaScript-friendly (maintains existing selectors)
+
+    @version 2.0
+    @created 2025-10-21
+    @updated 2025-10-21 - Added backward compatibility
+#}
+
+{# Generate unique IDs #}
+{% with field_id=field.id_for_label|default:field.html_name %}
+{% with error_id="error_"|add:field_id %}
+{% with help_id="help_"|add:field_id %}
+
+<div class="form-group{% if field.errors %} has-error{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}">
+    {# Label #}
+    {% if show_label|default:True %}
+        <label for="{{ field_id }}" class="form-label">
+            {{ field.label }}
+            {% if field.field.required and required_indicator|default:True %}
+                <span class="text-danger" aria-label="requerido">*</span>
+            {% endif %}
+        </label>
+    {% endif %}
+
+    {# Input Field - Render with proper attributes #}
+    {% if field.field.widget.input_type == 'checkbox' or field.field.widget.input_type == 'radio' %}
+        {# Checkbox/Radio: Different layout #}
+        <div class="form-check">
+            {{ field }}
+            <label class="form-check-label" for="{{ field_id }}">
+                {{ field.label }}
+            </label>
+        </div>
+    {% else %}
+        {# Regular input - Manual rendering for full control #}
+        <input type="{{ field.field.widget.input_type|default:'text' }}"
+               name="{{ field.html_name }}"
+               id="{{ field_id }}"
+               class="form-control{% if field.errors %} is-invalid{% endif %}{% if input_class %} {{ input_class }}{% endif %}"
+               {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+               {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+               {% if field.value %}value="{{ field.value }}"{% endif %}
+               {% if field.field.required %}required{% endif %}
+               aria-describedby="{% if field.errors %}{{ error_id }}{% else %}{{ help_id }}{% endif %}"
+               {% if field.errors %}aria-invalid="true"{% endif %}>
+    {% endif %}
+
+    {# Error Messages - Backward Compatible #}
+    {% if field.errors %}
+        {% if error_style == 'legacy' %}
+            {# Legacy style (.form-error) - Used by auth-*-enhanced.js #}
+            <div class="form-error" id="{{ error_id }}" role="alert">
+                {% for error in field.errors %}
+                    <small class="d-block">{{ error }}</small>
+                {% endfor %}
+            </div>
+        {% else %}
+            {# Bootstrap style (.invalid-feedback) - Default #}
+            <div class="invalid-feedback d-block" id="{{ error_id }}" role="alert">
+                {% for error in field.errors %}
+                    <span class="d-block">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {# Help Text #}
+    {% if help_text or field.help_text %}
+        {% if not field.errors %}
+            <small id="{{ help_id }}" class="form-text text-muted">
+                {{ help_text|default:field.help_text }}
+            </small>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endwith %}
+{% endwith %}
+{% endwith %}

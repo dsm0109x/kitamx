@@ -1,0 +1,387 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+
+{% block title %}Mi Cuenta - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/account-sheet.css' %}?v=1.0">
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header -->
+<div class="account-page-header">
+    <h1>Mi Cuenta</h1>
+</div>
+
+<!-- Account Sections (Vertical) -->
+<div>
+    <!-- Perfil -->
+    <div class="account-section">
+        <div class="account-section-header">PERFIL</div>
+                <form id="profile-form" class="needs-validation" novalidate>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="first_name" value="{{ user.first_name }}" required minlength="2" maxlength="150">
+                                <div class="invalid-feedback">Nombre requerido (2-150 caracteres)</div>
+                                <div class="valid-feedback">Válido</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Apellidos</label>
+                                <input type="text" class="form-control" id="last_name" value="{{ user.last_name }}" required minlength="2" maxlength="150">
+                                <div class="invalid-feedback">Apellidos requeridos (2-150 caracteres)</div>
+                                <div class="valid-feedback">Válido</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" value="{{ user.email }}" disabled>
+                                <div class="form-text">El email no se puede cambiar después del registro</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Teléfono <small class="text-muted">(formato internacional)</small></label>
+                                <input type="tel" class="form-control" id="phone" value="{{ user.phone }}" placeholder="+52XXXXXXXXXX" pattern="^\+[1-9]\d{1,14}$">
+                                <div class="invalid-feedback">Formato E.164: +52XXXXXXXXXX</div>
+                                <div class="valid-feedback">Teléfono válido</div>
+                                <div class="form-text">Incluye código de país (ej: +52 para México)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            Guardar Cambios
+                        </button>
+                    </div>
+                </form>
+    </div>
+
+    <!-- Seguridad -->
+    <div class="account-section">
+        <div class="account-section-header">SEGURIDAD</div>
+                <!-- Info de seguridad -->
+                <div class="security-info-table">
+                    <div class="security-info-row">
+                        <div class="security-info-label">Email verificado</div>
+                        <div class="security-info-value">
+                            {% if user.is_email_verified %}✓ Sí{% else %}No{% endif %}
+                        </div>
+                    </div>
+                    <div class="security-info-row">
+                        <div class="security-info-label">Cuenta creada</div>
+                        <div class="security-info-value">{{ user.date_joined|date:"d/m/Y" }}</div>
+                    </div>
+                    <div class="security-info-row">
+                        <div class="security-info-label">Último acceso</div>
+                        <div class="security-info-value">{{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</div>
+                    </div>
+                    <div class="security-info-row">
+                        <div class="security-info-label">Sesiones activas</div>
+                        <div class="security-info-value">
+                            <a href="#" onclick="loadUserSessions(); return false;" style="color: #111827; text-decoration: none;">
+                                Ver sesiones →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div style="font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 1rem;">
+                            Cambiar Contraseña
+                        </div>
+                        <form id="password-form">
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña Actual</label>
+                                <input type="password" class="form-control" id="current_password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="new_password1" required>
+                                <div class="form-text">Mínimo 8 caracteres</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Confirmar Nueva Contraseña</label>
+                                <input type="password" class="form-control" id="new_password2" required>
+                            </div>
+                            <button type="submit" class="btn btn-warning">
+                                Cambiar Contraseña
+                            </button>
+                        </form>
+                    </div>
+                </div>
+    </div>
+
+    <!-- Preferencias -->
+    <div class="account-section">
+        <div class="account-section-header">PREFERENCIAS</div>
+                <form id="preferences-form">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+                                <label class="form-label">Zona Horaria</label>
+                                <select class="form-select" id="timezone">
+                                    <option value="America/Mexico_City" {% if profile.timezone == 'America/Mexico_City' %}selected{% endif %}>México (Ciudad de México)</option>
+                                    <option value="America/Tijuana" {% if profile.timezone == 'America/Tijuana' %}selected{% endif %}>México (Tijuana)</option>
+                                    <option value="America/Cancun" {% if profile.timezone == 'America/Cancun' %}selected{% endif %}>México (Cancún)</option>
+                                    <option value="America/Monterrey" {% if profile.timezone == 'America/Monterrey' %}selected{% endif %}>México (Monterrey)</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="email_notifications"
+                                           {% if profile.email_notifications %}checked{% endif %}>
+                                    <label class="form-check-label" for="email_notifications">
+                                        Notificaciones por Email
+                                    </label>
+                                </div>
+                                <div class="form-text">Recibir alertas de pagos, facturas y recordatorios</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            Guardar Preferencias
+                        </button>
+                    </div>
+                </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.getElementById('profile-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    updateProfile();
+});
+
+document.getElementById('password-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    changePassword();
+});
+
+document.getElementById('preferences-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    updatePreferences();
+});
+
+function updateProfile() {
+    const form = document.getElementById('profile-form');
+
+    // Validación HTML5
+    if (!form.checkValidity()) {
+        form.classList.add('was-validated');
+        showToast('Por favor corrige los errores en el formulario', 'error');
+        return;
+    }
+
+    const formData = {
+        first_name: document.getElementById('first_name').value,
+        last_name: document.getElementById('last_name').value,
+        phone: document.getElementById('phone').value
+    };
+
+    const btn = event.submitter;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Guardando...';
+    btn.disabled = true;
+
+    fetch('{% url "accounts:update_profile" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.error || 'Error actualizando perfil', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function changePassword() {
+    const password1 = document.getElementById('new_password1').value;
+    const password2 = document.getElementById('new_password2').value;
+
+    if (password1 !== password2) {
+        showToast('Las contraseñas no coinciden', 'error');
+        return;
+    }
+
+    const formData = {
+        current_password: document.getElementById('current_password').value,
+        new_password1: password1,
+        new_password2: password2
+    };
+
+    const btn = event.submitter;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Cambiando...';
+    btn.disabled = true;
+
+    fetch('{% url "accounts:change_password" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+            document.getElementById('password-form').reset();
+        } else {
+            showToast(data.error || 'Error cambiando contraseña', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function updatePreferences() {
+    const formData = {
+        timezone: document.getElementById('timezone').value,
+        email_notifications: document.getElementById('email_notifications').checked
+    };
+
+    const btn = event.submitter;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Guardando...';
+    btn.disabled = true;
+
+    fetch('{% url "accounts:update_profile" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.error || 'Error actualizando preferencias', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+function deactivateCSD(certId, serialNumber) {
+    if (confirm(`¿Desactivar certificado ${serialNumber}?\n\nEsto impedirá generar nuevas facturas con este certificado.`)) {
+        fetch('{% url "config:deactivate_csd" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                certificate_id: certId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showToast(data.error || 'Error desactivando certificado', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        });
+    }
+}
+
+function loadUserSessions() {
+    fetch('{% url "accounts:user_sessions" %}')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('detail-panel-content').innerHTML = html;
+            document.getElementById('detailPanelTitle').textContent = 'Sesiones Activas';
+            const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailPanel'));
+            offcanvas.show();
+        })
+        .catch(error => {
+            showToast('Error cargando sesiones', 'error');
+        });
+}
+
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+
+    const csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    if (csrfCookie) return csrfCookie.split('=')[1];
+
+    return '';
+}
+
+// Auto-format RFC input
+document.getElementById('rfc').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+// Auto-format phone inputs with E.164 hint
+document.getElementById('phone').addEventListener('input', function(e) {
+    let value = e.target.value;
+    if (value && !value.startsWith('+') && !value.startsWith('52') && value.length > 0) {
+        // Add visual hint for Mexican numbers
+        if (value.length === 10) {
+            e.target.style.borderColor = '#ffc107';
+            e.target.nextElementSibling.innerHTML = '<i class="fas fa-exclamation-triangle text-warning"></i> Agregue +52 para formato internacional';
+        }
+    } else {
+        e.target.style.borderColor = '';
+        e.target.nextElementSibling.innerHTML = 'Formato: +52XXXXXXXXXX (incluye +52 para México)';
+    }
+});
+</script>
+{% endblock %}

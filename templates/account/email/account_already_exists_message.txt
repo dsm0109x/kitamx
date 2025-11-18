@@ -1,0 +1,34 @@
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+YA TIENES UNA CUENTA
+
+Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+Alguien intento crear una cuenta en Kita con este email, pero ya existe
+una cuenta registrada con esta direccion.
+
+OLVIDASTE QUE YA TENIAS CUENTA?
+Si fuiste tu, simplemente inicia sesion con tu email y contrasena.
+Si olvidaste tu contrasena, puedes recuperarla facilmente.
+
+Iniciar sesion: https://kita.mx/ingresar/
+Recuperar contrasena: https://kita.mx/recuperar-contrasena/
+
+NO FUISTE TU?
+Si no intentaste crear una cuenta, tu cuenta existente esta segura.
+Puedes ignorar este email. Por seguridad, considera cambiar tu contrasena
+si sospechas actividad no autorizada.
+
+¿Tienes dudas? Escribenos a hola@kita.mx
+
+--
+El equipo de Kita
+https://kita.mx
+hola@kita.mx
+
+--------------------------------------------------------------------------------
+Este email fue enviado porque alguien intento registrarse con tu email.
+Tu cuenta existente esta segura. Si no fuiste tu, puedes ignorar este mensaje.
+================================================================================

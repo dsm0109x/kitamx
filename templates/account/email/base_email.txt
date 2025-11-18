@@ -1,0 +1,19 @@
+{% block email_subject %}Kita{% endblock %}
+
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+{% block email_content %}{% endblock %}
+
+--------------------------------------------------------------------------------
+
+Kita
+https://kita.mx
+hola@kita.mx
+
+{% block email_footer_note %}
+Este email fue enviado desde tu cuenta de Kita.
+{% endblock %}
+
+================================================================================

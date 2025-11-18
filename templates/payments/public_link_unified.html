@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if payment_link %}{{ payment_link.title }}{% else %}Pago{% endif %} - {{ tenant.business_name }}</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Pago seguro{% if payment_link %} de ${{ payment_link.amount }} MXN{% endif %} para {{ tenant.business_name }}">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Toastify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/public-payment-complete.css' %}?v=2.0">
+</head>
+<body class="payment-page">
+
+    <!-- HEADER UNIFICADO - TODOS LOS ESTADOS -->
+    <header class="payment-header-main">
+        <div class="header-left">
+            <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" class="kita-logo">
+            <span class="kita-wordmark">Kita</span>
+        </div>
+        <div class="header-right">
+            <span class="security-badge-header">🔒 Conexión Segura</span>
+        </div>
+    </header>
+
+    <!-- STATUS BANNER - SEGÚN ESTADO -->
+    {% if payment_link.status == 'expired' or error_type == 'expired' %}
+    <div class="status-banner expired">
+        ⚠️ Este link de pago expiró el {{ payment_link.expires_at|date:"d/m/Y" }}
+        <br><small>Contacta a {{ tenant.business_name }} para obtener un nuevo link</small>
+    </div>
+
+    {% elif payment_link.status == 'paid' %}
+    <div class="status-banner paid">
+        ✓ Este link ya fue pagado exitosamente
+        <br><small>Puedes descargar tu factura abajo</small>
+    </div>
+
+    {% elif payment_link.status == 'cancelled' or error_type == 'cancelled' %}
+    <div class="status-banner cancelled">
+        × Este link fue cancelado por {{ tenant.business_name }}
+        <br><small>Contacta al proveedor para más información</small>
+    </div>
+
+    {% elif error_type == 'no_integration' or error_type == 'mp_error' %}
+    <div class="status-banner expired">
+        ⚠️ Sistema de pagos temporalmente no disponible
+        <br><small>Contacta a {{ tenant.business_name }} para completar tu pago</small>
+    </div>
+    {% endif %}
+
+    <div class="payment-container">
+        <div class="payment-card">
+
+            <!-- MERCHANT INFO - TODOS -->
+            <div class="merchant-section">
+                <div class="payment-to-label">{% if payment_link.status == 'paid' %}Pagado a{% else %}Pago a{% endif %}</div>
+                <div class="merchant-name">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            {% if payment_link %}
+            <!-- PAYMENT DETAILS - TODOS -->
+            <div class="payment-details">
+                <h1 class="payment-title">{{ payment_link.title }}</h1>
+                {% if payment_link.description and payment_link.status == 'active' %}
+                <p class="payment-description">{{ payment_link.description }}</p>
+                {% endif %}
+            </div>
+
+            <!-- AMOUNT - TODOS -->
+            <div class="amount-section">
+                <div class="amount-label">
+                    {% if payment_link.status == 'paid' %}
+                        Monto Pagado
+                    {% else %}
+                        Total{% if payment_link.status == 'active' %} a Pagar{% endif %}
+                    {% endif %}
+                </div>
+                <div class="amount-display">
+                    <span class="amount">${{ payment_link.amount }}</span>
+                    <span class="currency">{{ payment_link.currency }}</span>
+                </div>
+            </div>
+
+            <!-- CONTENIDO SEGÚN ESTADO -->
+            {% if payment_link.status == 'active' %}
+                <!-- TRUST SIGNALS -->
+                <div class="trust-signals">
+                    <div class="trust-item">Pago 100% seguro procesado por Mercado Pago</div>
+                    {% if payment_link.requires_invoice %}
+                    <div class="trust-item">Incluye factura CFDI 4.0 válida ante el SAT</div>
+                    {% endif %}
+                    <div class="trust-item">Tus datos están protegidos con encriptación SSL 256-bit</div>
+                    <div class="trust-item">Recibes confirmación inmediata por email</div>
+                </div>
+
+                <!-- BOTÓN PAGAR -->
+                <div class="cta-section">
+                    <button class="payment-cta-button" onclick="proceedToPay()">
+                        Pagar de Forma Segura →
+                    </button>
+                </div>
+
+                <!-- METADATA -->
+                <div class="payment-metadata">
+                    <div class="metadata-item">
+                        🕐 Válido hasta: <strong>{{ payment_link.expires_at|date:"d/m/Y" }} a las {{ payment_link.expires_at|time:"H:i" }}</strong>
+                    </div>
+                    {% if payment_link.customer_name %}
+                    <div class="metadata-item">
+                        👤 Para: <strong>{{ payment_link.customer_name }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+
+            {% elif payment_link.status == 'expired' %}
+                <!-- MENSAJE EXPIRADO -->
+                <div class="state-message">
+                    <p>Este link de pago ya no está disponible porque expiró.</p>
+                    <p>Contacta a {{ tenant.business_name }} para:</p>
+                    <ul>
+                        <li>Solicitar un nuevo link de pago</li>
+                        <li>Consultar el estado de tu servicio</li>
+                        <li>Resolver cualquier duda</li>
+                    </ul>
+                </div>
+
+                <div class="cta-section">
+                    {% if tenant.email %}
+                    <a href="mailto:{{ tenant.email }}?subject=Link de pago expirado: {{ payment_link.title }}" class="payment-cta-button" style="display: block; text-align: center; text-decoration: none;">
+                        Contactar por Email →
+                    </a>
+                    {% endif %}
+                </div>
+
+            {% elif payment_link.status == 'paid' %}
+                <!-- CONFIRMACIÓN PAGO -->
+                <div class="state-message success">
+                    <p><strong>✓ Pago recibido exitosamente</strong></p>
+                    {% if payment %}
+                    <p>ID de transacción: <code>{{ payment.mp_payment_id }}</code></p>
+                    <p>Fecha: {{ payment.processed_at|date:"d/m/Y H:i"|default:"Procesando..." }}</p>
+                    {% endif %}
+                </div>
+
+                {% if invoice %}
+                <!-- YA TIENE FACTURA -->
+                <div class="invoice-download">
+                    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem;">Factura CFDI 4.0 Generada</h3>
+                    <p style="font-size: 0.875rem; color: #6b7280; margin-bottom: 1rem;">
+                        UUID: <code>{{ invoice.uuid }}</code>
+                    </p>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <a href="/descargar/{{ payment_link.token }}/{{ invoice.uuid }}/" class="payment-cta-button" style="flex: 1; text-align: center; text-decoration: none;">
+                            Descargar PDF
+                        </a>
+                        <a href="/descargar/{{ payment_link.token }}/{{ invoice.uuid }}/" class="payment-cta-button" style="flex: 1; text-align: center; text-decoration: none;">
+                            Descargar XML
+                        </a>
+                    </div>
+                </div>
+
+                {% elif payment_link.requires_invoice %}
+                <!-- NECESITA FACTURA -->
+                <div class="state-message">
+                    <p><strong>¿Necesitas factura?</strong></p>
+                    <p>Ingresa tus datos fiscales para generar tu factura CFDI 4.0 válida ante el SAT.</p>
+                </div>
+
+                <div class="cta-section">
+                    <a href="/facturar/{{ payment_link.token }}/" class="payment-cta-button" style="display: block; text-align: center; text-decoration: none;">
+                        Generar Mi Factura →
+                    </a>
+                </div>
+
+                {% else %}
+                <!-- NO REQUIERE FACTURA -->
+                <div class="state-message">
+                    <p>Este pago no incluye facturación.</p>
+                    <p>Gracias por tu pago. Recibirás confirmación por email.</p>
+                </div>
+                {% endif %}
+
+            {% elif payment_link.status == 'cancelled' %}
+                <!-- MENSAJE CANCELADO -->
+                <div class="state-message">
+                    <p>Este link de pago fue cancelado.</p>
+                    {% if payment_link.cancellation_reason %}
+                    <p>Motivo: {{ payment_link.cancellation_reason }}</p>
+                    {% endif %}
+                    <p>Contacta a {{ tenant.business_name }} si necesitas un nuevo link.</p>
+                </div>
+
+                <div class="cta-section">
+                    {% if tenant.email %}
+                    <a href="mailto:{{ tenant.email }}?subject=Consulta sobre link cancelado: {{ payment_link.title }}" class="payment-cta-button" style="display: block; text-align: center; text-decoration: none;">
+                        Contactar por Email →
+                    </a>
+                    {% endif %}
+                </div>
+
+            {% endif %}
+            {% endif %}
+
+            <!-- FAQ - TODOS LOS ESTADOS -->
+            <div class="help-section">
+                <h2 class="help-title">¿Necesitas ayuda?</h2>
+
+                <details class="faq-item">
+                    <summary>¿Cómo pagar?</summary>
+                    <div class="faq-answer">
+                        <p>1. Click en "Pagar de Forma Segura"<br>
+                        2. Ingresa tus datos de tarjeta en Mercado Pago<br>
+                        3. Confirma el pago<br>
+                        4. Recibes confirmación por email</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Es seguro pagar aquí?</summary>
+                    <div class="faq-answer">
+                        <p>Sí, completamente seguro. Kita usa Mercado Pago (empresa de MercadoLibre) como procesador de pagos. Tus datos van directo a Mercado Pago con encriptación SSL.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>¿Qué es Kita?</summary>
+                    <div class="faq-answer">
+                        <p>Kita es una plataforma mexicana de pagos y facturación. {{ tenant.business_name }} usa Kita para procesar pagos de forma segura.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item">
+                    <summary>Contactar a {{ tenant.business_name }}</summary>
+                    <div class="faq-answer">
+                        {% if tenant.email %}
+                        <p><strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a></p>
+                        {% endif %}
+                        {% if tenant.phone %}
+                        <p><strong>Teléfono:</strong> <a href="tel:{{ tenant.phone }}">{{ tenant.phone }}</a></p>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- FOOTER UNIFICADO - TODOS -->
+    <footer class="payment-footer-main">
+        <div class="footer-branding">
+            Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+        </div>
+
+        <div class="footer-links">
+            <a href="/legal/privacidad/" target="_blank">Aviso de Privacidad</a> ·
+            <a href="/legal/terminos/" target="_blank">Términos y Condiciones</a> ·
+            <a href="/legal/cookies/" target="_blank">Política de Cookies</a> ·
+            <a href="mailto:hola@kita.mx">Soporte</a>
+        </div>
+
+        <div class="footer-support">
+            ¿Problemas? <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+        </div>
+
+        <div class="trust-badges">
+            🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ Mercado Pago Oficial
+        </div>
+
+        <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+            © 2025 Kita
+        </div>
+    </footer>
+
+    <!-- COOKIE BANNER - TODOS -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>🍪 Usamos cookies esenciales para procesar tu pago de forma segura.</p>
+            <div class="cookie-actions">
+                <button class="btn-accept-cookies" onclick="acceptCookies()">Aceptar</button>
+                <a href="/legal/cookies/" target="_blank">Más información</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        // Cookie consent
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('kita_cookie_consent')) {
+                setTimeout(() => {
+                    document.getElementById('cookieBanner').classList.add('show');
+                }, 1000);
+            }
+        });
+
+        function acceptCookies() {
+            localStorage.setItem('kita_cookie_consent', 'accepted');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+
+        // Track page view
+        {% if payment_link %}
+        fetch('/track-view/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                token: '{{ payment_link.token }}',
+                action: 'page_view'
+            })
+        }).catch(e => console.log('Analytics:', e));
+        {% endif %}
+
+        function proceedToPay() {
+            {% if payment_link %}
+            trackInteraction('payment_button_clicked');
+            {% endif %}
+
+            {% if init_point %}
+                showToast('Redirigiendo a pago seguro...', 'info');
+                setTimeout(() => {
+                    window.location.href = '{{ init_point }}';
+                }, 1000);
+            {% else %}
+                showToast('Error: No se pudo preparar el pago.', 'error');
+            {% endif %}
+        }
+
+        function trackInteraction(action) {
+            {% if payment_link %}
+            fetch('/track-interaction/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: '{{ payment_link.token }}',
+                    action: action
+                })
+            }).catch(e => console.log('Tracking:', e));
+            {% endif %}
+        }
+
+        function showToast(message, type) {
+            const colors = {
+                'success': '#15803d',
+                'error': '#ef4444',
+                'info': '#111827'
+            };
+
+            Toastify({
+                text: message,
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: colors[type] || '#111827',
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '0.875rem',
+                    borderRadius: '0',
+                    padding: '1rem 1.5rem'
+                }
+            }).showToast();
+        }
+    </script>
+</body>
+</html>

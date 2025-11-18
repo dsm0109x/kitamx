@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Link {% if error_type %}{{ error_type|title }}{% else %}No Disponible{% endif %} - {% if tenant %}{{ tenant.business_name }}{% else %}Kita{% endif %}</title>
+
+    <!-- SEO -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    {% load static %}
+    <!-- SPLIT SCREEN EDITORIAL CSS -->
+    <link rel="stylesheet" href="{% static 'css/public-payments-landing-style.css' %}?v=4.1">
+</head>
+<body class="payment-page">
+
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="payment-split-container">
+
+        <!-- LEFT PANEL - INFO STICKY (Navy-50) -->
+        <div class="left-panel-sticky">
+
+            <!-- Kita Branding -->
+            <div class="panel-section" style="margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" style="height: 32px; width: auto;">
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-black);">Kita</div>
+                </div>
+                <div style="font-size: 0.6875rem; color: var(--color-gray-500);">
+                    <i class="iconoir-lock"></i> Pago Seguro
+                </div>
+            </div>
+
+            <!-- Status Badge -->
+            {% if error_type == 'expired' or payment_link.status == 'expired' %}
+            <div class="panel-section" style="background: rgba(245, 158, 11, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #f59e0b;">
+                <div style="font-size: 0.875rem; color: #92400e; font-weight: 600;">
+                    ⚠️ Link expirado{% if payment_link %} el {{ payment_link.expires_at|date:"d/m/Y" }}{% endif %}
+                </div>
+            </div>
+            {% elif error_type == 'cancelled' or payment_link.status == 'cancelled' %}
+            <div class="panel-section" style="background: rgba(107, 114, 128, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #6b7280;">
+                <div style="font-size: 0.875rem; color: #374151; font-weight: 600;">
+                    × Link cancelado
+                </div>
+            </div>
+            {% else %}
+            <div class="panel-section" style="background: rgba(107, 114, 128, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #6b7280;">
+                <div style="font-size: 0.875rem; color: #374151; font-weight: 600;">
+                    × Link no disponible
+                </div>
+            </div>
+            {% endif %}
+
+            {% if payment_link %}
+            <!-- Merchant Info -->
+            <div class="panel-section">
+                <div class="panel-label">PAGO A</div>
+                <div class="merchant-name-large">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc-large">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Amount HERO - Editorial -->
+            <div class="panel-section amount-editorial">
+                <div class="panel-label">MONTO</div>
+                <div class="amount-hero-editorial">${{ payment_link.amount }}</div>
+                <span class="currency-editorial">{{ payment_link.currency }}</span>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Status Info -->
+            <div class="panel-section metadata-editorial">
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-warning-triangle"></i>
+                    Status: <strong>{% if error_type %}{{ error_type|title }}{% else %}Inactivo{% endif %}</strong>
+                </div>
+                {% if payment_link.expires_at %}
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-clock"></i>
+                    Expiró: <strong>{{ payment_link.expires_at|date:"d/m/Y" }}</strong>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <!-- No payment link -->
+            <div class="panel-section">
+                <div class="panel-label">LINK NO ENCONTRADO</div>
+                <div class="merchant-name-large">Este link no existe</div>
+            </div>
+            {% endif %}
+
+            <!-- Info Badge -->
+            <div class="trust-badge-editorial">
+                <i class="iconoir-info-circle"></i>
+                <span>Procesado por Kita</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL - MESSAGE (White) -->
+        <div class="right-panel-action">
+
+            <div class="right-panel-section">
+                <div class="section-title-editorial">{% if error_type == 'expired' %}LINK EXPIRADO{% elif error_type == 'cancelled' %}LINK CANCELADO{% else %}LINK INACTIVO{% endif %}</div>
+
+                <h1 class="payment-title-editorial">Este link de pago no está disponible</h1>
+
+                <div class="state-message-editorial">
+                    {% if error_type == 'expired' or payment_link.status == 'expired' %}
+                    <p>Este link de pago expiró y ya no acepta pagos.</p>
+                    <p>Por favor contacta a {{ tenant.business_name }} para:</p>
+                    <ul>
+                        <li>Solicitar un nuevo link de pago</li>
+                        <li>Consultar el estado de tu servicio</li>
+                        <li>Resolver cualquier duda</li>
+                    </ul>
+
+                    {% elif error_type == 'cancelled' or payment_link.status == 'cancelled' %}
+                    <p>Este link de pago fue cancelado.</p>
+                    {% if payment_link.cancellation_reason %}
+                    <p>Motivo: {{ payment_link.cancellation_reason }}</p>
+                    {% endif %}
+                    <p>Contacta a {{ tenant.business_name }} si necesitas un nuevo link.</p>
+
+                    {% elif error_type == 'used' %}
+                    <p>Este link ya fue utilizado y no acepta más pagos.</p>
+                    <p>Si necesitas realizar otro pago, solicita un nuevo link a {{ tenant.business_name }}.</p>
+
+                    {% else %}
+                    <p>Este link no está disponible o no existe.</p>
+                    <p>Verifica que la URL esté correcta o contacta a quien te envió el link.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if tenant and tenant.email %}
+            <div class="cta-editorial">
+                <a href="mailto:{{ tenant.email }}?subject=Consulta sobre link de pago{% if payment_link %}: {{ payment_link.title }}{% endif %}" class="btn-cta-editorial">
+                    Contactar por Email →
+                </a>
+            </div>
+            {% endif %}
+
+            <!-- FAQ -->
+            <div class="faq-editorial">
+                <div class="faq-title-editorial">¿NECESITAS AYUDA?</div>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Por qué no está disponible?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Los links tienen fecha de expiración. También pueden ser cancelados por el proveedor o ya haber sido utilizados.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Puedo pagar de otra forma?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Contacta directamente a {{ tenant.business_name|default:"quien te envió el link" }} para obtener un nuevo link de pago o coordinar otra forma de pago.</p>
+                    </div>
+                </details>
+
+                {% if tenant %}
+                <details class="faq-item-editorial">
+                    <summary>Contactar a {{ tenant.business_name }}</summary>
+                    <div class="faq-answer-editorial">
+                        {% if tenant.email %}
+                        <p><strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a></p>
+                        {% endif %}
+                        {% if tenant.phone %}
+                        <p><strong>Teléfono:</strong> {{ tenant.phone }}</p>
+                        {% endif %}
+                    </div>
+                </details>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- FOOTER (Spans both columns) -->
+        <footer class="payment-footer-editorial">
+            <div class="footer-branding">
+                Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+            </div>
+            <div class="footer-links">
+                <a href="/legal/privacidad/" target="_blank">Privacidad</a> ·
+                <a href="/legal/terminos/" target="_blank">Términos</a> ·
+                <a href="mailto:hola@kita.mx">Soporte</a>
+            </div>
+            <div class="trust-badges">
+                🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ Mercado Pago Oficial
+            </div>
+            <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+                © 2025 Kita
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- COOKIE BANNER -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>🍪 Usamos cookies esenciales.</p>
+            <div class="cookie-actions">
+                <button class="btn-accept-cookies" onclick="acceptCookies()">Aceptar</button>
+                <a href="/legal/cookies/" target="_blank">Más info</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        // Cookie consent
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('kita_cookie_consent')) {
+                setTimeout(() => {
+                    document.getElementById('cookieBanner').classList.add('show');
+                }, 1000);
+            }
+        });
+
+        function acceptCookies() {
+            localStorage.setItem('kita_cookie_consent', 'accepted');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

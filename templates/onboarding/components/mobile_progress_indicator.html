@@ -1,0 +1,71 @@
+
+<!-- Mobile Progress Wrapper -->
+<div class="mobile-progress-wrapper d-lg-none mb-4">
+    <!-- Toggle Button - Current Step Display -->
+    <button class="mobile-progress-toggle"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mobileProgressDetails"
+            aria-expanded="false"
+            aria-controls="mobileProgressDetails"
+            aria-label="Ver progreso completo del onboarding">
+        <div class="current-step-display">
+            <span class="step-badge">Paso {{ step }} de {{ total_steps|default:4 }}</span>
+            <h3 class="step-title-mobile">{{ step_title }}</h3>
+        </div>
+        <span class="iconoir-nav-arrow-down toggle-icon" aria-hidden="true"></span>
+    </button>
+
+    <!-- Collapsible Progress Details -->
+    <div class="collapse" id="mobileProgressDetails">
+        <div class="mobile-progress-tree">
+
+            <!-- Step 1: Identidad de tu Empresa -->
+            <div class="mobile-tree-step {% if step == 1 %}active{% elif user.onboarding_step > 1 %}completed{% endif %}">
+                <div class="mobile-step-icon">
+                    {% if user.onboarding_step > 1 %}✓{% else %}1{% endif %}
+                </div>
+                <div class="mobile-step-content">
+                    <div class="mobile-step-title">Identidad de tu Empresa</div>
+                    <div class="mobile-step-subtitle">Datos fiscales y RFC</div>
+                </div>
+            </div>
+
+            <!-- Step 2: Conectar Mercado Pago -->
+            <div class="mobile-tree-step {% if step == 2 %}active{% elif tenant.mercadopago_user_id %}completed{% endif %}">
+                <div class="mobile-step-icon">
+                    {% if tenant.mercadopago_user_id %}✓{% else %}2{% endif %}
+                </div>
+                <div class="mobile-step-content">
+                    <div class="mobile-step-title">Conectar Mercado Pago®</div>
+                    <div class="mobile-step-subtitle">
+                        {% if tenant.mercadopago_user_id %}Conectado{% else %}Opcional{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Certificado Digital -->
+            <div class="mobile-tree-step {% if step == 3 %}active{% elif tenant.csdcertificate_set.exists %}completed{% endif %}">
+                <div class="mobile-step-icon">
+                    {% if tenant.csdcertificate_set.exists %}✓{% else %}3{% endif %}
+                </div>
+                <div class="mobile-step-content">
+                    <div class="mobile-step-title">Certificado Digital</div>
+                    <div class="mobile-step-subtitle">
+                        {% if tenant.csdcertificate_set.exists %}CSD subido{% else %}Opcional{% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Activar Trial -->
+            <div class="mobile-tree-step {% if step == 4 %}active{% endif %}">
+                <div class="mobile-step-icon">4</div>
+                <div class="mobile-step-content">
+                    <div class="mobile-step-title">Activar Trial</div>
+                    <div class="mobile-step-subtitle">30 días gratis</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

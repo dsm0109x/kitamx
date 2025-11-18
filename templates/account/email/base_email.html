@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <meta name="supported-color-schemes" content="light dark">
+    <title>{% block email_title %}Kita{% endblock %}</title>
+    <style>
+        /* ========================================
+           WEB FONTS - Inter desde Google Fonts
+           ======================================== */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* ========================================
+           EMAIL RESET - Compatible con todos los clientes
+           ======================================== */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
+
+        /* ========================================
+           BASE STYLES - Brutalist Email Design
+           ======================================== */
+        body {
+            background-color: #f0f4f8;  /* Navy-50 como auth pages */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;  /* ✅ Inter primero */
+            line-height: 1.6;
+            color: #111827;  /* Gray-900 */
+            font-size: 16px;
+        }
+
+        /* Container principal */
+        .email-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f0f4f8;
+            padding: 24px 16px;  /* Reducido de 40px 20px */
+        }
+
+        .email-container {
+            background-color: #ffffff;
+            border: none;  /* ✅ Sin borde como cards web */
+            border-radius: 15px;  /* ✅ Border radius consistente */
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04),
+                        0 1px 4px rgba(0, 0, 0, 0.02);  /* ✅ Sombra suave */
+        }
+
+        /* ========================================
+           HEADER - Negro con barra verde + Logo
+           ======================================== */
+        .email-header {
+            background-color: #111827;  /* Gray-900 */
+            padding: 20px 24px;  /* Reducido de 32px 40px */
+            text-align: center;
+            border-bottom: 4px solid #15803d;  /* Verde accent */
+        }
+
+        /* Logo container con imagen + texto */
+        .logo-container {
+            display: inline-block;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .email-logo-img {
+            width: 40px;
+            height: 40px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        .email-logo {
+            font-family: 'Inter', Georgia, 'Times New Roman', serif;  /* ✅ Inter para "Kita" */
+            font-size: 32px;  /* Reducido de 36px */
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 0.5px;  /* ✅ Reducido para Inter */
+            line-height: 1;
+        }
+
+        .email-tagline {
+            color: #9CA3AF;
+            font-size: 10px;  /* Reducido de 11px */
+            margin-top: 4px;  /* Reducido de 8px */
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        /* ========================================
+           CONTENT AREA
+           ======================================== */
+        .email-content {
+            padding: 24px;  /* Reducido de 40px */
+        }
+
+        /* Icono grande centrado */
+        .email-icon {
+            text-align: center;
+            font-size: 48px;  /* Reducido de 56px */
+            margin: 0 0 16px 0;  /* Reducido de 24px */
+            line-height: 1;
+        }
+
+        /* Títulos */
+        .email-content h1 {
+            color: #111827;
+            font-size: 26px;  /* Reducido de 28px */
+            font-weight: 700;
+            margin: 0 0 8px 0;  /* Reducido de 12px */
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .email-content h2 {
+            color: #111827;
+            font-size: 20px;  /* Reducido de 22px */
+            font-weight: 700;
+            margin: 16px 0 12px 0;  /* Reducido de 24px 16px */
+            line-height: 1.3;
+        }
+
+        /* Párrafos */
+        .email-content p {
+            margin: 0 0 12px 0;  /* Reducido de 16px */
+            color: #4B5563;  /* Gray-600 */
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .email-content p.lead {
+            font-size: 16px;  /* Reducido de 18px */
+            color: #374151;
+            text-align: center;
+            margin-bottom: 16px;  /* Reducido de 24px */
+        }
+
+        .email-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ========================================
+           CTA BUTTON - Verde como web
+           ======================================== */
+        .btn-container {
+            text-align: center;
+            margin: 20px 0;  /* Reducido de 32px */
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 14px 28px;
+            background-color: #15803d;  /* Forest-700 CORRECTO */
+            color: #ffffff !important;
+            text-decoration: none !important;
+            border-radius: 9999px;  /* ✅ Pill redondo como web */
+            font-weight: 600;
+            font-size: 16px;
+            border: none;
+            mso-padding-alt: 0;
+            max-width: 100%;  /* Prevenir overflow */
+            box-sizing: border-box;
+        }
+
+        .btn-primary:hover {
+            background-color: #166534;  /* Forest-800 */
+            text-decoration: none !important;
+        }
+
+        /* Asegurar que links en botones no tengan underline */
+        a.btn-primary {
+            text-decoration: none !important;
+        }
+
+        /* Tabla para botón (mejor compatibilidad email) */
+        .btn-table {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .btn-table td {
+            text-align: center;
+            padding: 0;
+        }
+
+        /* ========================================
+           INFO BOXES - Sistema modular
+           ======================================== */
+
+        /* Success Box - Verde */
+        .success-box {
+            background-color: #f0fdf4;  /* Forest-50 */
+            border: 1px solid #bbf7d0;  /* Forest-200 */
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 15px;  /* ✅ Border radius consistente */
+        }
+
+        .success-box p {
+            margin: 0 0 6px 0;
+            color: #14532d;  /* Forest-900 */
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .success-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Info Box - Amarillo warning */
+        .info-box {
+            background-color: #FEF3C7;  /* Yellow-100 */
+            border: 1px solid #FDE68A;  /* Yellow-200 */
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 15px;  /* ✅ Border radius consistente */
+        }
+
+        .info-box p {
+            margin: 0 0 6px 0;
+            color: #92400E;  /* Yellow-900 */
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .info-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Security Box - Gris */
+        .security-box {
+            background-color: #F3F4F6;  /* Gray-100 */
+            border: 1px solid #E5E7EB;  /* Gray-200 */
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 15px;  /* ✅ Border radius consistente */
+        }
+
+        .security-box p {
+            margin: 3px 0;
+            font-size: 14px;
+            color: #6B7280;  /* Gray-500 */
+            line-height: 1.5;
+        }
+
+        .security-box p:first-child {
+            margin-top: 0;
+        }
+
+        .security-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        .security-box strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        /* Error Box - Rojo (para notificaciones críticas) */
+        .error-box {
+            background-color: #FEF2F2;  /* Red-50 */
+            border: 1px solid #FECACA;  /* Red-200 */
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 15px;  /* ✅ Border radius consistente */
+        }
+
+        .error-box p {
+            margin: 0 0 6px 0;
+            color: #991B1B;  /* Red-900 */
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .error-box p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ========================================
+           LINK FALLBACK
+           ======================================== */
+        .link-fallback {
+            margin-top: 16px;  /* Reducido de 24px */
+            padding: 12px;  /* Reducido de 16px */
+            background-color: #F9FAFB;
+            border-radius: 15px;  /* ✅ Border radius consistente */
+            border: 1px solid #e5e7eb;
+        }
+
+        .link-fallback p {
+            margin: 0 0 6px 0;  /* Reducido de 8px */
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .link-fallback p:last-child {
+            margin-bottom: 0;
+        }
+
+        .link-fallback a {
+            color: #15803d;
+            font-size: 13px;
+            word-break: break-all;
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        .email-footer {
+            background-color: #F9FAFB;
+            padding: 20px 24px;  /* Reducido de 32px 40px */
+            text-align: center;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .email-footer p {
+            margin: 8px 0;
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .email-footer a {
+            color: #15803d;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .email-footer .brand {
+            color: #111827;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* ========================================
+           LIST STYLES
+           ======================================== */
+        .email-content ul,
+        .email-content ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+
+        .email-content li {
+            margin: 8px 0;
+            color: #4B5563;
+            line-height: 1.5;
+        }
+
+        /* Strong text */
+        strong, b {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        /* Links en contenido */
+        .email-content a {
+            color: #15803d;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+
+        /* ========================================
+           UTILITY CLASSES
+           ======================================== */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        .text-small {
+            font-size: 13px;
+        }
+
+        /* ========================================
+           MOBILE RESPONSIVE
+           ======================================== */
+        @media only screen and (max-width: 600px) {
+            .email-wrapper {
+                padding: 16px 8px !important;
+            }
+
+            .email-container {
+                border: none !important;
+            }
+
+            .email-content,
+            .email-header,
+            .email-footer {
+                padding: 20px 16px !important;  /* Más padding horizontal */
+            }
+
+            .email-content h1 {
+                font-size: 22px !important;
+            }
+
+            .email-content h2 {
+                font-size: 18px !important;
+            }
+
+            .email-content p {
+                font-size: 15px !important;
+            }
+
+            /* Botón más pequeño en mobile SIN overflow */
+            .btn-primary {
+                padding: 12px 16px !important;  /* Menos padding horizontal */
+                font-size: 14px !important;  /* Fuente más pequeña */
+                display: inline-block !important;  /* Inline, no block */
+                max-width: 90% !important;  /* 90% max para prevenir overflow */
+                word-wrap: break-word !important;
+                white-space: normal !important;
+                line-height: 1.4 !important;
+            }
+
+            .btn-container {
+                padding: 0 10px !important;  /* Padding lateral */
+            }
+
+            .email-icon {
+                font-size: 40px !important;
+                margin-bottom: 12px !important;
+            }
+
+            .email-logo-img {
+                width: 32px !important;
+                height: 32px !important;
+            }
+
+            .email-logo {
+                font-size: 28px !important;
+            }
+
+            /* Reducir boxes en mobile */
+            .success-box,
+            .info-box,
+            .security-box,
+            .error-box {
+                padding: 10px 12px !important;
+                margin: 12px 0 !important;
+            }
+
+            /* Link fallback más compacto */
+            .link-fallback {
+                padding: 10px !important;
+            }
+
+            .link-fallback a {
+                font-size: 11px !important;
+                word-break: break-all !important;
+            }
+        }
+
+        /* ========================================
+           DARK MODE SUPPORT
+           ======================================== */
+        @media (prefers-color-scheme: dark) {
+            .email-wrapper {
+                background-color: #1f2937 !important;
+            }
+
+            .email-container {
+                background-color: #111827 !important;
+                border: 1px solid #374151 !important;  /* ✅ Borde sutil en dark */
+            }
+
+            .email-content {
+                background-color: #111827 !important;
+            }
+
+            .email-content h1,
+            .email-content h2 {
+                color: #f9fafb !important;
+            }
+
+            .email-content p {
+                color: #d1d5db !important;
+            }
+
+            .email-footer {
+                background-color: #1f2937 !important;
+                border-top-color: #374151 !important;
+            }
+
+            .email-footer p {
+                color: #9ca3af !important;
+            }
+
+            /* Success Box - Verde oscuro */
+            .success-box {
+                background-color: rgba(21, 128, 61, 0.15) !important;  /* ✅ Verde transparente */
+                border: 1px solid rgba(21, 128, 61, 0.3) !important;  /* ✅ Borde verde */
+            }
+
+            .success-box p {
+                color: #86efac !important;  /* ✅ Verde claro */
+            }
+
+            /* Info Box - Amarillo oscuro */
+            .info-box {
+                background-color: rgba(245, 158, 11, 0.15) !important;  /* ✅ Amarillo transparente */
+                border: 1px solid rgba(245, 158, 11, 0.3) !important;  /* ✅ Borde amarillo */
+            }
+
+            .info-box p {
+                color: #fde68a !important;  /* ✅ Amarillo claro */
+            }
+
+            /* Security Box - Gris oscuro */
+            .security-box {
+                background-color: #1f2937 !important;  /* ✅ Gris oscuro */
+                border: 1px solid #4b5563 !important;  /* ✅ Borde gris */
+            }
+
+            .security-box p {
+                color: #d1d5db !important;  /* ✅ Texto gris claro */
+            }
+
+            .security-box strong {
+                color: #f9fafb !important;  /* ✅ Blanco para strong */
+            }
+
+            /* Error Box - Rojo oscuro */
+            .error-box {
+                background-color: rgba(220, 38, 38, 0.15) !important;  /* ✅ Rojo transparente */
+                border: 1px solid rgba(220, 38, 38, 0.3) !important;  /* ✅ Borde rojo */
+            }
+
+            .error-box p {
+                color: #fca5a5 !important;  /* ✅ Rojo claro */
+            }
+
+            /* Link Fallback - Oscuro */
+            .link-fallback {
+                background-color: #1f2937 !important;
+                border-color: #374151 !important;
+            }
+
+            .link-fallback p {
+                color: #9ca3af !important;
+            }
+
+            .link-fallback a {
+                color: #86efac !important;  /* ✅ Verde claro */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <!-- HEADER -->
+            <div class="email-header">
+                <!-- Logo + Brand usando tabla para compatibilidad total -->
+                <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 0; padding: 0;">
+                    <tr>
+                        <td align="center" style="padding: 0;">
+                            <!-- Logo inline con texto -->
+                            <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                                <tr>
+                                    <td align="center" valign="middle" colspan="2">
+                                        <h1 class="email-logo" style="margin: 0; display: inline-block;">Kita</h1>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p class="email-tagline" style="margin-top: 8px;">Kit de Ayuda para Emprendedores</p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- CONTENT -->
+            <div class="email-content">
+                {% block email_content %}{% endblock %}
+            </div>
+
+            <!-- FOOTER -->
+            <div class="email-footer">
+                <p class="brand">Kita</p>
+                <p>
+                    <a href="https://kita.mx">kita.mx</a> •
+                    <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+                </p>
+                <p style="font-size: 12px; color: #9CA3AF; margin-top: 12px;">
+                    {% block email_footer_note %}
+                        Este email fue enviado desde tu cuenta de Kita.
+                    {% endblock %}
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

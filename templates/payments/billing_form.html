@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Factura - {{ tenant.business_name }}</title>
+
+    <!-- SEO -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    <!-- Bootstrap 5 (para tooltips) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Toastify -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    {% load static %}
+    <!-- SPLIT SCREEN EDITORIAL CSS -->
+    <link rel="stylesheet" href="{% static 'css/public-payments-landing-style.css' %}?v=4.3">
+</head>
+<body class="payment-page">
+
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="payment-split-container">
+
+        <!-- LEFT PANEL - INFO STICKY (Navy-50) -->
+        <div class="left-panel-sticky">
+
+            <!-- Kita Branding -->
+            <div class="panel-section" style="margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" style="height: 32px; width: auto;">
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-black);">Kita</div>
+                </div>
+                <div style="font-size: 0.6875rem; color: var(--color-gray-500);">
+                    <i class="iconoir-lock"></i> Conexión Segura
+                </div>
+            </div>
+
+            <!-- Status Badge -->
+            <div class="panel-section status-badge-success" style="background: rgba(21, 128, 61, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #15803d;">
+                <div style="font-size: 0.875rem; color: #14532d; font-weight: 600;">
+                    ✓ Pago completado · Genera tu CFDI 4.0
+                </div>
+            </div>
+
+            <!-- Merchant Info -->
+            <div class="panel-section">
+                <div class="panel-label">FACTURA DE</div>
+                <div class="merchant-name-large">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc-large">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Amount HERO - Editorial -->
+            <div class="panel-section amount-editorial">
+                <div class="panel-label">MONTO PAGADO</div>
+                <div class="amount-hero-editorial">${{ payment_link.amount }}</div>
+                <span class="currency-editorial">{{ payment_link.currency }}</span>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Info Footer -->
+            <div class="panel-section">
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-flash"></i>
+                    <span>Recibirás <strong>XML + PDF</strong> por email en segundos</span>
+                </div>
+                <div class="metadata-item-editorial">
+                    <i class="iconoir-check-circle"></i>
+                    <span><strong>100% válido</strong> ante el SAT</span>
+                </div>
+            </div>
+
+            <!-- Trust Badge -->
+            <div class="trust-badge-editorial">
+                <i class="iconoir-shield-check"></i>
+                <span>Timbrado con PAC Certificado</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL - FORM (White) -->
+        <div class="right-panel-action">
+
+            <!-- Title -->
+            <div class="right-panel-section">
+                <div class="section-title-editorial">DATOS FISCALES</div>
+                <h1 class="payment-title-editorial">Completa tus datos para generar tu factura</h1>
+                <p class="payment-description-editorial">
+                    Toda la información es necesaria para emitir un CFDI 4.0 válido ante el SAT.
+                </p>
+            </div>
+
+            <!-- Error Messages -->
+            {% if error_message %}
+            <div class="alert alert-danger">
+                <i class="iconoir-warning-triangle me-2"></i>
+                <strong>Error:</strong> {{ error_message }}
+            </div>
+            {% endif %}
+
+            <!-- Form -->
+            <form method="post" class="form-editorial needs-validation" novalidate>
+                {% csrf_token %}
+
+                <!-- SECTION 1: Identificación Fiscal -->
+                <div class="form-section-group">
+                    <h5 class="section-title-small">Identificación Fiscal</h5>
+
+                    <div class="row">
+                        <!-- RFC -->
+                        <div class="col-md-6 mb-3">
+                            <label for="rfc" class="form-label">
+                                RFC *
+                                <span class="iconoir-info-circle tooltip-icon"
+                                      data-bs-toggle="tooltip"
+                                      data-bs-placement="top"
+                                      title="Registro Federal de Contribuyentes. 13 caracteres para personas físicas."></span>
+                            </label>
+                            <input type="text"
+                                   class="form-control text-uppercase"
+                                   id="rfc"
+                                   name="rfc"
+                                   placeholder="XAXX010101000"
+                                   minlength="12"
+                                   maxlength="13"
+                                   pattern="^[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}$"
+                                   required>
+                            <div class="invalid-feedback">RFC inválido (12-13 caracteres)</div>
+                            <div class="valid-feedback">RFC válido</div>
+                            <small class="form-text text-muted">
+                                <i class="iconoir-id-card me-1"></i>
+                                Tu RFC como aparece en documentos oficiales
+                            </small>
+                        </div>
+
+                        <!-- Régimen Fiscal -->
+                        <div class="col-md-6 mb-3">
+                            <label for="fiscal_regime" class="form-label">
+                                Régimen Fiscal *
+                                <span class="iconoir-info-circle tooltip-icon"
+                                      data-bs-toggle="tooltip"
+                                      data-bs-placement="top"
+                                      data-bs-html="true"
+                                      title="<strong>Regímenes comunes:</strong><br>• 612 - Freelancers<br>• 626 - RESICO"></span>
+                            </label>
+                            <select class="form-select" id="fiscal_regime" name="fiscal_regime" required>
+                                <option value="">Selecciona tu régimen fiscal</option>
+                                <option value="612">612 - Actividades Empresariales y Profesionales</option>
+                                <option value="626">626 - Régimen Simplificado de Confianza</option>
+                                <option value="621">621 - Incorporación Fiscal</option>
+                                <option value="605">605 - Sueldos y Salarios</option>
+                                <option value="606">606 - Arrendamiento</option>
+                                <option value="608">608 - Demás ingresos</option>
+                                <option value="610">610 - Residentes en el Extranjero</option>
+                                <option value="616">616 - Sin obligaciones fiscales</option>
+                            </select>
+                            <small class="form-text text-muted">
+                                <i class="iconoir-list me-1"></i>
+                                Tu régimen registrado en el SAT
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Datos de Contacto -->
+                <div class="form-section-group">
+                    <h5 class="section-title-small">Datos de Contacto</h5>
+
+                    <!-- Razón Social (full width) -->
+                    <div class="mb-3">
+                        <label for="business_name" class="form-label">
+                            Razón Social *
+                            <span class="iconoir-info-circle tooltip-icon"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="Tu nombre fiscal legal exactamente como aparece en tu Constancia SAT"></span>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="business_name"
+                               name="business_name"
+                               placeholder="Nombre completo o razón social"
+                               minlength="3"
+                               maxlength="255"
+                               required>
+                        <div class="invalid-feedback">Razón social requerida (3-255 caracteres)</div>
+                        <div class="valid-feedback">Razón social válida</div>
+                        <small class="form-text text-muted">
+                            <i class="iconoir-building me-1"></i>
+                            Como aparece en tu RFC
+                        </small>
+                    </div>
+
+                    <div class="row">
+                        <!-- Email -->
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">
+                                Email *
+                            </label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="email"
+                                   name="email"
+                                   placeholder="tu@email.com"
+                                   required>
+                            <div class="invalid-feedback">Email inválido</div>
+                            <div class="valid-feedback">Email válido</div>
+                            <small class="form-text text-muted">
+                                <i class="iconoir-mail me-1"></i>
+                                Recibirás tu factura aquí
+                                <span id="autofill-hint" class="text-accent d-none">✨ Autocompletando...</span>
+                            </small>
+                            <span class="input-status-icon d-none" id="email-match-icon">
+                                <i class="iconoir-check-circle text-success"></i>
+                            </span>
+                            <span class="spinner-border spinner-border-sm d-none" id="email-loading"></span>
+                        </div>
+
+                        <!-- Código Postal -->
+                        <div class="col-md-6 mb-3">
+                            <label for="postal_code" class="form-label">
+                                Código Postal *
+                            </label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="postal_code"
+                                   name="postal_code"
+                                   placeholder="01234"
+                                   pattern="[0-9]{5}"
+                                   maxlength="5"
+                                   minlength="5"
+                                   required>
+                            <div class="invalid-feedback">Código postal debe ser 5 dígitos</div>
+                            <div class="valid-feedback">Código postal válido</div>
+                            <small class="form-text text-muted">
+                                <i class="iconoir-pin-alt me-1"></i>
+                                CP de tu domicilio fiscal
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Uso de la Factura -->
+                <div class="form-section-group">
+                    <h5 class="section-title-small">Uso de la Factura</h5>
+
+                    <!-- Uso CFDI -->
+                    <div class="mb-3">
+                        <label for="cfdi_use" class="form-label">
+                            Uso del CFDI *
+                            <span class="iconoir-info-circle tooltip-icon"
+                                  data-bs-toggle="tooltip"
+                                  data-bs-placement="top"
+                                  title="Si no estás seguro, selecciona G03 - Gastos en general"></span>
+                        </label>
+                        <select class="form-select" id="cfdi_use" name="cfdi_use" required>
+                            <option value="">Selecciona el uso</option>
+                            <option value="G01">G01 - Adquisición de mercancías</option>
+                            <option value="G02">G02 - Devoluciones, descuentos</option>
+                            <option value="G03" selected>G03 - Gastos en general</option>
+                            <option value="I01">I01 - Construcciones</option>
+                            <option value="I02">I02 - Mobilario y equipo</option>
+                            <option value="I03">I03 - Equipo de transporte</option>
+                            <option value="P01">P01 - Por definir</option>
+                            <option value="S01">S01 - Sin efectos fiscales</option>
+                        </select>
+                        <small class="form-text text-muted">
+                            <i class="iconoir-page me-1"></i>
+                            Para qué usarás esta factura
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Turnstile Widget -->
+                <div class="mb-3">
+                    <div class="turnstile-container">
+                        <div class="cf-turnstile"
+                             data-sitekey="{{ TURNSTILE_SITE_KEY }}"
+                             data-theme="light"
+                             data-size="normal"
+                             data-callback="onTurnstileSuccess"
+                             data-error-callback="onTurnstileError"
+                             data-expired-callback="onTurnstileExpired"></div>
+                    </div>
+                    <div class="form-text text-center" style="margin-top: 0.75rem;">
+                        <i class="iconoir-shield-check"></i>
+                        Verificación anti-bot para proteger el servicio de timbrado
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="d-grid">
+                    <button type="submit" class="btn-cta-editorial" id="submitBtn" disabled>
+                        <i class="iconoir-page me-2"></i>
+                        GENERAR FACTURA CFDI →
+                    </button>
+                    <div class="form-text text-center" style="margin-top: 0.5rem; font-size: 0.75rem; color: #9ca3af;" id="submitHint">
+                        Completa la verificación anti-bot para continuar
+                    </div>
+                </div>
+            </form>
+
+            <!-- FAQ -->
+            <div class="faq-editorial">
+                <div class="faq-title-editorial">¿NECESITAS AYUDA?</div>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Qué es el RFC?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Registro Federal de Contribuyentes. Tu identificador fiscal único del SAT.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Dónde encuentro mi régimen fiscal?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>En tu Constancia de Situación Fiscal del SAT. Si no lo sabes, selecciona "612 - Actividades Empresariales".</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Cuánto tarda?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Inmediato (5-15 segundos). Recibirás XML y PDF por email.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Qué es el Uso CFDI?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>El propósito fiscal. Si no estás seguro, selecciona <strong>G03 - Gastos en general</strong>.</p>
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <!-- FOOTER (Spans both columns) -->
+        <footer class="payment-footer-editorial">
+            <div class="footer-branding">
+                Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+            </div>
+            <div class="footer-links">
+                <a href="/legal/privacidad/" target="_blank">Privacidad</a> ·
+                <a href="/legal/terminos/" target="_blank">Términos</a> ·
+                <a href="mailto:hola@kita.mx">Soporte</a>
+            </div>
+            <div class="trust-badges">
+                🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ SAT Autorizado
+            </div>
+            <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+                © 2025 Kita
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- COOKIE BANNER -->
+    <div class="cookie-banner" id="cookieBanner">
+        <div class="cookie-content">
+            <p>🍪 Usamos cookies esenciales para generar tu factura.</p>
+            <div class="cookie-actions">
+                <button class="btn-accept-cookies" onclick="acceptCookies()">Aceptar</button>
+                <button class="btn-reject-cookies" onclick="rejectCookies()">Rechazar</button>
+                <a href="/legal/cookies/" target="_blank">Más info</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS (para tooltips) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <script>
+        // ==========================================
+        // BOOTSTRAP TOOLTIPS INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all tooltips
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    trigger: 'hover focus',
+                    html: true,
+                    boundary: 'window'
+                });
+            });
+        });
+    </script>
+
+    <script>
+        // ==========================================
+        // TURNSTILE CALLBACKS
+        // ==========================================
+        let turnstileToken = null;
+
+        function onTurnstileSuccess(token) {
+            turnstileToken = token;
+            const submitBtn = document.getElementById('submitBtn');
+            const submitHint = document.getElementById('submitHint');
+
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = '1';
+            if (submitHint) submitHint.style.display = 'none';
+
+            console.log('✓ Turnstile verificado');
+            showToast('✓ Verificación completada', 'success');
+        }
+
+        function onTurnstileError(error) {
+            console.error('Turnstile error:', error);
+            showToast('Error en verificación anti-bot. Recarga la página.', 'error');
+        }
+
+        function onTurnstileExpired() {
+            turnstileToken = null;
+            const submitBtn = document.getElementById('submitBtn');
+            const submitHint = document.getElementById('submitHint');
+
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.5';
+            if (submitHint) {
+                submitHint.style.display = 'block';
+                submitHint.textContent = 'Verificación expirada. Por favor completa nuevamente.';
+            }
+
+            showToast('Verificación expirada. Completa el captcha nuevamente.', 'warning');
+        }
+
+        // Cookie consent
+        window.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('kita_cookie_consent')) {
+                setTimeout(() => {
+                    document.getElementById('cookieBanner').classList.add('show');
+                }, 1000);
+            }
+        });
+
+        function acceptCookies() {
+            localStorage.setItem('kita_cookie_consent', 'accepted');
+            document.getElementById('cookieBanner').classList.remove('show');
+        }
+
+        function rejectCookies() {
+            localStorage.setItem('kita_cookie_consent', 'rejected');
+            document.getElementById('cookieBanner').classList.remove('show');
+            // Mostrar mensaje informativo
+            showToast('Has rechazado cookies no esenciales. Algunas funciones pueden estar limitadas.', 'info');
+        }
+
+        // Form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const form = this;
+
+            // Validate Turnstile first
+            if (!turnstileToken) {
+                e.preventDefault();
+                showToast('Por favor completa la verificación anti-bot', 'warning');
+                return false;
+            }
+
+            // HTML5 validation
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+                form.classList.add('was-validated');
+                showToast('Completa todos los campos correctamente', 'error');
+                return false;
+            }
+
+            // Add Turnstile token to form
+            const tokenInput = document.createElement('input');
+            tokenInput.type = 'hidden';
+            tokenInput.name = 'cf-turnstile-response';
+            tokenInput.value = turnstileToken;
+            form.appendChild(tokenInput);
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.innerHTML = '<i class="iconoir-refresh" style="animation: spin 1s linear infinite;"></i> Generando...';
+            submitBtn.disabled = true;
+        });
+
+        // RFC uppercase
+        document.getElementById('rfc').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Postal code numbers only
+        document.getElementById('postal_code').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Validar código postal con SEPOMEX al blur
+        document.getElementById('postal_code').addEventListener('blur', async function() {
+            const cp = this.value.trim();
+
+            // Limpiar estado anterior
+            this.classList.remove('is-valid', 'is-invalid');
+
+            if (cp.length !== 5) {
+                return; // Dejamos que la validación HTML5 lo maneje
+            }
+
+            try {
+                const response = await fetch('/api/address/postal-code/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({ codigo_postal: cp })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    this.classList.add('is-valid');
+
+                    // Mostrar info del CP si se encontró en BD
+                    if (data.source !== 'manual') {
+                        showToast(`CP válido: ${data.municipio}, ${data.estado}`, 'success');
+                    } else {
+                        showToast('CP no encontrado en base de datos. Completa los datos manualmente.', 'warning');
+                    }
+                } else {
+                    this.classList.add('is-invalid');
+                    showToast('Código postal no válido', 'error');
+                }
+            } catch (error) {
+                console.error('Error validando CP:', error);
+                // No bloqueamos el flujo si falla la validación
+            }
+        });
+
+        // Autofill recipient data
+        let autofillAttempted = false;
+
+        document.getElementById('email').addEventListener('blur', function() {
+            const rfc = document.getElementById('rfc').value.trim();
+            const email = this.value.trim();
+
+            if (!rfc || rfc.length < 12 || !email || !email.includes('@')) {
+                return;
+            }
+
+            if (autofillAttempted) {
+                return;
+            }
+
+            autofillAttempted = true;
+            lookupRecipient(rfc, email);
+        });
+
+        function fillRecipientData(result, matchIcon) {
+            if (!result.found || !result.match || !result.data) {
+                return;
+            }
+
+            if (result.data.business_name) {
+                const field = document.getElementById('business_name');
+                field.value = result.data.business_name;
+                field.classList.add('is-valid', 'autofilled');
+            }
+
+            if (result.data.postal_code) {
+                const field = document.getElementById('postal_code');
+                field.value = result.data.postal_code;
+                field.classList.add('is-valid', 'autofilled');
+            }
+
+            if (result.data.fiscal_regime) {
+                document.getElementById('fiscal_regime').value = result.data.fiscal_regime;
+            }
+
+            if (result.data.cfdi_use) {
+                document.getElementById('cfdi_use').value = result.data.cfdi_use;
+            }
+
+            if (matchIcon) {
+                matchIcon.classList.remove('d-none');
+                setTimeout(() => matchIcon.classList.add('d-none'), 3000);
+            }
+
+            showToast('✨ Datos autocompletados', 'success');
+        }
+
+        async function lookupRecipient(rfc, email) {
+            const loadingIcon = document.getElementById('email-loading');
+            const matchIcon = document.getElementById('email-match-icon');
+            const autofillHint = document.getElementById('autofill-hint');
+
+            // Check cache first (sessionStorage - expires with browser session)
+            const cacheKey = `recipient_lookup_${rfc}_${email}`;
+            const cached = sessionStorage.getItem(cacheKey);
+
+            if (cached) {
+                console.log('Using cached recipient data');
+                const result = JSON.parse(cached);
+                fillRecipientData(result, matchIcon);
+                return;
+            }
+
+            if (loadingIcon) loadingIcon.classList.remove('d-none');
+            if (autofillHint) autofillHint.classList.remove('d-none');
+
+            try {
+                const response = await fetch('/api/recipients/lookup/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ rfc, email })
+                });
+
+                const result = await response.json();
+
+                // Cache successful lookups
+                if (result.found && result.match) {
+                    sessionStorage.setItem(cacheKey, JSON.stringify(result));
+                }
+
+                // Fill data using helper function
+                fillRecipientData(result, matchIcon);
+
+            } catch (error) {
+                console.error('Lookup error:', error);
+            } finally {
+                if (loadingIcon) loadingIcon.classList.add('d-none');
+                if (autofillHint) autofillHint.classList.add('d-none');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const backgrounds = {
+                success: '#15803d',
+                error: '#ef4444',
+                warning: '#f59e0b',
+                info: '#111827'
+            };
+
+            Toastify({
+                text: message,
+                duration: 5000,
+                gravity: "top",
+                position: "center",
+                style: {
+                    background: backgrounds[type] || backgrounds.info,
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '0.875rem',
+                    borderRadius: '2px',
+                    padding: '1rem 1.5rem'
+                },
+                stopOnFocus: true
+            }).showToast();
+        }
+    </script>
+
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</body>
+</html>

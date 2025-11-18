@@ -1,0 +1,373 @@
+{% extends 'base_onboarding.html' %}
+{% load static %}
+
+{% block title %}{{ step_title }} - Kita{% endblock %}
+
+{% block content %}
+<div class="onboarding-container-clean">
+    <div class="onboarding-content">
+        <div class="container-fluid px-4">
+            <div class="onboarding-layout-sidebar">
+
+                <!-- SIDEBAR -->
+                <aside class="onboarding-sidebar d-none d-lg-block">
+                    <!-- Logo -->
+                    <div class="sidebar-logo-container">
+                        <div class="d-flex align-items-center gap-2 justify-content-end">
+                            <img src="{% static logo_path %}"
+                                 alt=""
+                                 height="50"
+                                 class="sidebar-logo">
+                            <span class="kita-brand kita-brand-md mb-0">Kita</span>
+                        </div>
+                        <p class="kita-tagline small text-end mb-0 mt-1">Kit de Ayuda para Emprendedores</p>
+                    </div>
+
+                    <!-- Progress Tree -->
+                    <nav class="progress-tree" aria-label="Progreso de configuración">
+                        <div class="progress-tree-title">Progreso del Setup</div>
+
+                        <!-- Step 1: Completed -->
+                        <div class="tree-step completed">
+                            <a href="{% url 'onboarding:step1' %}" class="tree-step-link" aria-label="Paso 1: Identidad de tu Empresa (completado)">
+                                <div class="tree-step-icon" aria-hidden="true">✓</div>
+                                <div class="tree-step-title">Identidad de tu Empresa</div>
+                                <p class="tree-step-subtitle">Datos fiscales completados</p>
+                            </a>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="tree-step {% if tenant.mercadopago_user_id %}completed{% endif %}">
+                            <a href="{% url 'onboarding:step2' %}" class="tree-step-link" aria-label="Paso 2: Conectar Mercado Pago®">
+                                <div class="tree-step-icon" aria-hidden="true">
+                                    {% if tenant.mercadopago_user_id %}✓{% else %}2{% endif %}
+                                </div>
+                                <div class="tree-step-title">Conectar Mercado Pago®</div>
+                                <p class="tree-step-subtitle">
+                                    {% if tenant.mercadopago_user_id %}Conectado{% else %}Opcional{% endif %}
+                                </p>
+                            </a>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="tree-step {% if tenant.csdcertificate_set.exists %}completed{% endif %}">
+                            <a href="{% url 'onboarding:step3' %}" class="tree-step-link" aria-label="Paso 3: Certificado Digital">
+                                <div class="tree-step-icon" aria-hidden="true">
+                                    {% if tenant.csdcertificate_set.exists %}✓{% else %}3{% endif %}
+                                </div>
+                                <div class="tree-step-title">Certificado Digital</div>
+                                <p class="tree-step-subtitle">
+                                    {% if tenant.csdcertificate_set.exists %}CSD subido{% else %}Opcional{% endif %}
+                                </p>
+                            </a>
+                        </div>
+
+                        <!-- Step 4: Active -->
+                        <div class="tree-step active">
+                            <a href="{% url 'onboarding:step4' %}" class="tree-step-link" aria-current="step" aria-label="Paso 4: Activar Trial (actual)">
+                                <div class="tree-step-icon" aria-hidden="true">4</div>
+                                <div class="tree-step-title">Activar Trial</div>
+                                <p class="tree-step-subtitle">30 días gratis</p>
+                            </a>
+                        </div>
+                    </nav>
+                </aside>
+
+                <!-- MAIN CONTENT -->
+                <main class="onboarding-main">
+                    <div class="onboarding-card-modern">
+                        <!-- Header -->
+                        <div class="mb-5">
+                            <h1 class="h3 mb-2 fw-bold text-accent">{{ step_title }}</h1>
+                            <p class="text-muted mb-0">{{ step_description }}</p>
+                        </div>
+
+                        <!-- Step Progress (Mobile) - COMPONENT -->
+                        {% include 'onboarding/components/mobile_progress_indicator.html' %}
+
+                        <!-- Configuration Summary -->
+                        <div class="mb-5">
+                            <h5 class="fw-bold mb-4 pb-3 border-bottom">Configuración Completada</h5>
+
+                            <!-- Identity -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-start">
+                                    <span class="iconoir-check-circle me-3 config-summary-icon completed"></span>
+                                    <div class="flex-grow-1">
+                                        <h6 class="config-summary-title">Identidad de tu Empresa</h6>
+                                        <p class="config-summary-text mb-1">
+                                            <strong>Empresa:</strong> {{ tenant.name }}<br>
+                                            <strong>RFC:</strong> {{ tenant.rfc }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- BUG FIX #10: Mercado Pago® con link clickeable si no está completo -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-start">
+                                    {% if tenant.mercadopago_user_id %}
+                                        <span class="iconoir-check-circle me-3 config-summary-icon completed"></span>
+                                        <div class="flex-grow-1">
+                                            <h6 class="config-summary-title">Mercado Pago® Conectado</h6>
+                                            <p class="config-summary-text mb-0">Listo para recibir pagos de tus clientes</p>
+                                        </div>
+                                    {% else %}
+                                        <span class="iconoir-circle me-3 config-summary-icon pending"></span>
+                                        <div class="flex-grow-1">
+                                            <h6 class="config-summary-title text-muted">Mercado Pago®</h6>
+                                            <p class="config-summary-text mb-0">
+                                                Pendiente -
+                                                <a href="{% url 'onboarding:step2' %}" class="text-accent">
+                                                    <strong>Conectar ahora</strong>
+                                                </a>
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- BUG FIX #10 + #83: CSD con link clickeable si no está completo -->
+                            <div class="mb-4">
+                                <div class="d-flex align-items-start">
+                                    {% if tenant.csdcertificate_set.exists %}
+                                        <span class="iconoir-check-circle me-3 config-summary-icon completed"></span>
+                                        <div class="flex-grow-1">
+                                            <h6 class="config-summary-title">Certificado Digital (CSD)</h6>
+                                            <p class="config-summary-text mb-0">Listo para generar facturas CFDI 4.0</p>
+                                        </div>
+                                    {% else %}
+                                        <span class="iconoir-circle me-3 config-summary-icon pending"></span>
+                                        <div class="flex-grow-1">
+                                            <h6 class="config-summary-title text-muted">Certificado Digital (CSD)</h6>
+                                            <p class="config-summary-text mb-0">
+                                                Opcional -
+                                                <a href="{% url 'onboarding:step3' %}" class="text-accent">
+                                                    <strong>Subir ahora</strong>
+                                                </a>
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trial Section -->
+                        <div class="mb-5 pb-5 border-bottom">
+                            <h5 class="fw-bold mb-3">Trial de 30 Días</h5>
+
+                            {% if tenant.subscription and tenant.subscription.trial_ends_at %}
+                                <!-- Trial Active -->
+                                <div class="mb-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="trial-active-icon me-3">
+                                            <span class="iconoir-check"></span>
+                                        </div>
+                                        <div>
+                                            <h6 class="trial-active-title mb-0">Trial Activo</h6>
+                                            <p class="config-summary-text mb-0">Tu acceso está configurado</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row text-center mb-4">
+                                        <div class="col-6">
+                                            <div class="py-3">
+                                                <div class="trial-stats-number">
+                                                    {{ tenant.subscription.days_until_trial_end }}
+                                                </div>
+                                                <small class="trial-stats-label">días restantes</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="py-3">
+                                                <div class="trial-stats-number">{{ tenant.subscription.trial_ends_at|date:"d/m/Y" }}</div>
+                                                <small class="trial-stats-label">fecha de expiración</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <a href="{% url 'dashboard:index' %}"
+                                           class="btn btn-primary btn-lg"
+                                           id="goToDashboardBtn">
+                                            <span class="iconoir-rocket me-2"></span>
+                                            Ir a mi Dashboard
+                                        </a>
+                                    </div>
+                                </div>
+
+                            {% else %}
+                                <!-- Activate Trial -->
+                                <p class="trial-info-text mb-4">
+                                    Activa tu acceso completo sin costo. Sin tarjeta de crédito. Cancela cuando quieras.
+                                </p>
+
+                                <div class="d-grid mb-3">
+                                    <button type="button"
+                                            class="btn btn-primary btn-lg"
+                                            id="startTrialBtn"
+                                            onclick="startTrial()">
+                                        <span class="btn-content">
+                                            <span class="iconoir-play me-2"></span>
+                                            Activar Trial Gratuito
+                                        </span>
+                                        <span class="btn-loading d-none">
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                            Activando...
+                                        </span>
+                                    </button>
+                                </div>
+
+                                <p class="text-center mb-0">
+                                    <small class="text-muted">
+                                        30 días de acceso completo • Sin compromisos • Cancela libre
+                                    </small>
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- What Happens Next -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold mb-2">¿Qué pasa después del trial?</h6>
+                            <p class="text-muted mb-2 config-summary-text">
+                                Tres días antes de que termine, te enviaremos un recordatorio por email.
+                            </p>
+                            <p class="text-muted mb-0 config-summary-text">
+                                Para continuar usando Kita: <strong>$299 MXN/mes</strong>.
+                                Si no haces nada, tu cuenta se pausará automáticamente. Sin cargos, sin sorpresas.
+                            </p>
+                        </div>
+
+                        <!-- Navigation -->
+                        <div class="d-flex justify-content-between align-items-center mt-5">
+                            <a href="{% url 'onboarding:step3' %}" class="btn btn-link">
+                                <span class="iconoir-arrow-left me-2"></span>
+                                Paso Anterior
+                            </a>
+
+                            {% if tenant.subscription and tenant.subscription.trial_ends_at %}
+                                <a href="{% url 'dashboard:index' %}" class="btn btn-link">
+                                    Ir al Dashboard
+                                    <span class="iconoir-arrow-right"></span>
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="mt-5 pt-4 border-top">
+                            <p class="text-muted mb-0 small">
+                                <strong>Paso {{ step }} de {{ total_steps }}</strong> •
+                                Último paso del onboarding •
+                                Trial activado instantáneamente al confirmar
+                            </p>
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Navigation Components -->
+{% include 'onboarding/components/mobile_navigation.html' %}
+
+<!-- BUG FIX #19: Success Modal con botón X para cerrar y navegar inmediatamente -->
+<div class="modal fade" id="successModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="successModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-redesign">
+            <!-- BUG FIX #19: Botón close opcional -->
+            <button type="button" class="btn-close position-absolute top-0 end-0 m-3" onclick="goToDashboard()" aria-label="Cerrar e ir al dashboard" style="z-index: 10;"></button>
+
+            <!-- Icon Header -->
+            <div class="modal-icon-header">
+                <div class="modal-icon modal-icon-success">
+                    <span class="iconoir-check"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="modal-body text-center px-4 pb-4">
+                <h4 class="modal-title-redesign mb-3" id="successModalTitle">
+                    ¡Trial Activado! 🎉
+                </h4>
+
+                <p class="modal-description mb-4">
+                    Tu acceso completo a Kita está listo.<br>
+                    Tienes <strong>30 días gratis</strong> para explorar todo.
+                </p>
+
+                <div class="d-grid mb-3">
+                    <button type="button" class="btn btn-primary btn-lg btn-modal-primary" onclick="goToDashboard()">
+                        <span class="iconoir-rocket me-2"></span>
+                        Comenzar Ahora
+                    </button>
+                </div>
+
+                <p class="text-muted mb-0">
+                    <small>Redirigiendo en <span id="countdown">3</span>s...</small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirm Trial Modal - Redesigned -->
+<div class="modal fade" id="confirmTrialModal" tabindex="-1" aria-labelledby="confirmTrialTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-redesign">
+            <!-- Icon Header -->
+            <div class="modal-icon-header">
+                <div class="modal-icon modal-icon-info">
+                    <span class="iconoir-rocket"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="modal-body text-center px-4 pb-2">
+                <h5 class="modal-title-redesign" id="confirmTrialTitle">
+                    Activar Trial Gratuito
+                </h5>
+
+                <p class="modal-description mb-3">
+                    30 días de acceso completo sin costo. Sin tarjeta de crédito. Cancela cuando quieras.
+                </p>
+
+                <p class="text-muted mb-0">
+                    <small>✅ Recordatorio 3 días antes de que termine tu trial</small>
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary btn-modal-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary btn-modal-primary" onclick="confirmStartTrial()" id="confirmTrialBtn">
+                    <span class="iconoir-rocket me-2"></span>
+                    Activar Trial
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Smart Loading System -->
+<div class="loading-topbar" id="loadingTopbar">
+    <div class="loading-topbar-progress"></div>
+</div>
+
+<div class="loading-message-card" id="loadingMessage">
+    <div class="d-flex align-items-center">
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        <span id="loadingText">Activando tu trial...</span>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{# All JavaScript moved to external file for better cacheability and maintainability #}
+<script src="{% static 'js/onboarding-step4.js' %}?v=1.0" defer></script>
+{% endblock %}

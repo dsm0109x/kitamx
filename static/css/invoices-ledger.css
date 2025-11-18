@@ -1,0 +1,628 @@
+/**
+ * INVOICES PAGE - ACCOUNTING LEDGER STYLE
+ * =========================================
+ *
+ * Diseño tipo libro contable para gestión de facturas CFDI.
+ * Profesional, denso, sin colores, solo tipografía.
+ *
+ * Features:
+ * - ✅ Header UPPERCASE compacto
+ * - ✅ Stats inline (1 línea)
+ * - ✅ Filters inline
+ * - ✅ Tabla 5 columnas (2-3 líneas por factura)
+ * - ✅ UUID completo visible
+ * - ✅ Sin badges coloridos
+ * - ✅ Totales en DM Serif
+ * - ✅ Monocromático
+ *
+ * @version 1.0 - Accounting Ledger
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   PAGE HEADER - COMPACTO
+   ============================================ */
+
+.invoices-page-header {
+    background: #ffffff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.invoices-page-header h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.invoices-page-header h1 i {
+    display: none !important;
+}
+
+.invoices-page-header .btn-toolbar {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+}
+
+.invoices-page-header .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0;
+}
+
+.invoices-page-header .btn {
+    background: transparent;
+    border: none;
+    color: #111827;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+}
+
+.invoices-page-header .btn:hover {
+    color: #15803d;
+}
+
+.invoices-page-header .btn i {
+    display: none;
+}
+
+.invoices-page-header .btn-outline-primary::after {
+    content: ' ⟳';
+}
+
+.invoices-page-header .btn-outline-success:first-of-type::after {
+    content: ' ↓';
+}
+
+/* Ocultar header original */
+.d-flex.border-bottom h1.h2 {
+    display: none;
+}
+
+.d-flex.border-bottom {
+    display: none !important;
+}
+
+/* ============================================
+   STATS INLINE - 1 LÍNEA
+   ============================================ */
+
+.stats-inline-invoices {
+    background: #f9fafb;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.stats-inline-invoices strong {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #111827;
+    margin: 0 0.25rem;
+}
+
+/* Ocultar stats cards */
+.row.mb-4:has(.col-lg-3) {
+    display: none !important;
+}
+
+/* ============================================
+   FILTERS INLINE
+   ============================================ */
+
+.filters-inline-invoices {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.filters-inline-invoices label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.filters-inline-invoices select,
+.filters-inline-invoices input {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    background: #ffffff;
+}
+
+.filters-inline-invoices .btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+}
+
+.filters-inline-invoices .btn:hover {
+    background: #15803d;
+}
+
+.filters-inline-invoices .btn i {
+    display: none;
+}
+
+.filters-inline-invoices .btn-outline-secondary {
+    background: transparent;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+}
+
+.filters-inline-invoices .btn-outline-secondary:hover {
+    background: #111827;
+    color: #ffffff;
+}
+
+/* Ocultar filters card */
+.card.mb-4:has(.card-header h6 i.fa-filter) {
+    display: none !important;
+}
+
+/* ============================================
+   TABLE - LEDGER STYLE
+   ============================================ */
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+.card-header {
+    background: #fafbfc;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 1rem;
+}
+
+.card-header h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    color: #9ca3af !important;
+    margin: 0 !important;
+}
+
+.card-header h6 i {
+    display: none;
+}
+
+.card-body {
+    padding: 0;
+    overflow: visible !important;
+}
+
+#invoices-table {
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+/* Headers */
+#invoices-table thead th {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #9ca3af !important;
+    background: #fafbfc !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 0.75rem 1rem !important;
+}
+
+/* Cells */
+#invoices-table tbody td {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #ffffff;
+    border-bottom: 1px solid #f3f4f6;
+    padding: 0.75rem 1rem;
+    vertical-align: top;
+}
+
+#invoices-table tbody tr {
+    background: #ffffff !important;
+}
+
+#invoices-table tbody tr:hover {
+    background: #fafbfc !important;
+}
+
+/* ============================================
+   COLUMNAS ESPECÍFICAS
+   ============================================ */
+
+/* Serie-Folio */
+#invoices-table tbody td:nth-child(1) strong {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    color: #111827;
+    display: block;
+    margin-bottom: 0.125rem;
+}
+
+#invoices-table tbody td:nth-child(1) small {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    display: block;
+}
+
+/* Cliente */
+#invoices-table tbody td:nth-child(2) {
+    max-width: 200px;
+}
+
+/* RFC */
+#invoices-table tbody td:nth-child(3) code {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.8125rem;
+    color: #111827;
+    background: transparent;
+    padding: 0;
+}
+
+/* Total - DM SERIF */
+#invoices-table tbody td:nth-child(4) {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 1.125rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;
+}
+
+#invoices-table tbody td:nth-child(4) small {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    display: block;
+}
+
+/* Estado - TEXTO SIMPLE */
+#invoices-table .badge {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+#invoices-table .badge.bg-success,
+#invoices-table .badge.bg-warning,
+#invoices-table .badge.bg-danger,
+#invoices-table .badge.bg-info,
+#invoices-table .badge.bg-secondary {
+    background: transparent !important;
+    color: #111827 !important;
+}
+
+/* ============================================
+   BOTONES ACCIONES - MINIMALISTAS
+   ============================================ */
+
+#invoices-table .btn-group {
+    display: flex;
+    gap: 0.25rem;
+}
+
+#invoices-table .btn-group .btn {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+#invoices-table .btn-group .btn:hover {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}
+
+#invoices-table .btn-group .btn i {
+    font-size: 0.875rem;
+}
+
+#invoices-table .btn-outline-danger:hover {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+}
+
+/* ============================================
+   COLORES DE TEXTO - UNIFORMES
+   ============================================ */
+
+#invoices-table .text-success {
+    color: #111827 !important;
+}
+
+#invoices-table .text-muted {
+    color: #9ca3af !important;
+}
+
+/* ============================================
+   DATATABLE CONTROLS
+   ============================================ */
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    padding: 1rem;
+}
+
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.dataTables_wrapper .dataTables_info {
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    padding: 1rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: transparent;
+    border: none;
+    color: #6b7280 !important;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: transparent !important;
+    color: #111827 !important;
+    text-decoration: underline;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: transparent !important;
+    color: #111827 !important;
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous::before {
+    content: '← ';
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.next::after {
+    content: ' →';
+}
+
+/* ============================================
+   Z-INDEX - JERARQUÍA CORRECTA
+   ============================================ */
+
+/* ✅ Modals SOBRE offcanvas */
+.modal.show,
+.modal.fade.show,
+div.modal {
+    z-index: 10000 !important;
+}
+
+/* ✅ Modal backdrop DEBAJO del modal pero SOBRE offcanvas */
+.modal-backdrop.show,
+.modal-backdrop.fade.show,
+div.modal-backdrop {
+    z-index: 9500 !important;                 /* Entre offcanvas y modal */
+}
+
+/* Offcanvas DEBAJO de todo */
+.offcanvas.show,
+.offcanvas.offcanvas-end {
+    z-index: 1045 !important;
+}
+
+.offcanvas-backdrop.show,
+div.offcanvas-backdrop {
+    z-index: 1044 !important;
+}
+
+/* ============================================
+   MODALS - MINIMALISTAS
+   ============================================ */
+
+.modal-header {
+    background: #fafbfc;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
+}
+
+.modal-header .modal-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.125rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+    color: #111827 !important;
+}
+
+.modal-header .modal-title i {
+    display: none;
+}
+
+.modal-body {
+    padding: 1.25rem;
+}
+
+.modal-body .alert {
+    background: #f9fafb !important;
+    border: none !important;
+    border-left: 2px solid #111827 !important;
+    border-radius: 0 !important;
+    color: #111827 !important;
+    padding: 0.75rem;
+}
+
+.modal-body .alert-warning {
+    border-left-color: #111827 !important;
+}
+
+.modal-body .alert strong {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.modal-footer {
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
+}
+
+.modal-footer .btn {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    color: #111827;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.modal-footer .btn:hover {
+    background: #111827;
+    color: #ffffff;
+}
+
+.modal-footer .btn-danger {
+    border-color: #e5e7eb;
+    color: #111827;
+}
+
+.modal-footer .btn-danger:hover {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #ffffff;
+}
+
+.modal-footer .btn i {
+    display: none;
+}
+
+/* ============================================
+   FORM ELEMENTS - MINIMALISTAS
+   ============================================ */
+
+.form-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.375rem;
+}
+
+.form-select,
+.form-control {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #ffffff;
+}
+
+.form-select:focus,
+.form-control:focus {
+    border-color: #111827;
+    box-shadow: none;
+}
+
+/* ============================================
+   LOADING PRELOADER
+   ============================================ */
+
+.dataTables_processing {
+    background: rgba(250, 251, 252, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    background-image: none !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 1.5rem 2rem !important;
+    z-index: 9999 !important;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .invoices-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .invoices-page-header h1 {
+        font-size: 1.25rem !important;
+    }
+
+    .stats-inline-invoices {
+        font-size: 0.75rem;
+    }
+
+    .filters-inline-invoices {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filters-inline-invoices select,
+    .filters-inline-invoices input {
+        width: 100%;
+    }
+}

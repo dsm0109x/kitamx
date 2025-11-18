@@ -1,0 +1,902 @@
+{% extends 'dashboard/base.html' %}
+{% load static %}
+
+{% block title %}IA - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/ia-terminal.css' %}?v=1.0">
+<style>
+/* Chat Bubbles Enhanced */
+.chat-bubble {
+    padding: 0.875rem 1.125rem;
+    border-radius: 1.125rem;
+    max-width: 85%;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+
+.chat-bubble-assistant {
+    background: var(--bg-secondary);
+    border-bottom-left-radius: 0.375rem;
+}
+
+.chat-bubble-user {
+    background: var(--color-forest-700);
+    color: white;
+    border-bottom-right-radius: 0.375rem;
+}
+
+/* Typing Indicator */
+.typing-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+.typing-dots span {
+    width: 8px;
+    height: 8px;
+    background: var(--color-gray-400);
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+/* Link Preview Card Enhanced */
+.link-preview-card {
+    border: 2px solid var(--color-forest-700);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.preview-header {
+    background: var(--color-forest-700);
+    color: white;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.preview-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-default);
+}
+
+.preview-item:last-child {
+    border-bottom: none;
+}
+
+.preview-item i {
+    color: var(--color-forest-700);
+    font-size: 1.125rem;
+}
+
+/* Success Animation */
+.success-animation {
+    font-size: 3rem;
+    text-align: center;
+    animation: celebrate 0.6s ease-out;
+}
+
+@keyframes celebrate {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Empty State */
+.empty-state-ai {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.empty-state-ai .empty-icon {
+    font-size: 5rem;
+    color: var(--color-forest-700);
+    margin-bottom: 1.5rem;
+    opacity: 0.8;
+}
+
+.examples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.example-card {
+    background: white;
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.example-card:hover {
+    border-color: var(--color-forest-700);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.example-card .example-icon {
+    font-size: 2rem;
+    color: var(--color-forest-700);
+    margin-bottom: 0.75rem;
+}
+
+.example-card .example-text {
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+
+<!-- Empty State - First Time User (Initially visible if no conversations) -->
+<div class="empty-state-ai" id="empty-state-ai" {% if stats.total_conversations > 0 %}style="display: none;"{% endif %}>
+    <div class="empty-icon">
+        <i class="iconoir-brain"></i>
+    </div>
+    <h2>Bienvenido a Kita IA</h2>
+    <p class="lead text-muted">Crea links de pago usando lenguaje natural. Solo describe qué necesitas y yo me encargo del resto.</p>
+
+    <button class="btn btn-accent btn-lg mt-3" onclick="startFirstConversation()">
+        <i class="iconoir-chat-lines me-2"></i>
+        Empezar a Crear Links
+    </button>
+
+    <div class="examples-grid">
+        <div class="example-card" onclick="quickMessage('Crea un link de $500 para Juan Pérez por consultoría web que expire en 3 días')">
+            <div class="example-icon">
+                <i class="iconoir-dollar"></i>
+            </div>
+            <strong class="d-block mb-2">Link con Cliente</strong>
+            <div class="example-text">"Crea un link de $500 para Juan Pérez por consultoría web que expire en 3 días"</div>
+        </div>
+
+        <div class="example-card" onclick="quickMessage('Necesito un link de $1200 para diseño web con factura para María')">
+            <div class="example-icon">
+                <i class="iconoir-page"></i>
+            </div>
+            <strong class="d-block mb-2">Link con Factura</strong>
+            <div class="example-text">"Necesito un link de $1200 para diseño web con factura para María"</div>
+        </div>
+
+        <div class="example-card" onclick="quickMessage('Link de $300 que expire mañana para reparación de PC')">
+            <div class="example-icon">
+                <i class="iconoir-clock"></i>
+            </div>
+            <strong class="d-block mb-2">Link con Vigencia</strong>
+            <div class="example-text">"Link de $300 que expire mañana para reparación de PC"</div>
+        </div>
+
+        <div class="example-card" onclick="quickMessage('Cobrar $750 por desarrollo de app móvil')">
+            <div class="example-icon">
+                <i class="iconoir-flash"></i>
+            </div>
+            <strong class="d-block mb-2">Link Rápido</strong>
+            <div class="example-text">"Cobrar $750 por desarrollo de app móvil"</div>
+        </div>
+    </div>
+
+    <div class="mt-4 p-3 bg-light" style="border-left: 4px solid var(--color-forest-700); max-width: 600px; margin-left: auto; margin-right: auto;">
+        <strong>💡 Tip:</strong>
+        <p class="mb-0 small">Puedes incluir: monto, concepto, cliente, email, vigencia (días), y si requiere factura. Yo extraigo la información y te muestro una vista previa antes de crear.</p>
+    </div>
+</div>
+
+<!-- Chat Interface (Initially hidden if no conversations) -->
+<div id="chat-interface" {% if stats.total_conversations == 0 %}style="display: none;"{% endif %}>
+
+<!-- Page Header Terminal -->
+<div class="ia-page-header">
+    <h1>IA</h1>
+    <button type="button" class="btn btn-outline-secondary btn-sm" onclick="clearChat()">
+        Limpiar
+    </button>
+</div>
+
+<!-- Chat Container -->
+<div class="row justify-content-center">
+    <div class="col-xl-10">
+        <div class="card h-100" style="min-height: 70vh;">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm me-3">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="iconoir-brain text-white"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Asistente Kita</h6>
+                        <small class="text-muted" id="chat-status">Conectando...</small>
+                    </div>
+                    <div class="ms-auto">
+                        <span class="badge bg-warning" id="connection-status">
+                            <i class="iconoir-wifi me-1"></i>
+                            Conectando...
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body d-flex flex-column p-0">
+                <!-- Chat Messages -->
+                <div class="flex-grow-1 p-3" id="chat-messages" style="max-height: calc(70vh - 200px); overflow-y: auto;">
+                    <!-- Welcome Message -->
+                    <div class="d-flex mb-3">
+                        <div class="avatar-sm me-3">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="iconoir-brain text-white"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="chat-bubble chat-bubble-assistant">
+                                <p class="mb-2">¡Hola <strong>{{ user.first_name }}</strong>! Soy tu asistente de Kita.</p>
+                                <p class="mb-2">Puedo ayudarte a crear links de pago usando lenguaje natural.</p>
+                                <p class="mb-2"><strong>Ejemplos de comandos:</strong></p>
+                                <ul class="mb-0">
+                                    <li>"Crea un link de $500 para Juan Pérez por consultoría que expire en 3 días"</li>
+                                    <li>"Necesito un link de $1200 para diseño web con factura para María"</li>
+                                    <li>"Link de $300 que expire mañana para reparación de PC"</li>
+                                    <li>"Cobrar $750 por desarrollo de app móvil"</li>
+                                </ul>
+                            </div>
+                            <small class="text-muted">Hace un momento</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="border-top p-3">
+                    <form id="chat-form" class="d-flex">
+                        <div class="flex-grow-1 me-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="chat-input"
+                                       placeholder="Ej: Crea un link de $500 para consultoría web..."
+                                       autocomplete="off" maxlength="500">
+                                <span class="input-group-text">
+                                    <small id="char-count" class="text-muted">0/500</small>
+                                </span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="send-btn">
+                            <i class="iconoir-send"></i>
+                        </button>
+                    </form>
+
+                    <!-- Quick Actions -->
+                    <div class="mt-2">
+                        <small class="text-muted me-2">Acciones rápidas:</small>
+                        <button class="btn btn-outline-primary btn-sm me-1" onclick="quickMessage('Crea un link de $')">
+                            <i class="iconoir-plus me-1"></i>Link rápido
+                        </button>
+                        <button class="btn btn-outline-info btn-sm me-1" onclick="quickMessage('¿Cómo crear un link con factura?')">
+                            <i class="iconoir-help-circle me-1"></i>Ayuda
+                        </button>
+                        <button class="btn btn-outline-success btn-sm me-1" onclick="quickMessage('Muestra mis links recientes')">
+                            <i class="iconoir-list me-1"></i>Mis links
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="quickMessage('Link de $100 para servicio técnico')">
+                            <i class="iconoir-spark me-1"></i>Ejemplo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+<!-- End Chat Interface -->
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+
+<script>
+let eventSource = null;
+let isConnected = false;
+let conversationId = null;
+
+// Start first conversation (hide empty state, show chat)
+function startFirstConversation() {
+    document.getElementById('empty-state-ai').style.display = 'none';
+    document.getElementById('chat-interface').style.display = 'block';
+
+    // Initialize SSE and chat
+    initializeSSE();
+    updateCharCount();
+
+    // Focus on input
+    setTimeout(() => {
+        const input = document.getElementById('chat-input');
+        if (input) input.focus();
+    }, 300);
+}
+
+// Initialize SSE when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Only init SSE if chat interface is visible
+    const chatInterface = document.getElementById('chat-interface');
+    if (chatInterface && chatInterface.style.display !== 'none') {
+        initializeSSE();
+        updateCharCount();
+
+        // Character count handler
+        const chatInput = document.getElementById('chat-input');
+        if (chatInput) {
+            chatInput.addEventListener('input', updateCharCount);
+        }
+
+        // Chat form submission
+        const chatForm = document.getElementById('chat-form');
+        if (chatForm) {
+            chatForm.addEventListener('submit', handleChatSubmit);
+        }
+    }
+});
+
+function initializeSSE() {
+    // Close existing connection
+    if (eventSource) {
+        eventSource.close();
+    }
+
+    eventSource = new EventSource('{% url "kita_ia:chat_stream" %}');
+
+    eventSource.onopen = function(event) {
+        isConnected = true;
+        updateConnectionStatus('connected');
+    };
+
+    eventSource.onmessage = function(event) {
+        try {
+            const data = JSON.parse(event.data);
+            handleChatMessage(data);
+        } catch (e) {
+            console.error('SSE parse error:', e);
+        }
+    };
+
+    eventSource.onerror = function(event) {
+        isConnected = false;
+        updateConnectionStatus('error');
+
+        // Attempt to reconnect after 3 seconds
+        setTimeout(() => {
+            if (!isConnected) {
+                initializeSSE();
+            }
+        }, 3000);
+    };
+}
+
+function updateConnectionStatus(status) {
+    const statusElement = document.getElementById('connection-status');
+    const chatStatus = document.getElementById('chat-status');
+
+    if (!statusElement || !chatStatus) return;
+
+    switch(status) {
+        case 'connected':
+            statusElement.className = 'badge bg-success';
+            statusElement.innerHTML = '<i class="iconoir-check-circle me-1"></i>En línea';
+            chatStatus.textContent = 'Conectado';
+            break;
+        case 'error':
+            statusElement.className = 'badge bg-danger';
+            statusElement.innerHTML = '<i class="iconoir-warning-triangle me-1"></i>Reconectando...';
+            chatStatus.textContent = 'Reconectando...';
+            break;
+        case 'processing':
+            statusElement.className = 'badge bg-info';
+            statusElement.innerHTML = '<i class="iconoir-refresh me-1"></i>Procesando...';
+            chatStatus.textContent = 'Procesando...';
+            break;
+    }
+}
+
+function handleChatMessage(data) {
+    if (data.type === 'connected') {
+        // Connection established
+    } else if (data.type === 'ping') {
+        // Keep alive ping - do nothing
+    } else if (data.type === 'timeout') {
+        // Connection timeout
+        removeTypingIndicator();
+        addAssistantMessage('La conexión se cerró por inactividad. Recarga la página si quieres continuar.');
+        updateConnectionStatus('error');
+    } else if (data.type === 'assistant_message') {
+        removeTypingIndicator();
+        addAssistantMessage(data.message, data.timestamp);
+    } else if (data.type === 'link_preview') {
+        removeTypingIndicator();
+        addLinkPreview(data);
+    } else if (data.type === 'link_created') {
+        removeTypingIndicator();
+        addLinkCreated(data);
+    } else if (data.type === 'error') {
+        removeTypingIndicator();
+        addErrorMessage(data.message);
+    }
+
+    // Scroll to bottom
+    const messagesContainer = document.getElementById('chat-messages');
+    if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+}
+
+function handleChatSubmit(e) {
+    e.preventDefault();
+
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    // Add user message to chat immediately
+    addUserMessage(message);
+
+    // Show typing indicator
+    showTypingIndicator();
+
+    // Send message to server
+    sendChatMessage(message);
+
+    // Clear input
+    input.value = '';
+    updateCharCount();
+
+    // Update status
+    updateConnectionStatus('processing');
+
+    // Disable send button temporarily
+    const sendBtn = document.getElementById('send-btn');
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="iconoir-refresh"></i>';
+
+    setTimeout(() => {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = '<i class="iconoir-send"></i>';
+    }, 2000);
+}
+
+function sendChatMessage(message) {
+    fetch('{% url "kita_ia:send_message" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            message: message,
+            conversation_id: conversationId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            conversationId = data.conversation_id;
+            updateConnectionStatus('connected');
+        } else {
+            removeTypingIndicator();
+            addErrorMessage(data.error || 'Error enviando mensaje');
+            updateConnectionStatus('connected');
+        }
+    })
+    .catch(error => {
+        removeTypingIndicator();
+        addErrorMessage('Error de conexión. Intenta de nuevo.');
+        updateConnectionStatus('error');
+    });
+}
+
+function showTypingIndicator() {
+    const messagesContainer = document.getElementById('chat-messages');
+
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'd-flex mb-3';
+    typingDiv.id = 'typing-indicator';
+    typingDiv.innerHTML = `
+        <div class="avatar-sm me-3">
+            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="iconoir-brain text-white"></i>
+            </div>
+        </div>
+        <div class="flex-grow-1">
+            <div class="chat-bubble chat-bubble-assistant">
+                <span class="typing-dots">
+                    <span></span><span></span><span></span>
+                </span>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.appendChild(typingDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    const indicator = document.getElementById('typing-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+function addUserMessage(message) {
+    const messagesContainer = document.getElementById('chat-messages');
+    const timestamp = new Date().toLocaleTimeString('es-MX', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'd-flex justify-content-end mb-3';
+    messageDiv.innerHTML = `
+        <div class="text-end" style="max-width: 70%;">
+            <div class="chat-bubble chat-bubble-user">
+                ${escapeHtml(message)}
+            </div>
+            <small class="text-muted">${timestamp}</small>
+        </div>
+    `;
+
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addAssistantMessage(message, timestamp = null) {
+    const messagesContainer = document.getElementById('chat-messages');
+    const time = timestamp ? new Date(timestamp).toLocaleTimeString('es-MX', {
+        hour: '2-digit',
+        minute: '2-digit'
+    }) : new Date().toLocaleTimeString('es-MX', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'd-flex mb-3';
+    messageDiv.innerHTML = `
+        <div class="avatar-sm me-3">
+            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="iconoir-brain text-white"></i>
+            </div>
+        </div>
+        <div class="flex-grow-1">
+            <div class="chat-bubble chat-bubble-assistant">
+                ${message}
+            </div>
+            <small class="text-muted">${time}</small>
+        </div>
+    `;
+
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addLinkPreview(data) {
+    const messagesContainer = document.getElementById('chat-messages');
+    const linkData = data.link_data || data;
+
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'd-flex mb-3';
+    previewDiv.innerHTML = `
+        <div class="avatar-sm me-3">
+            <div class="bg-info rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="iconoir-eye text-white"></i>
+            </div>
+        </div>
+        <div class="flex-grow-1">
+            <div class="link-preview-card">
+                <div class="preview-header">
+                    <i class="iconoir-link"></i>
+                    <strong>Vista Previa del Link</strong>
+                </div>
+                <div class="card-body">
+                    <div class="preview-item">
+                        <i class="iconoir-text-box"></i>
+                        <span class="text-muted">Título:</span>
+                        <strong>${escapeHtml(linkData.title)}</strong>
+                    </div>
+                    <div class="preview-item">
+                        <i class="iconoir-dollar"></i>
+                        <span class="text-muted">Monto:</span>
+                        <strong>$${linkData.amount} MXN</strong>
+                    </div>
+                    <div class="preview-item">
+                        <i class="iconoir-user"></i>
+                        <span class="text-muted">Cliente:</span>
+                        <strong>${escapeHtml(linkData.customer_name || 'No especificado')}</strong>
+                    </div>
+                    <div class="preview-item">
+                        <i class="iconoir-clock"></i>
+                        <span class="text-muted">Expira en:</span>
+                        <strong>${linkData.expires_days} día${linkData.expires_days !== 1 ? 's' : ''}</strong>
+                    </div>
+                    <div class="preview-item">
+                        <i class="iconoir-page"></i>
+                        <span class="text-muted">Factura:</span>
+                        <strong>${linkData.requires_invoice ? 'Sí' : 'No'}</strong>
+                    </div>
+                    ${linkData.customer_email ? `
+                    <div class="preview-item">
+                        <i class="iconoir-mail"></i>
+                        <span class="text-muted">Email:</span>
+                        <strong>${escapeHtml(linkData.customer_email)}</strong>
+                    </div>
+                    ` : ''}
+
+                    <div class="mt-3 d-grid gap-2">
+                        <button class="btn btn-accent" onclick="confirmLinkCreation('${linkData.conversation_id || conversationId}')">
+                            <i class="iconoir-check me-2"></i>
+                            Crear Link
+                        </button>
+                        <button class="btn btn-outline-secondary" onclick="cancelLinkCreation()">
+                            <i class="iconoir-xmark me-2"></i>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.appendChild(previewDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addLinkCreated(eventData) {
+    const messagesContainer = document.getElementById('chat-messages');
+
+    const linkId = eventData.link_id;
+    const linkUrl = eventData.url;
+
+    const successDiv = document.createElement('div');
+    successDiv.className = 'd-flex mb-3';
+    successDiv.innerHTML = `
+        <div class="avatar-sm me-3">
+            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="iconoir-check text-white"></i>
+            </div>
+        </div>
+        <div class="flex-grow-1">
+            <div class="alert alert-success" style="border-left: 4px solid var(--color-forest-700);">
+                <div class="success-animation mb-2">
+                    ✨ 🎉 ✨
+                </div>
+                <h6>
+                    <i class="iconoir-link me-2"></i>
+                    ¡Link Creado Exitosamente!
+                </h6>
+                <p class="mb-2"><strong>URL Pública:</strong></p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" value="${linkUrl}" id="created-link-url-${linkId}" readonly>
+                    <button class="btn btn-outline-secondary" onclick="copyToClipboard(document.getElementById('created-link-url-${linkId}').value, 'URL copiada')">
+                        <i class="iconoir-copy"></i>
+                    </button>
+                </div>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/enlaces/" class="btn btn-sm btn-primary">
+                        <i class="iconoir-list me-1"></i>
+                        Ver en Links
+                    </a>
+                    <button class="btn btn-sm btn-outline-primary" onclick="showDetailPanel('link', '${linkId}')">
+                        <i class="iconoir-eye me-1"></i>
+                        Ver Detalles
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="quickMessage('Crea otro link de')">
+                        <i class="iconoir-plus me-1"></i>
+                        Crear Otro
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.appendChild(successDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function addErrorMessage(message) {
+    const messagesContainer = document.getElementById('chat-messages');
+
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'd-flex mb-3';
+    errorDiv.innerHTML = `
+        <div class="avatar-sm me-3">
+            <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                <i class="iconoir-warning-triangle text-white"></i>
+            </div>
+        </div>
+        <div class="flex-grow-1">
+            <div class="alert alert-danger">
+                <strong>Error:</strong> ${escapeHtml(message)}
+            </div>
+        </div>
+    `;
+
+    messagesContainer.appendChild(errorDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+function quickMessage(message) {
+    // If empty state is visible, show chat first
+    const emptyState = document.getElementById('empty-state-ai');
+    const chatInterface = document.getElementById('chat-interface');
+
+    if (emptyState && emptyState.style.display !== 'none') {
+        emptyState.style.display = 'none';
+        chatInterface.style.display = 'block';
+
+        // Initialize SSE and chat if not already initialized
+        if (!eventSource) {
+            initializeSSE();
+            updateCharCount();
+
+            // Setup event listeners
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('input', updateCharCount);
+            }
+
+            const chatForm = document.getElementById('chat-form');
+            if (chatForm) {
+                chatForm.addEventListener('submit', handleChatSubmit);
+            }
+        }
+    }
+
+    // Fill input with message
+    const input = document.getElementById('chat-input');
+    if (input) {
+        input.value = message;
+        setTimeout(() => input.focus(), 300);
+    }
+}
+
+function confirmLinkCreation(convId) {
+    const confirmBtn = event.target;
+    const cancelBtn = confirmBtn.parentNode.querySelector('.btn-outline-secondary');
+
+    const originalConfirmText = confirmBtn.innerHTML;
+    const originalCancelText = cancelBtn.innerHTML;
+
+    confirmBtn.innerHTML = '<i class="iconoir-refresh me-1"></i>Creando...';
+    confirmBtn.disabled = true;
+    cancelBtn.disabled = true;
+
+    fetch('{% url "kita_ia:confirm_link" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({
+            conversation_id: convId,
+            action: 'confirm'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const previewCard = confirmBtn.closest('.link-preview-card');
+            if (previewCard) {
+                previewCard.style.opacity = '0.6';
+                previewCard.style.pointerEvents = 'none';
+            }
+            showToast('Link creándose... Detalles en un momento', 'success');
+        } else {
+            addErrorMessage(data.error || 'Error confirmando el link');
+            confirmBtn.innerHTML = originalConfirmText;
+            confirmBtn.disabled = false;
+            cancelBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        addErrorMessage('Error confirmando el link.');
+        confirmBtn.innerHTML = originalConfirmText;
+        confirmBtn.disabled = false;
+        cancelBtn.innerHTML = originalCancelText;
+        cancelBtn.disabled = false;
+    });
+}
+
+function cancelLinkCreation() {
+    addAssistantMessage('Entendido, he cancelado la creación del link. ¿En qué más puedo ayudarte?');
+}
+
+function clearChat() {
+    if (confirm('¿Estás seguro de que quieres limpiar el chat?')) {
+        const messagesContainer = document.getElementById('chat-messages');
+        messagesContainer.innerHTML = `
+            <div class="d-flex mb-3">
+                <div class="avatar-sm me-3">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                        <i class="iconoir-brain text-white"></i>
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <div class="chat-bubble chat-bubble-assistant">
+                        <p class="mb-2">¡Hola <strong>{{ user.first_name }}</strong>! Soy tu asistente de Kita.</p>
+                        <p class="mb-2">Puedo ayudarte a crear links de pago usando lenguaje natural.</p>
+                        <p class="mb-2"><strong>Ejemplos:</strong></p>
+                        <ul class="mb-0">
+                            <li>"Crea un link de $500 para Juan Pérez por consultoría que expire en 3 días"</li>
+                            <li>"Necesito un link de $1200 para diseño web con factura"</li>
+                            <li>"Link de $300 que expire mañana para reparación de PC"</li>
+                        </ul>
+                    </div>
+                    <small class="text-muted">Hace un momento</small>
+                </div>
+            </div>
+        `;
+        conversationId = null;
+    }
+}
+
+function updateCharCount() {
+    const input = document.getElementById('chat-input');
+    const counter = document.getElementById('char-count');
+
+    if (!input || !counter) return;
+
+    counter.textContent = `${input.value.length}/500`;
+
+    if (input.value.length > 480) {
+        counter.className = 'text-danger';
+    } else if (input.value.length > 450) {
+        counter.className = 'text-warning';
+    } else {
+        counter.className = 'text-muted';
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', function() {
+    if (eventSource) {
+        eventSource.close();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,34 @@
+# robots.txt para Kita
+# https://dash.kita.mx/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /dashboard/
+Disallow: /links/
+Disallow: /kita-ia/
+Disallow: /subscription/
+Disallow: /invoices/
+Disallow: /reports/
+Disallow: /account/
+Disallow: /settings/
+Disallow: /logs/
+Disallow: /help/
+Disallow: /webhooks/
+Disallow: /onboarding/
+Disallow: /billing/
+Disallow: /config/
+Disallow: /audit/
+Disallow: /media/
+
+# Allow public payment and invoice pages
+Allow: /hola/
+Allow: /facturar/
+Allow: /descargar/
+
+# Sitemap
+Sitemap: https://dash.kita.mx/sitemap.xml
+
+# Crawl delay (optional - ajusta según necesites)
+Crawl-delay: 1

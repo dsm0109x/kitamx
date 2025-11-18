@@ -1,0 +1,779 @@
+/**
+ * KITA BRUTALIST OVERRIDES
+ * Estilo minimalista angular sin bordes
+ *
+ * Características:
+ * - Formas angulares (border-radius: 0)
+ * - Monocromático (solo grises)
+ * - Sin bordes decorativos
+ * - Solo botones pueden ser redondos
+ */
+
+/* ========================================
+   GLOBAL ANGULAR OVERRIDES
+   ======================================== */
+
+/* Eliminar border-radius SOLO de elementos no-interactivos */
+.modal-content,
+.modal-header,
+.modal-footer,
+.dropdown-menu,
+.offcanvas,
+.toast,
+.popover,
+.list-group-item,
+.input-group,
+.navbar-collapse {
+    border-radius: 10px !important;
+}
+
+/* Alerts SÍ tienen border-radius */
+.alert {
+    border-radius: 5px !important;  /* ✅ Alerts con radius */
+}
+
+/* ✂️ REMOVED: .card definitions - now in base-components.css
+   Brutalist overrides should NOT redefine entire components */
+
+/* ✅ INPUTS REMOVIDOS DE AQUÍ - Ahora tienen border-radius 8px global
+   (definido más abajo en línea 575+) */
+
+/* ========================================
+   ELIMINAR BORDERS DECORATIVOS
+   ======================================== */
+
+/* Cards - Override solo necesario si hay conflicto con Bootstrap */
+/* ✂️ REMOVED: Definición completa movida a base-components.css */
+
+/* ========================================
+   ✂️ BOTONES REMOVED - Ahora en buttons.css
+   ======================================== */
+
+/* TODAS las definiciones de botones (.btn-accent, .btn-primary, .btn-secondary)
+   han sido movidas a: 02-components/buttons.css
+
+   Este archivo (brutalist-overrides) debería contener SOLO overrides de border-radius,
+   NO redefiniciones completas de componentes. */
+
+/* FAQ items SIN SOMBRA */
+.faq-item {
+    border: none !important;
+    border-left: none !important;
+    border-top: none !important;
+    background: #ffffff !important;  /* ✅ Blanco */
+    margin-bottom: 0.25rem !important;  /* ✅ Espacio compacto */
+    border-radius: var(--radius-card, 15px) !important;  /* ✅ Border radius */
+    box-shadow: none !important;  /* ✅ SIN SOMBRA */
+}
+
+/* Timeline steps con border sutil */
+.timeline-step {
+    border: 2px solid #e5e7eb !important;  /* ✅ Borde sutil */
+    background: var(--color-gray-100) !important;
+    border-radius: var(--radius-card, 15px) !important;  /* ✅ Border radius */
+}
+
+.timeline-step.active {
+    background: #f0f4f8 !important;  /* ✅ Navy-50 visible */
+    border: 2px solid #111827 !important;  /* ✅ Negro */
+}
+
+.timeline-step.active h5,
+.timeline-step.active p {
+    color: #111827 !important;  /* ✅ Texto negro, NO blanco */
+}
+
+/* Comparison cards sin border */
+.comparison-card,
+.comparison-step {
+    border: none !important;
+    background: var(--color-gray-50) !important;
+}
+
+/* Example fields sin borders */
+.example-field,
+.timeline-result-card,
+.invoice-result-card,
+.whatsapp-preview,
+.payment-method-item,
+.flow-step,
+.file-badge,
+.timeline-checklist li {
+    border: none !important;  /* Sin barras laterales */
+    border-left: none !important;  /* Sin barra izquierda */
+    background: var(--color-gray-50) !important;
+}
+
+/* Pricing cards sin border */
+.pricing-card {
+    border: none !important;
+    background: var(--color-gray-100) !important;
+}
+
+.pricing-card-kita {
+    border: 4px solid var(--color-gray-900) !important;  /* Kita con borde negro grueso */
+    background: white !important;
+}
+
+/* CTA cards sin border */
+.cta-step-card {
+    border: none !important;
+    border-top: 4px solid var(--color-gray-900) !important;  /* Solo barra superior */
+    background: var(--color-gray-50) !important;
+}
+
+/* Calc cards sin border */
+.calc-card,
+.calculator-roi {
+    border: none !important;
+    background: var(--color-gray-100) !important;
+}
+
+.calc-card-before {
+    border-left: 4px solid var(--color-gray-700) !important;
+}
+
+.calc-card-after {
+    border-left: 4px solid var(--color-gray-900) !important;
+}
+
+/* ========================================
+   ELIMINAR GLASSMORPHISM Y GRADIENTES
+   ======================================== */
+
+/* Reemplazar glassmorphism con sólidos - CARDS BLANCAS */
+.timeline-step,
+.faq-item,
+.comparison-step,
+.example-field,
+.payment-method-item,
+.flow-step,
+.file-badge,
+.timeline-checklist li,
+.pricing-card,
+.cta-step-card,
+.calc-card,
+.calculator-roi,
+.timeline-result-card,
+.invoice-result-card,
+.whatsapp-preview,
+.whatsapp-message,
+.tech-trust-item,
+.value-core-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #ffffff !important;  /* Blanco - CARDS destacan sobre sections grises */
+}
+
+/* Timeline step activo - NAVY SUTIL */
+.timeline-step.active {
+    background: #f0f4f8 !important;  /* ✅ Navy-50 visible */
+    border: 2px solid #111827 !important;  /* ✅ Negro con borde sutil */
+}
+
+.timeline-step.active .timeline-number {
+    background: #111827 !important;  /* NEGRO - no verde */
+    color: #ffffff !important;
+}
+
+.timeline-step.active h5,
+.timeline-step.active p {
+    color: #111827 !important;  /* TODO texto NEGRO en activo */
+}
+
+/* Dashboard header - sobre fondo claro */
+.dashboard-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* ========================================
+   ELIMINAR BLANCO PURO - FORZAR OFF-WHITE
+   ======================================== */
+
+/* Elementos internos - pueden ser blancos */
+.whatsapp-message,
+.value-tag,
+.feature-pill {
+    background: #ffffff !important;  /* Blanco OK */
+}
+
+/* Step numbers mini - negros */
+.step-number-mini,
+.cta-step-number {
+    background: #111827 !important;  /* Negro sólido */
+    color: #ffffff !important;
+    border: none !important;
+}
+
+/* ROI calculator */
+.roi-calculator {
+    background: #ffffff !important;  /* Blanco - es una card */
+    border: none !important;
+    border-top: 4px solid #111827 !important;
+}
+
+/* Tech trust items */
+.tech-trust-item {
+    background: #ffffff !important;  /* Blanco - son cards */
+}
+
+/* Value hero icon - negro */
+.value-hero-icon {
+    background: #111827 !important;  /* Negro */
+}
+
+/* Pricing badge - negro */
+.pricing-badge {
+    background: #111827 !important;
+    color: #ffffff !important;
+}
+
+/* Step content code - gris claro */
+.step-content code {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+/* FAQ highlighted sin color amarillo */
+.faq-item-highlighted {
+    background: #f9fafb !important;  /* Gray-50 destacado */
+    border-left: 4px solid #111827 !important;
+}
+
+/* Value card sin gradiente */
+.value-hero-card {
+    background: #ffffff !important;  /* Blanco - es una card */
+    border: 2px solid #111827 !important;
+}
+
+/* WhatsApp header - monocromático */
+.whatsapp-header {
+    background: var(--color-gray-800) !important;
+    color: white !important;
+}
+
+/* Gradientes a sólidos */
+.value-hero-card,
+.secondary-features-bar {
+    background: var(--color-gray-50) !important;
+}
+
+/* Dashboard header - sólido */
+.dashboard-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: white !important;
+    border-bottom: 1px solid var(--color-gray-200) !important;
+}
+
+/* Sidebar - sólido */
+.modern-sidebar {
+    background: var(--color-gray-900) !important;  /* Negro sólido */
+}
+
+/* Navbar brutalist - override de estilos */
+.navbar-brutalist {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: #ffffff !important;
+    border-bottom: 2px solid #111827 !important;  /* Barra negra sólida */
+    box-shadow: none !important;
+}
+
+/* Botones en navbar - mismo tamaño y estilo */
+.navbar-brutalist .btn-outline-secondary,
+.navbar-brutalist .btn-primary {
+    padding: 0.5rem 1.25rem !important;  /* Mismo padding = mismo tamaño */
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    border: none !important;  /* SIN BORDER NUNCA */
+}
+
+.navbar-brutalist .btn-outline-secondary {
+    background: #e5e7eb !important;  /* Gris claro - sin border */
+    color: #111827 !important;  /* Texto negro */
+}
+
+.navbar-brutalist .btn-outline-secondary:hover {
+    background: #d1d5db !important;  /* Gris más oscuro */
+    color: #111827 !important;  /* Texto negro */
+    border: none !important;
+}
+
+.navbar-brutalist .btn-primary {
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%) !important;
+    background-size: 200% 200% !important;
+    background-position: 0% 50% !important;
+    color: #ffffff !important;
+}
+
+.navbar-brutalist .btn-primary:hover {
+    background-position: 100% 50% !important;
+    color: #ffffff !important;
+    border: none !important;
+    box-shadow:
+        0 6px 16px rgba(21, 128, 61, 0.35),
+        0 0 0 3px rgba(21, 128, 61, 0.1);
+}
+
+/* Footer CTA - botón blanco SIN BORDER */
+.footer-cta-final .btn-accent,
+.footer-cta-final .btn {
+    background: #ffffff !important;  /* Blanco sobre footer oscuro */
+    color: #111827 !important;       /* Texto negro */
+    border: none !important;  /* SIN BORDER */
+}
+
+.footer-cta-final .btn-accent:hover,
+.footer-cta-final .btn:hover {
+    background: #f3f4f6 !important;  /* Gris claro */
+    color: #111827 !important;
+    border: none !important;  /* SIN BORDER */
+}
+
+/* ========================================
+   NÚMEROS Y BADGES CIRCULARES (PERMITIDOS)
+   ======================================== */
+
+/* Estos SÍ pueden ser redondos (círculos perfectos) */
+.timeline-number,
+.step-number,
+.step-number-mini,
+.cta-step-number,
+.tenant-avatar,
+.stat-icon,
+.value-hero-icon,
+.feature-icon,
+.header-action-btn,
+.badge {
+    border-radius: 50% !important;  /* Círculos permitidos */
+}
+
+/* Badges de pill */
+.badge-pill,
+.pricing-badge,
+.hero-badge,
+.trust-badge-hero,
+.value-tag {
+    border-radius: var(--radius-full) !important;  /* Pills permitidos */
+}
+
+/* ========================================
+   SHADOWS - SUTILES PERO MARCADAS
+   ======================================== */
+
+/* Shadow sutil marcada: poco blur, poco spread, alpha visible */
+.card,
+.pricing-card,
+.pricing-card-enhanced,
+.comparison-card,
+.timeline-step {
+    box-shadow:
+        0 2px 4px rgba(65, 65, 65, 0.12),
+        0 1px 2px rgba(68, 68, 68, 0.08) !important;
+}
+
+/* FAQ items SIN sombra - FORZADO */
+.faq-item,
+.faq-item:hover,
+.faq-item:focus,
+.faq-item.active {
+    box-shadow: none !important;
+    -webkit-box-shadow: none !important;
+}
+
+/* ROI calculator y result - SIN sombra */
+.roi-calculator-panel,
+.roi-result-hero,
+.roi-result-clean {
+    box-shadow: none !important;
+}
+
+
+
+/* ========================================
+   COLORES MONOCROMÁTICOS
+   ======================================== */
+
+/* Success/Warning/Error → Grises */
+.text-success,
+.badge.bg-success {
+    color: var(--color-gray-700) !important;
+}
+
+.text-warning {
+    color: var(--color-gray-600) !important;
+}
+
+.text-error,
+.text-danger {
+    color: var(--color-gray-800) !important;
+}
+
+.bg-success {
+    background-color: var(--color-gray-200) !important;
+}
+
+.bg-warning {
+    background-color: var(--color-gray-100) !important;
+}
+
+.bg-danger,
+.bg-error {
+    background-color: var(--color-gray-300) !important;
+}
+
+/* Iconos monocromáticos */
+.iconoir-check-circle,
+.iconoir-warning-circle,
+.iconoir-info-circle {
+    color: var(--color-gray-700) !important;
+}
+
+/* ========================================
+   CORREGIR TEXTOS BLANCOS SOBRE FONDO CLARO
+   ======================================== */
+
+/* Timeline numbers - negro sobre blanco */
+.timeline-number,
+.step-number,
+.step-number-mini {
+    background: var(--color-gray-900) !important;  /* Negro sólido */
+    color: white !important;  /* Blanco OK sobre negro */
+    border: none !important;
+}
+
+/* Step content code - oscuro sobre claro */
+.step-content code {
+    background: var(--color-gray-200) !important;
+    color: var(--color-gray-900) !important;
+}
+
+/* Comparison step numbers - monocromático */
+.comparison-step-number-before,
+.comparison-step-number-after {
+    background: var(--color-gray-800) !important;
+    color: white !important;
+}
+
+/* CTA button final - negro sobre cualquier fondo */
+.cta-button-final {
+    background: var(--color-gray-900) !important;
+    color: white !important;
+}
+
+/* Value badges - solo si están sobre fondo claro */
+.value-hero-badge,
+.pricing-badge {
+    background: var(--color-gray-900) !important;
+    color: white !important;
+}
+
+/* Value hero icon */
+.value-hero-icon {
+    background: var(--color-gray-900) !important;
+}
+
+.value-hero-icon .iconoir {
+    color: white !important;
+}
+
+/* Urgency badge - monocromático */
+.urgency-badge {
+    background-color: var(--color-gray-200) !important;
+    border: 2px solid var(--color-gray-700) !important;
+    color: var(--color-gray-900) !important;
+}
+
+.urgency-badge .iconoir {
+    color: var(--color-gray-700) !important;
+}
+
+/* FAQ highlighted - monocromático */
+.faq-item-highlighted {
+    background: var(--color-gray-100) !important;
+}
+
+.faq-item-highlighted .badge {
+    background: var(--color-gray-800) !important;
+    color: white !important;
+}
+
+/* Value card - monocromático */
+.value-card {
+    background: var(--color-gray-100) !important;
+    border: 2px solid var(--color-gray-800) !important;
+}
+
+/* ========================================
+   INPUTS BRUTALIST - GLOBAL (UNIFIED)
+   ======================================== */
+
+/* ✅ TODOS LOS INPUTS USAN ESTILO BRUTALIST (como auth)
+   Para integridad y consistencia visual en toda la app */
+
+.form-control:not(.is-valid):not(.is-invalid),
+.form-select:not(.is-valid):not(.is-invalid),
+textarea.form-control:not(.is-valid):not(.is-invalid),
+input:not(.btn):not([type="checkbox"]):not([type="radio"]):not(.faq-search-input):not(.is-valid):not(.is-invalid) {
+    border: 2px solid #e5e7eb !important;  /* ✅ Border completo */
+    border-radius: 8px !important;  /* ✅ 8px radius UNIFICADO */
+    padding: 0.875rem 1rem !important;
+    font-size: 0.95rem !important;
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Readonly inputs - mantener mismo estilo pero con indicador visual */
+.form-control:read-only,
+.form-control[readonly] {
+    background-color: #f9fafb !important;  /* Fondo más claro */
+    cursor: not-allowed;
+    opacity: 0.9;
+}
+
+.form-control:hover:not(:focus):not(:disabled):not(.is-valid):not(.is-invalid),
+.form-select:hover:not(:focus):not(:disabled):not(.is-valid):not(.is-invalid),
+textarea.form-control:hover:not(:focus):not(:disabled):not(.is-valid):not(.is-invalid) {
+    background-color: #f9fafb !important;  /* background-color en vez de background */
+    border-color: #d1d5db !important;
+}
+
+.form-control:focus:not(.is-valid):not(.is-invalid),
+.form-select:focus:not(.is-valid):not(.is-invalid),
+textarea.form-control:focus:not(.is-valid):not(.is-invalid),
+input:not(.btn):not([type="checkbox"]):not([type="radio"]):focus:not(.is-valid):not(.is-invalid) {
+    border-color: #111827 !important;  /* ✅ Negro */
+    border-radius: 8px !important;
+    box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.1) !important;  /* ✅ Glow negro */
+    outline: none !important;
+    transform: scale(1.01) !important;  /* ✅ Micro scale */
+}
+
+/* Placeholder */
+.form-control::placeholder,
+.form-select::placeholder,
+textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1;
+}
+
+/* Password fields con toggle button */
+.password-wrapper .form-control {
+    padding-right: 3rem !important;  /* Espacio para toggle button */
+}
+
+/* ========================================
+   MODALS - FORCE VALIDATION STYLES
+   ======================================== */
+
+/* Asegurar que validation styles ganen sobre base styles en modales */
+.create-link-modal .form-control.is-valid,
+.create-link-modal .form-select.is-valid,
+.create-link-modal textarea.form-control.is-valid,
+.edit-link-modal .form-control.is-valid,
+.edit-link-modal .form-select.is-valid,
+.edit-link-modal textarea.form-control.is-valid {
+    border-color: #15803d !important;
+    background-color: #f0fdf4 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 20px !important;
+    padding-right: 45px !important;
+}
+
+.create-link-modal .form-control.is-invalid,
+.create-link-modal .form-select.is-invalid,
+.create-link-modal textarea.form-control.is-invalid,
+.edit-link-modal .form-control.is-invalid,
+.edit-link-modal .form-select.is-invalid,
+.edit-link-modal textarea.form-control.is-invalid {
+    border-color: #dc2626 !important;
+    background-color: #fef2f2 !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='3'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 20px !important;
+    padding-right: 45px !important;
+}
+
+.create-link-modal .invalid-feedback,
+.edit-link-modal .invalid-feedback {
+    display: block;
+    color: #dc2626 !important;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 600;
+}
+
+/* ========================================
+   VALIDATION STATES - UNIFIED
+   ======================================== */
+
+/* Invalid State - CON X VISUAL */
+.form-control.is-invalid,
+.form-select.is-invalid,
+textarea.form-control.is-invalid {
+    border-color: #dc2626 !important;  /* ✅ Rojo visible (Red-600) */
+    background-color: #fef2f2 !important;    /* Fondo rojo sutil */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23dc2626' stroke-width='3'%3E%3Cline x1='18' y1='6' x2='6' y2='18'%3E%3C/line%3E%3Cline x1='6' y1='6' x2='18' y2='18'%3E%3C/line%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 20px !important;
+    padding-right: 45px !important;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus,
+textarea.form-control.is-invalid:focus {
+    border-color: #dc2626 !important;  /* ✅ Rojo en focus */
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.15) !important;  /* ✅ Glow rojo */
+}
+
+/* Valid State - CON CHECKMARK VISUAL */
+.form-control.is-valid,
+.form-select.is-valid,
+textarea.form-control.is-valid {
+    border-color: #15803d !important;  /* Verde accent */
+    background-color: #f0fdf4 !important;    /* Fondo verde muy sutil */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='3'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 20px !important;
+    padding-right: 45px !important;
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus,
+textarea.form-control.is-valid:focus {
+    border-color: #15803d !important;
+    box-shadow: 0 0 0 4px rgba(21, 128, 61, 0.1) !important;  /* Glow verde */
+}
+
+/* Error Feedback (Bootstrap Standard) */
+.invalid-feedback {
+    display: none;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #dc2626 !important;  /* ✅ Rojo visible */
+    font-weight: 600 !important;  /* ✅ Bold para visibilidad */
+}
+
+.invalid-feedback.d-block {
+    display: block !important;
+}
+
+.form-control.is-invalid ~ .invalid-feedback,
+.form-select.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Error Feedback (Legacy Style) - Compatible con auth-*-enhanced.js */
+.form-error {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #dc2626 !important;  /* ✅ Rojo visible */
+    font-weight: 600 !important;  /* ✅ Bold para visibilidad */
+}
+
+.form-error small {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.form-error small:last-child {
+    margin-bottom: 0;
+}
+
+/* Success Feedback */
+.valid-feedback {
+    display: none;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #15803d;  /* Verde accent */
+    font-weight: 500;
+}
+
+.valid-feedback.d-block {
+    display: block !important;
+}
+
+.form-control.is-valid ~ .valid-feedback,
+.form-select.is-valid ~ .valid-feedback {
+    display: block;
+}
+
+/* Form Group Error State */
+.form-group.has-error .form-label {
+    color: #dc2626 !important;  /* ✅ Rojo visible */
+    font-weight: 600 !important;
+}
+
+/* Global Form Error Messages */
+.form-error-global {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: #fef2f2;
+    border-left: 4px solid #dc2626 !important;  /* ✅ Borde rojo visible */
+    border-radius: var(--radius-card, 15px);  /* ✅ Border radius consistente */
+    color: #dc2626 !important;  /* ✅ Texto rojo visible */
+    font-weight: 600 !important;  /* ✅ Bold */
+}
+
+/* Shake animation on error */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97);
+}
+
+/* ========================================
+   MOBILE ADJUSTMENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    /* Mantener consistencia angular en mobile */
+    .modal-content,
+    .offcanvas,
+    .dropdown-menu {
+        border-radius: 0 !important;
+    }
+}
+
+/* ========================================
+   EXCEPTIONS - Elementos que SÍ pueden tener radius
+   ======================================== */
+
+/* Botones (ya tienen border-radius en buttons.css) */
+.btn,
+button.btn {
+    /* Mantener border-radius de botón */
+}
+
+/* Avatars y elementos circulares */
+.avatar,
+.profile-pic,
+.user-avatar {
+    border-radius: 50% !important;
+}
+
+/* Badges pill */
+.badge-pill {
+    border-radius: var(--radius-full) !important;
+}
+
+/* ========================================
+   LEGAL PAGES - YA SON BRUTALIST
+   ======================================== */
+
+/* Legal pages ya tienen diseño brutalist nativo en legal.css
+   No necesitan overrides especiales - son coherentes con el home */

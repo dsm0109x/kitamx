@@ -1,0 +1,45 @@
+{% extends "emails/base.html" %}
+
+{% block email_title %}Cuenta de Google Desconectada - Kita{% endblock %}
+
+{% block email_content %}
+    <!-- Icono Grande -->
+    <div class="email-icon">🔓</div>
+
+    <h1>Google Desconectado</h1>
+
+    <p class="lead">
+        Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+    </p>
+
+    <p>
+        Has desconectado tu cuenta de <strong>Google</strong> de tu cuenta de Kita.
+    </p>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p><strong>A partir de ahora:</strong></p>
+        <p>
+            Solo podrás iniciar sesión con tu <strong>email y contraseña</strong>.
+            El botón "Continuar con Google" ya no funcionará para tu cuenta.
+        </p>
+    </div>
+
+    <!-- Security Box -->
+    <div class="security-box">
+        <p><strong>Para tu seguridad:</strong></p>
+        <p>• Puedes volver a conectar Google cuando quieras desde Configuración</p>
+        <p>• Asegúrate de recordar tu contraseña de email</p>
+        <p>• Si no reconoces esta actividad, contacta con soporte inmediatamente</p>
+    </div>
+
+    <p class="text-muted text-center" style="margin-top: 32px;">
+        ¿Tienes dudas? Escríbenos a
+        <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+    </p>
+{% endblock %}
+
+{% block email_footer_note %}
+    Este email fue enviado porque desconectaste tu cuenta de Google.<br>
+    Si no fuiste tú, contacta inmediatamente con hola@kita.mx
+{% endblock %}

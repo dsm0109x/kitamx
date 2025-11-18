@@ -1,0 +1,245 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize static %}
+
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard-command-center.css' %}">
+{% endblock %}
+
+{% block dashboard_content %}
+
+<!-- HERO SECTION -->
+<div class="command-center-hero">
+    <div class="hero-content">
+        <h1 class="hero-title">
+            👋 ¡Hola, {{ user.first_name|default:"Usuario" }}!
+        </h1>
+        <p class="hero-subtitle">
+            {% if pending_tasks|length > 0 %}
+                Tienes {{ pending_tasks|length }} tarea{{ pending_tasks|length|pluralize }} pendiente{{ pending_tasks|length|pluralize }}
+            {% else %}
+                
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions-grid">
+        <button type="button" class="action-card action-card-primary" onclick="showCreateLinkModal()">
+            <i class="iconoir-plus action-icon"></i>
+            <h3 class="action-title">Crear Link de Pago</h3>
+            <p class="action-subtitle">Genera un link para cobrar</p>
+        </button>
+
+        <a href="{% url 'config:integrations' %}" class="action-card action-card-secondary">
+            <i class="iconoir-settings action-icon"></i>
+            <h3 class="action-title">Configurar</h3>
+            <p class="action-subtitle">MercadoPago & SmartWeb</p>
+        </a>
+    </div>
+</div>
+
+<!-- TRIAL PROGRESS CARD (if trial) -->
+{% if subscription_info.is_trial %}
+<div class="trial-progress-card">
+    <div class="trial-progress-content">
+        <div class="trial-info-section">
+            <div class="trial-icon-large">
+                {% if subscription_info.days_until_expiry <= 3 %}
+                    ⚠️
+                {% elif subscription_info.days_until_expiry <= 7 %}
+                    🟡
+                {% else %}
+                    🚀
+                {% endif %}
+            </div>
+            <div class="trial-text-content">
+                <h3 class="trial-card-title">
+                    {% if subscription_info.days_until_expiry <= 3 %}
+                        ¡Tu trial termina pronto!
+                    {% elif subscription_info.days_until_expiry <= 7 %}
+                        Tu trial está por terminar
+                    {% else %}
+                        Estás en período de prueba
+                    {% endif %}
+                </h3>
+                <p class="trial-card-subtitle">
+                    Te quedan <strong>{{ subscription_info.days_until_expiry }} día{{ subscription_info.days_until_expiry|pluralize }}</strong> de acceso gratuito
+                </p>
+            </div>
+        </div>
+
+        <div class="trial-progress-section">
+            <div class="trial-progress-bar">
+                <div class="trial-progress-fill {% if subscription_info.days_until_expiry <= 3 %}trial-critical{% elif subscription_info.days_until_expiry <= 7 %}trial-warning{% endif %}"
+                     style="width: {{ tenant.trial_progress_percent }}%">
+                </div>
+            </div>
+            <div class="trial-progress-stats">
+                <span class="trial-stat">
+                    <i class="iconoir-calendar"></i>
+                    Termina: {{ subscription_info.trial_ends_at|date:"d/m/Y" }}
+                </span>
+                <span class="trial-stat">
+                    {{ tenant.trial_progress_percent }}% usado
+                </span>
+            </div>
+        </div>
+
+        <div class="trial-action-section">
+
+            <p class="trial-benefits-hint">
+                $299 MXN/mes · Facturación ilimitada · Enlaces ilimitados
+            </p>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- ALERTS (if any) -->
+{% if alerts %}
+<div class="alerts-section mb-3">
+    {% for alert in alerts %}
+    <div class="alert alert-{{ alert.severity }} d-flex align-items-center justify-content-between" role="alert">
+        <div>
+            <i class="iconoir-warning-triangle me-2"></i>
+            <strong>{{ alert.message }}</strong>
+        </div>
+        <a href="{{ alert.action_url }}" class="btn btn-sm btn-{{ alert.severity }}">
+            Resolver
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- PENDING TASKS -->
+{% if pending_tasks %}
+<div class="section-card mb-3">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="iconoir-bell me-2"></i>
+            Requiere tu atención
+            <span class="badge bg-danger ms-2">{{ pending_tasks|length }}</span>
+        </h2>
+    </div>
+
+    <div class="pending-tasks-list">
+        {% for task in pending_tasks %}
+        <div class="task-item task-priority-{{ task.priority }}">
+            <div class="task-icon">
+                <i class="{{ task.icon }}"></i>
+            </div>
+            <div class="task-content">
+                <h3 class="task-title">{{ task.title }}</h3>
+                <p class="task-description">{{ task.description }}</p>
+            </div>
+            <div class="task-action">
+                <a href="{{ task.action_url }}" class="btn btn-sm btn-primary">
+                    Resolver
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- QUICK ACCESS GRID -->
+<div class="section-card mb-3">
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="iconoir-app-window me-2"></i>
+            Estado General
+        </h2>
+    </div>
+
+    <div class="quick-access-grid" role="navigation" aria-label="Estado general del sistema">
+        <!-- Links -->
+        <a href="{% url 'links:index' %}"
+           class="quick-card"
+           aria-label="Ver {{ quick_stats.active_links_count }} links activos">
+            <div class="quick-card-icon">
+                <i class="iconoir-link"></i>
+            </div>
+            <h3 class="quick-card-title">Links</h3>
+            <div class="quick-card-stat" id="quick-stat-links" aria-live="polite">{{ quick_stats.active_links_count }}</div>
+            <p class="quick-card-label">activos</p>
+        </a>
+
+        <!-- Facturas -->
+        <a href="{% url 'invoicing:index' %}"
+           class="quick-card"
+           aria-label="Ver {{ quick_stats.pending_invoices_count }} facturas pendientes">
+            <div class="quick-card-icon">
+                <i class="iconoir-page"></i>
+            </div>
+            <h3 class="quick-card-title">Facturas</h3>
+            <div class="quick-card-stat" id="quick-stat-invoices" aria-live="polite">{{ quick_stats.pending_invoices_count }}</div>
+            <p class="quick-card-label">pendientes</p>
+        </a>
+
+        <!-- Suscripción -->
+        <a href="{% url 'billing:index' %}"
+           class="quick-card"
+           aria-label="Ver estado de suscripción: {{ subscription_info.status }}">
+            <div class="quick-card-icon">
+                <i class="iconoir-credit-card"></i>
+            </div>
+            <h3 class="quick-card-title">Suscripción</h3>
+            <div class="quick-card-stat">{{ subscription_info.status|title }}</div>
+            <p class="quick-card-label">estado</p>
+        </a>
+    </div>
+</div>
+
+<!-- RECENT ACTIVITY STREAM -->
+<div class="section-card">
+    <div class="section-header d-flex justify-content-between align-items-center">
+        <h2 class="section-title">
+            <i class="iconoir-list me-2"></i>
+            Actividad Reciente
+        </h2>
+        <span class="text-muted small">Últimas 24 horas</span>
+    </div>
+
+    <div class="activity-stream" id="activity-stream" role="feed" aria-label="Actividad reciente">
+        {% for activity in recent_activity %}
+        <div class="activity-item"
+             tabindex="0"
+             role="article"
+             aria-label="{{ activity.title }} - {{ activity.timestamp|naturaltime }}"
+             onclick="showDetailPanel('{{ activity.detail_type }}', '{{ activity.detail_id }}')"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();showDetailPanel('{{ activity.detail_type }}', '{{ activity.detail_id }}');}">
+            <div class="activity-icon bg-{{ activity.color }}" aria-hidden="true">
+                <i class="{{ activity.icon }}"></i>
+            </div>
+            <div class="activity-content">
+                <h4 class="activity-title">{{ activity.title }}</h4>
+                <p class="activity-description">{{ activity.description }}</p>
+                <span class="activity-time">{{ activity.timestamp|naturaltime }}</span>
+            </div>
+            <div class="activity-action">
+                <button type="button"
+                        onclick="event.stopPropagation(); showDetailPanel('{{ activity.detail_type }}', '{{ activity.detail_id }}');"
+                        class="btn btn-sm btn-link"
+                        aria-label="Ver detalles de {{ activity.title }}">
+                    Ver →
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <i class="iconoir-inbox"></i>
+            <p>No hay actividad reciente</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/dashboard-command-center.js' %}"></script>
+{% endblock %}

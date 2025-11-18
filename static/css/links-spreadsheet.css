@@ -1,0 +1,701 @@
+/**
+ * LINKS PAGE - SPREADSHEET MODE
+ * ===============================
+ *
+ * Diseño minimalista tipo hoja de cálculo para /links/
+ * Sin colores, sin badges, sin sombras, solo tipografía y datos.
+ *
+ * Features:
+ * - ✅ Header UPPERCASE compacto
+ * - ✅ Stats inline (1 línea)
+ * - ✅ Table sin striped ni colores
+ * - ✅ 7 columnas (reducido de 12)
+ * - ✅ Sin badges coloridos
+ * - ✅ Números en DM Serif
+ * - ✅ Monocromático
+ * - ✅ Sin sombras
+ *
+ * @version 1.0 - Spreadsheet Mode
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   PAGE HEADER - COMPACTO
+   ============================================ */
+
+.links-page-header {
+    background: #ffffff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Título UPPERCASE */
+.links-page-header h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.links-page-header h1 i {
+    display: none !important;                 /* Sin iconos */
+}
+
+/* Botones como links simples */
+.links-page-header .btn-toolbar {
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+}
+
+.links-page-header .btn-group {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0;
+}
+
+.links-page-header .btn {
+    background: transparent;
+    border: none;
+    color: #111827;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.375rem 0.75rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.links-page-header .btn:hover {
+    color: #15803d;
+    background: transparent;
+}
+
+.links-page-header .btn i {
+    display: none;                            /* Sin iconos */
+}
+
+.links-page-header .btn::after {
+    margin-left: 0.375rem;
+}
+
+.links-page-header .btn-primary::after {
+    content: '→';
+}
+
+.links-page-header .btn[onclick*="refresh"]::after {
+    content: '⟳';
+}
+
+.links-page-header .dropdown-toggle::after {
+    content: '↓';
+    border: none;
+    margin-left: 0.375rem;
+}
+
+/* Dropdown minimalista */
+.links-page-header .dropdown-menu {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+}
+
+.links-page-header .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.links-page-header .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.links-page-header .dropdown-item:hover {
+    background: #fafbfc;
+    color: #15803d;
+}
+
+.links-page-header .dropdown-item i {
+    display: none;
+}
+
+/* ============================================
+   STATS INLINE - 1 LÍNEA
+   ============================================ */
+
+.stats-inline-bar {
+    background: #f9fafb;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.stats-inline-bar strong {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #111827;
+    margin: 0 0.25rem;
+}
+
+/* Ocultar stats grid si existe */
+.stats-grid,
+[class*="stats_grid"] {
+    display: none !important;
+}
+
+/* ============================================
+   FILTERS - INLINE
+   ============================================ */
+
+.filters-inline-bar {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.filters-inline-bar label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.filters-inline-bar select,
+.filters-inline-bar input {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    background: #ffffff;
+}
+
+.filters-inline-bar .btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.375rem 1rem;
+    font-size: 0.875rem;
+}
+
+.filters-inline-bar .btn:hover {
+    background: #15803d;
+}
+
+/* Ocultar filters panel colapsable */
+.filters-panel,
+[class*="filters_panel"] {
+    display: none !important;
+}
+
+/* ============================================
+   BULK ACTIONS - INLINE
+   ============================================ */
+
+.bulk-actions-bar {
+    background: #f9fafb;
+    border: none;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.75rem 0;
+    margin-bottom: 1rem;
+}
+
+.bulk-actions-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bulk-selected-text {
+    font-size: 0.875rem;
+    color: #111827;
+    font-weight: 600;
+}
+
+.bulk-selected-text i {
+    display: none;
+}
+
+.bulk-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.bulk-buttons .btn {
+    background: transparent;
+    border: none;
+    color: #111827;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.bulk-buttons .btn:hover {
+    color: #15803d;
+}
+
+.bulk-buttons .btn i {
+    display: none;
+}
+
+.bulk-buttons .btn-outline-danger:hover {
+    color: #ef4444;
+}
+
+/* ============================================
+   DATATABLE - SPREADSHEET STYLE
+   ============================================ */
+
+.card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: none !important;
+    overflow: visible !important;             /* ✅ Permitir dropdown salir */
+}
+
+.card-body {
+    padding: 0;
+    overflow: visible !important;             /* ✅ Permitir dropdown salir */
+}
+
+/* ✅ Table wrapper también */
+.table-responsive {
+    overflow-x: auto;
+    overflow-y: visible !important;           /* ✅ Y visible para dropdown */
+}
+
+#linksTable_wrapper {
+    overflow: visible !important;
+}
+
+/* Table base */
+#linksTable {
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+#linksTable thead th {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #9ca3af !important;
+    background: #fafbfc !important;
+    border-bottom: 1px solid #e5e7eb !important;
+    border-top: none !important;
+    padding: 0.75rem 1rem !important;         /* ✅ Padding horizontal añadido */
+    vertical-align: middle !important;
+}
+
+/* ✅ Forzar Inter en TODAS las columnas */
+#linksTable thead th,
+#linksTable thead th:nth-child(1),
+#linksTable thead th:nth-child(2),
+#linksTable thead th:nth-child(3),
+#linksTable thead th:nth-child(4),
+#linksTable thead th:nth-child(5),
+#linksTable thead th:nth-child(6),
+#linksTable thead th:nth-child(7),
+table.dataTable thead th,
+table.dataTable thead td {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #9ca3af !important;
+}
+
+#linksTable tbody td {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    color: #111827;
+    background: #ffffff;
+    border-bottom: 1px solid #f3f4f6;
+    border-top: none;
+    padding: 0.75rem 1rem;                    /* ✅ Padding horizontal añadido */
+    vertical-align: middle;
+}
+
+/* ✅ SIN striped */
+#linksTable tbody tr {
+    background: #ffffff !important;
+}
+
+#linksTable tbody tr:hover {
+    background: #fafbfc !important;           /* Hover muy sutil */
+}
+
+/* ============================================
+   COLUMNAS ESPECÍFICAS
+   ============================================ */
+
+/* Checkbox */
+#linksTable .select-checkbox {
+    width: 30px;
+    text-align: center;
+}
+
+/* Título */
+#linksTable .fw-bold {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.9375rem !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    display: block;
+    margin-bottom: 0.125rem;
+}
+
+#linksTable small.text-muted {
+    font-size: 0.8125rem;
+    color: #9ca3af !important;
+    display: block;
+}
+
+/* ✅ Monto - INTER (homologado) */
+#linksTable .amount-cell,
+#linksTable td:nth-child(4),
+#linksTable td:nth-child(4) div,
+#linksTable td:nth-child(4) .fw-bold {
+    font-family: 'Inter', sans-serif !important;  /* ✅ Inter como las demás */
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;              /* ✅ Bold para destacar */
+    color: #111827 !important;
+}
+
+/* ============================================
+   BADGES - TEXTO SIMPLE
+   ============================================ */
+
+#linksTable .badge {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+}
+
+#linksTable .badge.bg-primary,
+#linksTable .badge.bg-success,
+#linksTable .badge.bg-warning,
+#linksTable .badge.bg-danger,
+#linksTable .badge.bg-secondary,
+#linksTable .badge.bg-info {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+#linksTable .badge i {
+    display: none;                            /* Sin iconos en badges */
+}
+
+/* ============================================
+   COLORES DE TEXTO - UNIFORMES
+   ============================================ */
+
+#linksTable .text-success,
+#linksTable .text-danger,
+#linksTable .text-warning,
+#linksTable .text-primary,
+#linksTable .text-info {
+    color: #111827 !important;
+}
+
+#linksTable .text-muted {
+    color: #9ca3af !important;
+}
+
+/* ============================================
+   DROPDOWN ACCIONES - MINIMALISTA
+   ============================================ */
+
+#linksTable .dropdown {
+    position: static;                         /* ✅ Static para que escape */
+}
+
+#linksTable tbody td:last-child {
+    position: relative;                       /* ✅ Anchor point */
+    overflow: visible !important;
+}
+
+#linksTable .dropdown .btn {
+    background: transparent;
+    border: none;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+}
+
+#linksTable .dropdown .btn:hover {
+    color: #111827;
+}
+
+#linksTable .dropdown-menu {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    padding: 0;
+    min-width: 180px;
+    z-index: 9999 !important;                 /* ✅ Sobre todo */
+    background: #ffffff;
+    position: absolute !important;
+}
+
+/* ✅ Cuando está abierto */
+#linksTable .dropdown-menu.show {
+    z-index: 9999 !important;
+}
+
+#linksTable .dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: #111827;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+#linksTable .dropdown-item:last-child {
+    border-bottom: none;
+}
+
+#linksTable .dropdown-item:hover {
+    background: #fafbfc;
+    color: #15803d;
+}
+
+#linksTable .dropdown-item.text-danger {
+    color: #111827 !important;
+}
+
+#linksTable .dropdown-item.text-danger:hover {
+    color: #ef4444 !important;
+}
+
+#linksTable .dropdown-item i {
+    display: none;                            /* Sin iconos */
+}
+
+#linksTable .dropdown-divider {
+    border-top: 1px solid #f3f4f6;
+    margin: 0;
+}
+
+/* ============================================
+   DATATABLE CONTROLS - MINIMALISTAS
+   ============================================ */
+
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    font-size: 0.875rem;
+    color: #6b7280;
+    padding: 1rem;                            /* ✅ Padding añadido */
+}
+
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;                /* ✅ Padding aumentado */
+    font-size: 0.875rem;
+    background: #ffffff;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    background: #ffffff;
+}
+
+.dataTables_wrapper .dataTables_info {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    padding: 1rem;                            /* ✅ Padding añadido */
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    padding: 1rem;                            /* ✅ Padding añadido */
+}
+
+/* ✅ Botones de paginación rediseñados */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    background: transparent;
+    border: none;                             /* ✅ Sin borde */
+    border-radius: 0;
+    color: #6b7280 !important;
+    padding: 0.375rem 0.75rem;
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: transparent !important;
+    color: #111827 !important;
+    text-decoration: underline;
+    border: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: transparent !important;
+    color: #111827 !important;
+    border: none;
+    font-weight: 700;                         /* ✅ Bold para página actual */
+    text-decoration: underline;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    color: #d1d5db !important;
+    opacity: 0.5;
+}
+
+/* ✅ Separador entre botones */
+.dataTables_wrapper .dataTables_paginate .paginate_button:not(:last-child)::after {
+    content: '·';
+    margin: 0 0.25rem;
+    color: #d1d5db;
+}
+
+/* ✅ Texto de botones Anterior/Siguiente */
+.dataTables_wrapper .dataTables_paginate .paginate_button.previous::before {
+    content: '← ';
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.next::after {
+    content: ' →';
+}
+
+/* ============================================
+   EMPTY STATE - MINIMALISTA
+   ============================================ */
+
+.empty-state {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: none;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #d1d5db;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    max-width: 500px;
+    margin: 0 auto 1.5rem;
+    line-height: 1.6;
+}
+
+.empty-state .btn {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+}
+
+.empty-state .btn:hover {
+    background: #15803d;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .links-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .links-page-header h1 {
+        font-size: 1.25rem !important;
+    }
+
+    .stats-inline-bar {
+        font-size: 0.75rem;
+    }
+
+    .stats-inline-bar strong {
+        font-size: 1rem;
+    }
+
+    /* Table responsive */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* ============================================
+   DATATABLE LOADING - MODIFICAR EXISTENTE
+   ============================================ */
+
+/* ✅ Modificar preloader existente de DataTable */
+.dataTables_processing {
+    background: rgba(250, 251, 252, 0.95) !important; /* ✅ Fondo blur */
+    backdrop-filter: blur(8px) !important;    /* ✅ Backdrop blur */
+    -webkit-backdrop-filter: blur(8px) !important;
+    background-image: none !important;        /* ✅ Sin spinner azul */
+    font-family: 'Inter', sans-serif !important; /* ✅ Inter */
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: #111827 !important;                /* ✅ Negro */
+    border: 1px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    padding: 3rem 4rem !important;
+    z-index: 9999 !important;
+}
+
+/* ============================================
+   OCULTAR ELEMENTOS NO USADOS
+   ============================================ */
+
+/* Ocultar border-bottom del layout base */
+.d-flex.justify-content-between.flex-wrap.border-bottom {
+    border-bottom: none !important;
+}

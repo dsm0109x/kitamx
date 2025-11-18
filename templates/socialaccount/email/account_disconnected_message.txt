@@ -1,0 +1,30 @@
+================================================================================
+Kita - Kit de Ayuda para Emprendedores
+================================================================================
+
+CUENTA DE GOOGLE DESCONECTADA
+
+Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+
+Has desconectado tu cuenta de Google de tu cuenta de Kita.
+
+A PARTIR DE AHORA:
+Solo podras iniciar sesion con tu email y contrasena.
+El boton "Continuar con Google" ya no funcionara para tu cuenta.
+
+PARA TU SEGURIDAD:
+• Puedes volver a conectar Google cuando quieras desde Configuracion
+• Asegurate de recordar tu contrasena de email
+• Si no reconoces esta actividad, contacta con soporte inmediatamente
+
+¿Tienes dudas? Escribenos a hola@kita.mx
+
+--
+El equipo de Kita
+https://kita.mx
+hola@kita.mx
+
+--------------------------------------------------------------------------------
+Este email fue enviado porque desconectaste tu cuenta de Google.
+Si no fuiste tu, contacta inmediatamente con hola@kita.mx
+================================================================================

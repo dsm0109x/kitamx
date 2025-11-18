@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Kita - SaaS Facturación CFDI 4.0{% endblock %}</title>
+
+    <!-- Favicons (multi-size for optimal display) -->
+    {% load static %}
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'images/favicon/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'images/favicon/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'images/favicon/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'images/favicon/site.webmanifest' %}">
+
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2" as="font" type="font/woff2" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+          crossorigin="anonymous">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    <!-- Font Awesome (legacy support for other pages) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+    <!-- Dropzone CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css">
+
+    <!-- Unified Design Tokens (MUST load FIRST) -->
+    <link rel="stylesheet" href="{% static 'css/00-tokens/design-tokens-unified.css' %}?v=3.0">
+
+    <!-- BASE COMPONENTS - Single Source of Truth (DRY System) -->
+    <link rel="stylesheet" href="{% static 'css/01-base/base-components.css' %}?v=1.0">
+    <link rel="stylesheet" href="{% static 'css/01-base/alerts.css' %}?v=1.0">
+
+    <!-- Components -->
+    <link rel="stylesheet" href="{% static 'css/02-components/buttons.css' %}?v=3.0">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/kita.css' %}?v=21.0">
+
+    <!-- BRUTALIST OVERRIDES (MUST load LAST) -->
+    <link rel="stylesheet" href="{% static 'css/00-tokens/brutalist-overrides.css' %}?v=3.7">
+
+    <!-- Brand Typography (DM Serif Display for "Kita" branding) -->
+    <link rel="stylesheet" href="{% static 'css/01-base/brand-typography.css' %}">
+
+    <!-- Google Search Console Verification -->
+    <!-- TODO: Replace with your actual verification code from Google Search Console -->
+    <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE_HERE"> -->
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Smart Loading System - Global -->
+    <div class="loading-topbar" id="loadingTopbar">
+        <div class="loading-topbar-progress"></div>
+    </div>
+
+    <div class="loading-message-card" id="loadingMessage">
+        <div class="d-flex align-items-center">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <span id="loadingText">Cargando...</span>
+        </div>
+    </div>
+
+    {% block content %}
+    {% endblock %}
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossorigin="anonymous"></script>
+
+    <!-- jQuery (required for DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+
+    <!-- Toastify JS -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+    <!-- Dropzone JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.js"></script>
+
+    <!-- Kita Global JS -->
+    <script>
+    // Global Toastify function
+    window.showToast = function(message, type = 'info') {
+        const colors = {
+            success: '#28a745',
+            error: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8'
+        };
+
+        Toastify({
+            text: message,
+            duration: 5000,
+            gravity: "top",
+            position: "right",
+            stopOnFocus: true,
+            backgroundColor: colors[type] || colors.info,
+        }).showToast();
+    };
+
+    // Show Django messages as toasts
+    {% if messages %}
+        {% for message in messages %}
+            showToast("{{ message|escapejs }}", "{{ message.tags }}");
+        {% endfor %}
+    {% endif %}
+
+    // Global loading system functions
+    window.showLoading = function(message = 'Cargando...') {
+        const topbar = document.getElementById('loadingTopbar');
+        const card = document.getElementById('loadingMessage');
+        const text = document.getElementById('loadingText');
+
+        if (topbar) topbar.classList.add('active');
+        if (card) card.classList.add('active');
+        if (text) text.textContent = message;
+    };
+
+    window.hideLoading = function() {
+        const topbar = document.getElementById('loadingTopbar');
+        const card = document.getElementById('loadingMessage');
+
+        if (topbar) topbar.classList.remove('active');
+        if (card) card.classList.remove('active');
+    };
+
+    // ========================================
+    // GLOBAL MODAL LOADER SYSTEM
+    // ========================================
+    window.KitaModalLoader = class {
+        constructor() {
+            this.loadingModals = new Set(); // Track which modals are loading
+            this.cache = new Map(); // Cache modal contents
+        }
+
+        async loadModal(modalId, fetchUrl, options = {}) {
+            const {
+                targetElementId = null,
+                onInit = null,
+                cacheKey = fetchUrl,
+                showSkeleton = true,
+                skeletonHTML = this.getDefaultSkeleton()
+            } = options;
+
+            // Prevent multiple simultaneous loads
+            if (this.loadingModals.has(modalId)) {
+                console.log(`[ModalLoader] ${modalId} already loading, ignoring`);
+                return false;
+            }
+
+            // Check cache first
+            if (this.cache.has(cacheKey)) {
+                const cachedHTML = this.cache.get(cacheKey);
+                if (targetElementId) {
+                    document.getElementById(targetElementId).innerHTML = cachedHTML;
+                }
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                if (onInit) onInit();
+                return true;
+            }
+
+            this.loadingModals.add(modalId);
+
+            try {
+                // Show skeleton if configured
+                if (showSkeleton && targetElementId) {
+                    document.getElementById(targetElementId).innerHTML = skeletonHTML;
+                }
+
+                // Show modal immediately with skeleton
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+
+                // Fetch content
+                const response = await fetch(fetchUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const html = await response.text();
+
+                // Cache the content
+                this.cache.set(cacheKey, html);
+
+                // Replace skeleton with real content
+                if (targetElementId) {
+                    document.getElementById(targetElementId).innerHTML = html;
+                }
+
+                // Run initialization callback
+                if (onInit) onInit();
+
+                return true;
+
+            } catch (error) {
+                console.error(`[ModalLoader] Error loading ${modalId}:`, error);
+                showToast('Error cargando contenido', 'error');
+
+                // Close modal on error
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById(modalId));
+                if (modalInstance) modalInstance.hide();
+
+                return false;
+
+            } finally {
+                this.loadingModals.delete(modalId);
+            }
+        }
+
+        getDefaultSkeleton() {
+            return `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    <p class="text-muted">Cargando...</p>
+                </div>
+            `;
+        }
+
+        clearCache(cacheKey = null) {
+            if (cacheKey) {
+                this.cache.delete(cacheKey);
+            } else {
+                this.cache.clear();
+            }
+        }
+
+        isLoading(modalId) {
+            return this.loadingModals.has(modalId);
+        }
+    };
+
+    // Initialize global instance
+    window.modalLoader = new window.KitaModalLoader();
+
+    // Global Dropzone defaults
+    if (typeof Dropzone !== 'undefined') {
+        Dropzone.autoDiscover = false;
+
+        window.createDropzone = function(elementId, options = {}) {
+            const defaultOptions = {
+                url: "/upload/upload/",
+                maxFilesize: 10, // MB
+                addRemoveLinks: true,
+                dictDefaultMessage: "Arrastra archivos aquí o haz clic para seleccionar",
+                dictRemoveFile: "Eliminar",
+                dictCancelUpload: "Cancelar",
+                dictUploadCanceled: "Subida cancelada",
+                dictFileTooBig: "Archivo muy grande (máx {{maxFilesize}}MB)",
+                dictInvalidFileType: "Tipo de archivo no permitido",
+                dictResponseError: "Error del servidor ({{statusCode}})",
+                paramName: "file",
+                headers: {
+                    "X-CSRFToken": getCsrfToken()
+                },
+                ...options
+            };
+
+            return new Dropzone(elementId, defaultOptions);
+        };
+
+        // Helper function to get CSRF token
+        function getCsrfToken() {
+            const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfInput) {
+                return csrfInput.value;
+            }
+
+            // Try to get from cookie as fallback
+            const csrfCookie = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='));
+
+            if (csrfCookie) {
+                return csrfCookie.split('=')[1];
+            }
+
+            console.warn('CSRF token not found');
+            return '';
+        }
+    }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

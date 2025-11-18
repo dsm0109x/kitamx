@@ -1,0 +1,161 @@
+/**
+ * Timeline Extra Components - Badges y Link Created
+ * Brutalist design improvements
+ */
+
+/* ===== LINK CREATED CARD ===== */
+
+.link-created-card {
+    background: #ffffff;
+    border: none;  /* Sin border */
+    border-radius: 0;  /* Angular */
+    padding: 1.5rem;
+}
+
+.link-created-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.link-created-header .iconoir {
+    font-size: 1.5rem;
+}
+
+.link-created-header strong {
+    font-size: 1.1rem;
+}
+
+/* URL Display con botón copiar */
+.link-url-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-left: none;  /* Sin barra verde */
+}
+
+.link-code {
+    flex: 1;
+    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111827;
+    background: transparent;
+    padding: 0;
+    border: none;
+}
+
+.btn-copy-minimal {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.btn-copy-minimal:hover {
+    background: #000000;
+    transform: scale(1.05);
+}
+
+.btn-copy-minimal .iconoir {
+    font-size: 1.1rem;
+}
+
+/* Actions - Botones minimalistas */
+.link-actions-minimal {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn-minimal {
+    flex: 1;
+    background: #f3f4f6;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.action-btn-minimal:hover {
+    background: #e5e7eb;
+    transform: translateY(-1px);
+}
+
+.action-btn-minimal:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.action-btn-minimal .iconoir {
+    font-size: 1.1rem;
+}
+
+/* ===== BADGES REDISEÑADOS ===== */
+
+.badge-brutalist {
+    background: #111827;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge-brutalist .iconoir {
+    font-size: 1rem;
+}
+
+/* Badge variants */
+.badge-success {
+    background: #059669;
+    color: #ffffff;
+}
+
+.badge-neutral {
+    background: #e5e7eb;
+    color: #111827;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 576px) {
+    .link-actions-minimal {
+        flex-direction: column;
+    }
+
+    .action-btn-minimal {
+        width: 100%;
+    }
+
+    .link-url-display {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn-copy-minimal {
+        width: 100%;
+        justify-content: center;
+    }
+}

@@ -1,0 +1,40 @@
+<svg width="400" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Greca Prehispánica Continua - Estilo Zapoteca (Tono sobre tono) -->
+    <pattern id="grecaPattern" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+      <!-- Fondo gris claro base -->
+      <rect width="80" height="80" fill="#f9fafb"/>
+
+      <!-- Greca escalonada continua en gris muy sutil -->
+      <g fill="none" stroke="#e5e7eb" stroke-width="2" stroke-linecap="square">
+        <!-- Línea horizontal continua con escalones -->
+        <path d="M 0,20 L 10,20 L 10,10 L 20,10 L 20,20 L 30,20 L 30,10 L 40,10 L 40,20 L 50,20 L 50,10 L 60,10 L 60,20 L 70,20 L 70,10 L 80,10"/>
+
+        <!-- Línea horizontal inferior continua -->
+        <path d="M 0,60 L 10,60 L 10,70 L 20,70 L 20,60 L 30,60 L 30,70 L 40,70 L 40,60 L 50,60 L 50,70 L 60,70 L 60,60 L 70,60 L 70,70 L 80,70"/>
+      </g>
+
+      <!-- Elementos geométricos de relleno (círculos muy sutiles) -->
+      <g fill="#e5e7eb" opacity="0.5">
+        <circle cx="15" cy="40" r="2"/>
+        <circle cx="35" cy="40" r="2"/>
+        <circle cx="55" cy="40" r="2"/>
+        <circle cx="75" cy="40" r="2"/>
+      </g>
+
+      <!-- Líneas verticales sutiles de conexión -->
+      <g fill="none" stroke="#e5e7eb" stroke-width="1" opacity="0.4">
+        <line x1="20" y1="20" x2="20" y2="30"/>
+        <line x1="40" y1="20" x2="40" y2="30"/>
+        <line x1="60" y1="20" x2="60" y2="30"/>
+
+        <line x1="20" y1="50" x2="20" y2="60"/>
+        <line x1="40" y1="50" x2="40" y2="60"/>
+        <line x1="60" y1="50" x2="60" y2="60"/>
+      </g>
+    </pattern>
+  </defs>
+
+  <!-- Aplicar el patrón -->
+  <rect width="400" height="400" fill="url(#grecaPattern)"/>
+</svg>

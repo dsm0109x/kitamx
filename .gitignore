@@ -1,0 +1,179 @@
+# =============================================================================
+# KITA PROJECT - .gitignore
+# =============================================================================
+
+# Environment variables - CRITICAL SECURITY
+# =============================================================================
+.env
+.env.*
+!.env.example
+*.local
+
+# Python
+# =============================================================================
+*.py[cod]
+*$py.class
+*.so
+.Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Django
+# =============================================================================
+*.log
+db.sqlite3
+db.sqlite3-journal
+/staticfiles/
+/media/
+local_settings.py
+
+# Django migrations (opcional - descomenta si no quieres versionar migraciones)
+# **/migrations/*.py
+# !**/migrations/__init__.py
+
+# Celery
+# =============================================================================
+celerybeat-schedule
+celerybeat.pid
+
+# Testing
+# =============================================================================
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+*.cover
+*.py,cover
+.hypothesis/
+
+# IDEs
+# =============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+# =============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# Project specific - Backups and temp files
+# =============================================================================
+/logs/
+/backup_*/
+/migration_backup_*/
+profiles/
+
+# Large media files
+# =============================================================================
+*.gif
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+
+# Diagrams and documentation (optional - uncomment if you want to exclude)
+*.drawio
+*.drawio.bak
+
+# Ruff cache
+# =============================================================================
+.ruff_cache/
+
+# Deployment scripts with sensitive info
+# =============================================================================
+sync-to-production.sh
+deploy-*.sh
+
+# Documentation that might contain sensitive info
+# =============================================================================
+# Uncomment if needed
+# docs/deployment-notes.md
+# docs/credentials.md
+
+# Temporary files
+# =============================================================================
+*.tmp
+*.temp
+*.bak
+*.old
+*.orig
+
+# SSL certificates and keys
+# =============================================================================
+*.pem
+*.key
+*.crt
+*.cert
+*.p12
+*.pfx
+
+# Google OAuth credentials
+# =============================================================================
+client_secret*.json
+*_secret_*.json
+
+# Database dumps
+# =============================================================================
+*.sql
+*.dump
+*.bak
+
+# Compiled CSS/JS (if using preprocessors)
+# =============================================================================
+*.css.map
+*.js.map
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Other
+# =============================================================================
+.cache/
+*.pid

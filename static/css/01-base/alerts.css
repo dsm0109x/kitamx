@@ -1,0 +1,231 @@
+/**
+ * KITA ALERTS - Global Alert Styles
+ * Diseño moderno con icono de fondo inclinado
+ *
+ * @version 1.0
+ */
+
+/* ========================================
+   ALERT BASE - Con icono de fondo
+   ======================================== */
+
+.alert {
+    position: relative;
+    padding: 1rem 1.25rem;  /* ✅ Sin padding extra derecha */
+    border: none;
+    border-radius: var(--radius-card, 15px);
+    font-size: 0.95rem;
+    font-weight: 500;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+/* Icono de fondo - Derecha, grande, transparente, inclinado */
+.alert::before {
+    content: '';
+    position: absolute;
+    right: 10px;  /* ✅ Más a la izquierda */
+    top: 50%;
+    transform: translateY(-50%) rotate(-15deg);  /* ✅ Inclinación sutil */
+    font-size: 5rem;  /* ✅ Icono grande */
+    opacity: 0.1;  /* ✅ Un poco más visible */
+    pointer-events: none;
+    z-index: 0;
+    line-height: 1;
+    width: 5rem;
+    height: 5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Contenido al frente del icono */
+.alert > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ocultar iconos legacy si existen en HTML */
+.alert .iconoir,
+.alert .fa,
+.alert .fas,
+.alert .far,
+.alert svg {
+    display: none !important;  /* ✅ Ocultar iconos legacy en HTML */
+}
+
+/* ========================================
+   ALERT SUCCESS (Verde)
+   ======================================== */
+
+.alert-success {
+    background: rgba(21, 128, 61, 0.1);  /* Verde sutil */
+    color: #15803d;  /* Verde oscuro */
+}
+
+.alert-success::before {
+    content: '✓';  /* ✅ Checkmark simple (funciona siempre) */
+    font-family: sans-serif;
+    font-weight: 700;
+    color: #15803d;
+}
+
+/* ========================================
+   ALERT DANGER / ERROR (Rojo)
+   ======================================== */
+
+.alert-danger,
+.alert-error {
+    background: rgba(220, 38, 38, 0.1);  /* Rojo sutil */
+    color: #dc2626;  /* Rojo oscuro */
+}
+
+.alert-danger::before,
+.alert-error::before {
+    content: '✕';  /* ✅ X simple (funciona siempre) */
+    font-family: sans-serif;
+    font-weight: 700;
+    color: #dc2626;
+}
+
+/* ========================================
+   ALERT WARNING (Amarillo/Naranja)
+   ======================================== */
+
+.alert-warning {
+    background: rgba(245, 158, 11, 0.1);  /* Amarillo sutil */
+    color: #d97706;  /* Naranja oscuro */
+}
+
+.alert-warning::before {
+    content: '!';  /* ✅ Exclamación simple (funciona siempre) */
+    font-family: sans-serif;
+    font-weight: 700;
+    color: #d97706;
+}
+
+/* ========================================
+   ALERT INFO (Azul)
+   ======================================== */
+
+.alert-info {
+    background: rgba(59, 130, 246, 0.1);  /* Azul sutil */
+    color: #2563eb;  /* Azul oscuro */
+}
+
+.alert-info::before {
+    content: 'i';  /* ✅ Info simple (funciona siempre) */
+    font-family: Georgia, serif;
+    font-style: italic;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+/* ========================================
+   ALERT DISMISSIBLE (Con botón cerrar)
+   ======================================== */
+
+.alert-dismissible {
+    padding-right: 3rem;  /* Espacio para botón close */
+}
+
+.alert-dismissible .btn-close {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    z-index: 2;
+}
+
+.alert-dismissible .btn-close:hover {
+    opacity: 1;
+}
+
+/* ========================================
+   ALERT CON TÍTULO
+   ======================================== */
+
+.alert-heading {
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   ALERT LINKS
+   ======================================== */
+
+.alert-link {
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.alert-success .alert-link {
+    color: #166534;  /* Verde más oscuro */
+}
+
+.alert-danger .alert-link,
+.alert-error .alert-link {
+    color: #991b1b;  /* Rojo más oscuro */
+}
+
+.alert-warning .alert-link {
+    color: #b45309;  /* Naranja más oscuro */
+}
+
+.alert-info .alert-link {
+    color: #1d4ed8;  /* Azul más oscuro */
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .alert {
+        padding: 0.875rem 1rem;  /* ✅ Compacto */
+        font-size: 0.9rem;
+    }
+
+    .alert::before {
+        font-size: 3.5rem;  /* Icono más pequeño en mobile */
+        width: 3.5rem;
+        height: 3.5rem;
+        right: 5px;  /* ✅ Más a la izquierda */
+    }
+
+    .alert-dismissible {
+        padding-right: 2.5rem;
+    }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+.alert {
+    animation: alert-appear 0.3s ease;
+}
+
+@keyframes alert-appear {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Respeta preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+    .alert {
+        animation: none;
+    }
+
+    .alert::before {
+        transform: translateY(-50%);  /* Sin rotación */
+    }
+}

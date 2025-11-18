@@ -1,0 +1,994 @@
+/**
+ * KITA SIDEBAR GHOST MODE - Transparencia Absoluta
+ * ==================================================
+ *
+ * Sistema de navegación ultra-minimalista para dashboard.
+ * Sidebar completamente transparente con elementos flotantes.
+ *
+ * Features:
+ * - ✅ Fondo transparente (sin glass effect)
+ * - ✅ Elementos flotantes individuales
+ * - ✅ Hover states pronunciados
+ * - ✅ Sombras sutiles para profundidad
+ * - ✅ Borde derecho como delimitador
+ * - ✅ Animaciones premium
+ * - ✅ Collapse state optimizado
+ * - ✅ Mobile/Tablet responsive
+ *
+ * Inspiración: Figma, Framer, Arc Browser
+ * Filosofía: "Invisible hasta que lo necesitas"
+ *
+ * @version 2.0 - Ghost Mode
+ * @created 2025-11-10
+ */
+
+/* ========================================
+   SIDEBAR BASE - TRANSPARENTE
+   ======================================== */
+
+.kita-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+
+    /* Navy background */
+    background: #0f172a;  /* Navy-900 oscuro */
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+
+    /* Borde derecho sutil */
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+
+    transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollbar styling (webkit) - Más sutil */
+.kita-sidebar::-webkit-scrollbar {
+    width: 4px;                               /* Más delgado */
+}
+
+.kita-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kita-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);           /* Muy sutil */
+    border-radius: 2px;
+}
+
+.kita-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   COLLAPSED STATE (90px)
+   ======================================== */
+
+.kita-sidebar.collapsed {
+    width: 90px;
+}
+
+/* ========================================
+   SIDEBAR INNER STRUCTURE
+   ======================================== */
+
+.sidebar-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+}
+
+/* ========================================
+   LOGO SECTION - TOP
+   ======================================== */
+
+.sidebar-logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.25rem 0.5rem 1.25rem;  /* Top reducido: 2rem → 1rem */
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.4rem;
+}
+
+.sidebar-logo-img {
+    height: 48px;  /* Mitad: 96px → 48px */
+    width: auto;
+}
+
+.sidebar-brand-text {
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 2.25rem;  /* Mitad: 4.5rem → 2.25rem */
+    font-weight: 400;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.kita-sidebar.collapsed .sidebar-logo-section {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.kita-sidebar.collapsed .sidebar-brand-text {
+    display: none;
+}
+
+/* ========================================
+   TOP ACCENT LINE - Brand Identity
+   ======================================== */
+
+/* Tenant at bottom - Sin card, solo separator */
+.sidebar-tenant-bottom {
+    margin-top: auto;  /* Push to bottom */
+    margin-bottom: 0;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);  /* Separator arriba */
+}
+
+.sidebar-tenant-bottom .tenant-selector {
+    background: transparent;
+    backdrop-filter: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    pointer-events: none;  /* Deshabilitar interacción */
+}
+
+.sidebar-tenant-bottom .tenant-selector:hover {
+    background: transparent;  /* Sin efecto hover */
+    transform: none;
+    box-shadow: none;
+}
+
+.sidebar-tenant-bottom .tenant-avatar {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-tenant-bottom .tenant-name,
+.sidebar-tenant-bottom .tenant-rfc {
+    color: #ffffff;
+}
+
+.sidebar-tenant-bottom .tenant-rfc {
+    opacity: 0.7;
+}
+
+.sidebar-inner::before {
+    content: '';
+    position: sticky;
+    top: 0;
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg,
+        #15803d 0%,
+        #16a34a 50%,
+        transparent 100%);                     /* Gradiente que se desvanece */
+    z-index: 10;
+    opacity: 0.6;                             /* Sutil */
+}
+
+/* ========================================
+   TENANT SECTION - FLOATING CARD
+   ======================================== */
+
+.sidebar-tenant-card {
+    padding: 1.25rem 1rem 1rem;              /* Espaciado generoso */
+    margin: 0;
+}
+
+.tenant-selector {
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    padding: 0.875rem;                        /* Padding interno */
+
+    /* ✅ GHOST MODE: Fondo flotante con hover */
+    background: rgba(255, 255, 255, 0.6);    /* Semi-transparente */
+    backdrop-filter: blur(8px);               /* Blur sutil */
+    -webkit-backdrop-filter: blur(8px);
+
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;                      /* Redondeado generoso */
+
+    /* ✅ Sombra flotante sutil */
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.04),
+        0 1px 3px rgba(0, 0, 0, 0.06);
+
+    cursor: default;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+/* Hover state del tenant card */
+.tenant-selector:hover {
+    background: rgba(255, 255, 255, 0.8);    /* Más opaco en hover */
+    border-color: rgba(21, 128, 61, 0.15);   /* Borde verde sutil */
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.06),
+        0 2px 6px rgba(21, 128, 61, 0.08);   /* Sombra con hint verde */
+    transform: translateY(-1px);              /* Lift sutil */
+}
+
+.tenant-avatar {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #15803d, #16a34a, #22c55e);
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow:
+        0 4px 12px rgba(21, 128, 61, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Avatar hover */
+.tenant-selector:hover .tenant-avatar {
+    transform: scale(1.05) rotate(2deg);      /* Micro scale + rotate */
+    box-shadow:
+        0 6px 16px rgba(21, 128, 61, 0.3),
+        0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.tenant-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0;
+}
+
+.tenant-name {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-weight: 700;
+    color: #111827;
+    font-size: 1.125rem;
+    margin: 0;
+    line-height: 1.25;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    transition: color 0.2s ease;
+}
+
+.tenant-selector:hover .tenant-name {
+    color: #15803d;                           /* Verde en hover */
+}
+
+.tenant-rfc {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    margin: 0;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.tenant-selector:hover .tenant-rfc {
+    color: #6b7280;                           /* Más oscuro en hover */
+}
+
+/* ========================================
+   COLLAPSED STATE - TENANT SECTION
+   ======================================== */
+
+.kita-sidebar.collapsed .sidebar-tenant-card {
+    padding: 1rem 0.75rem;
+}
+
+.kita-sidebar.collapsed .tenant-selector {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    padding: 0.75rem 0.5rem;
+    text-align: center;
+}
+
+.kita-sidebar.collapsed .tenant-avatar {
+    width: 56px;
+    height: 56px;
+    font-size: 1.75rem;
+}
+
+.kita-sidebar.collapsed .tenant-info {
+    display: none;
+}
+
+/* ========================================
+   QUICK ACTION BUTTON - FLOATING CTA
+   ======================================== */
+
+.sidebar-cta-primary {
+    display: none;                            /* Oculto por defecto (usar topbar FAB) */
+    margin: 0 1rem 1rem;
+    padding: 0.875rem 1.25rem;
+
+    /* ✅ GHOST MODE: Botón flotante */
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+
+    border: none;
+    border-radius: 12px;                      /* Más redondeado */
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+
+    /* ✅ Sombra flotante pronunciada */
+    box-shadow:
+        0 4px 16px rgba(21, 128, 61, 0.3),
+        0 2px 8px rgba(21, 128, 61, 0.2);
+
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.sidebar-cta-primary:hover {
+    background-position: 100% 50%;
+    transform: translateY(-3px) scale(1.02);  /* Lift + scale */
+    box-shadow:
+        0 8px 24px rgba(21, 128, 61, 0.4),
+        0 4px 12px rgba(21, 128, 61, 0.3),
+        0 0 0 4px rgba(21, 128, 61, 0.1);     /* Ring externo */
+}
+
+.sidebar-cta-primary:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+.sidebar-cta-primary i {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.kita-sidebar.collapsed .sidebar-cta-primary {
+    padding: 0.875rem;
+    margin: 0 0.75rem 1rem;
+}
+
+.kita-sidebar.collapsed .cta-text {
+    display: none;
+}
+
+/* ========================================
+   NAVIGATION CONTAINER
+   ======================================== */
+
+.sidebar-nav-container {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 0.75rem;                       /* Padding lateral para floating items */
+}
+
+/* ========================================
+   NAV SECTIONS
+   ======================================== */
+
+.nav-section {
+    margin-bottom: 1.25rem;  /* Espacio para distinguir secciones */
+    position: relative;
+}
+
+.nav-section:first-child {
+    padding-top: 0.25rem;  /* Reducido: 0.5rem → 0.25rem */
+}
+
+.nav-section-title {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);  /* Blanco semi-transparente sobre navy */
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0.5rem 0.375rem;
+    padding: 0;
+    transition: all 0.2s ease;
+    opacity: 0.8;
+}
+
+/* Hover en toda la sección hace el título más visible */
+.nav-section:hover .nav-section-title {
+    opacity: 1;
+    color: #6b7280;                           /* Más oscuro */
+}
+
+.kita-sidebar.collapsed .nav-section-title {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+/* ========================================
+   NAV LIST
+   ======================================== */
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;                            /* ✅ REDUCIDO: 0.25rem → 0.125rem */
+}
+
+.nav-item {
+    margin-bottom: 0;
+}
+
+/* ========================================
+   NAV LINKS - FLOATING GHOST ITEMS
+   ======================================== */
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.3rem 1rem;  /* Reducido: 0.5rem → 0.375rem */
+    margin: 0;
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+
+    /* Transparente por defecto */
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: visible;
+}
+
+/* Icon */
+.nav-icon {
+    font-size: 1.25rem;
+    min-width: 20px;
+    color: rgba(255, 255, 255, 0.6);  /* Blanco sobre navy */
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Content (text + subtitle) */
+.nav-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.nav-text {
+    color: rgba(255, 255, 255, 0.6);  /* Blanco sobre navy */
+    font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    transition: all 0.2s ease;
+}
+
+.nav-subtitle {
+    display: none !important;                 /* ✅ OCULTAR subtítulos completamente */
+}
+
+/* ========================================
+   NAV LINK STATES - GHOST HOVER
+   ======================================== */
+
+/* HOVER - Item flotante aparece */
+.nav-link:hover {
+    /* ✅ GHOST MODE: Fondo flotante aparece */
+    background: rgba(255, 255, 255, 0.9);
+   
+    z-index: 10;                              /* Sobre otros items */
+}
+
+/* Icon bounce en hover - EXAGERADO */
+.nav-link:hover .nav-icon {
+    color: #15803d;
+}
+
+@keyframes ghost-icon-bounce {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.4) rotate(-15deg); }  /* Más scale y rotation */
+    50% { transform: scale(0.85) rotate(12deg); }
+    75% { transform: scale(1.25) rotate(-8deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Text en hover */
+.nav-link:hover .nav-text {
+    color: #0f172a;  /* Navy oscuro sobre fondo blanco hover */
+    font-weight: 600;
+}
+
+/* Subtitle oculto (ya no se usa) */
+
+/* ========================================
+   ACTIVE STATE - GHOST SOLID
+   ======================================== */
+
+.nav-link.active {
+    /* Active state sobre navy - Más visible */
+    background: rgb(55, 112, 76);  /* Verde más visible sobre navy */
+
+
+   
+    color: #111827;
+}
+
+/* Active state aparece con animación */
+.nav-link.active {
+    animation: ghost-active-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+
+/* Icon active con pulse */
+.nav-link.active .nav-icon {
+    color: #e0f8e9;
+    font-weight: bold;
+    animation: ghost-icon-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes ghost-icon-pulse {
+    0%, 100% {
+        transform: scale(1);
+        filter: drop-shadow(0 0 4px rgba(21, 128, 61, 0.3));
+    }
+    50% {
+        transform: scale(1.08);
+        filter: drop-shadow(0 0 8px rgba(21, 128, 61, 0.4));
+    }
+}
+
+/* Text active */
+.nav-link.active .nav-text {
+    color: #e0f8e9;
+    font-weight: 700;                         /* Bold */
+}
+
+/* Subtitle oculto */
+
+/* ========================================
+   FOCUS STATE - Accessibility
+   ======================================== */
+
+.nav-link:focus-visible {
+    outline: none;
+    background: rgba(255, 255, 255, 0.95);
+    border-color: #15803d;
+    box-shadow:
+        0 0 0 4px rgba(21, 128, 61, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* ========================================
+   ACTIVE + HOVER (Overlay)
+   ======================================== */
+
+.nav-link.active:hover {
+}
+.nav-link.active:hover .nav-icon {
+}
+
+/* ========================================
+   NAV BADGES - FLOATING
+   ======================================== */
+
+/* ✅ BADGES ELIMINADOS - No se usan */
+.nav-badge-count,
+.nav-badge-new,
+.nav-badge-dot {
+    display: none !important;
+}
+
+/* ========================================
+   COLLAPSED STATE - NAV ITEMS
+   ======================================== */
+
+.kita-sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: 0.625rem;                        /* ✅ REDUCIDO: 0.875rem → 0.625rem */
+    margin: 0 0.25rem;
+}
+
+.kita-sidebar.collapsed .nav-link:hover {
+    transform: translateY(-2px) scale(1.05);  /* Solo lift + scale */
+}
+
+.kita-sidebar.collapsed .nav-content {
+    display: none;
+}
+
+/* Badges collapsed - eliminados */
+
+/* ========================================
+   TOOLTIPS EN COLLAPSED - GHOST STYLE
+   ======================================== */
+
+.kita-sidebar.collapsed .nav-link {
+    position: relative;
+}
+
+.kita-sidebar.collapsed .nav-link::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 1rem);
+    top: 50%;
+    transform: translateY(-50%) translateX(-8px) scale(0.95);
+
+    /* ✅ GHOST MODE: Tooltip flotante */
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    color: #ffffff;
+    padding: 0.625rem 0.875rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        0 2px 6px rgba(0, 0, 0, 0.15);
+
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1000;
+}
+
+.kita-sidebar.collapsed .nav-link:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0) scale(1);
+    transition-delay: 0.3s;
+}
+
+/* Tooltip arrow */
+.kita-sidebar.collapsed .nav-link::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 0.5rem);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 6px 8px 6px 0;
+    border-color: transparent rgba(17, 24, 39, 0.95) transparent transparent;
+    opacity: 0;
+    transition: opacity 0.25s ease 0.3s;
+}
+
+.kita-sidebar.collapsed .nav-link:hover::before {
+    opacity: 1;
+}
+
+/* ========================================
+   MAIN CONTENT ADJUSTMENT
+   ======================================== */
+
+.dashboard-body {
+    display: flex;
+    min-height: 100vh;
+}
+
+.dashboard-main {
+    flex: 1;
+    margin-left: 280px !important;
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+}
+
+/* Selector hermano (preferido) */
+.kita-sidebar.collapsed ~ .dashboard-main {
+    margin-left: 90px !important;
+}
+
+/* Selector por body class (respaldo) */
+body.sidebar-collapsed .dashboard-main {
+    margin-left: 90px !important;
+}
+
+/* Main content padding */
+.main-content {
+    padding-top: calc(56px + 2rem) !important; /* ✅ AJUSTADO: 70px → 56px (topbar height) */
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    padding-bottom: 0rem !important;
+    min-height: calc(100vh - 56px);       /* ✅ AJUSTADO */
+}
+
+/* Container fluid */
+.main-content .container-fluid {
+    max-width: 1200px;
+    margin: 0 auto;
+    transition: max-width 0.3s ease;
+}
+
+/* Selector hermano (preferido) */
+.kita-sidebar.collapsed ~ .dashboard-main .main-content .container-fluid {
+    max-width: 1400px;
+}
+
+/* Selector por body class (respaldo) */
+body.sidebar-collapsed .dashboard-main .main-content .container-fluid {
+    max-width: 1400px;
+}
+
+/* ========================================
+   TABLET MODE (768px - 1199px)
+   ======================================== */
+
+@media (min-width: 768px) and (max-width: 1199px) {
+    .kita-sidebar {
+        width: 220px;
+    }
+
+    .nav-link {
+        padding: 0.5rem 0.875rem;         /* ✅ MISMO padding vertical (0.5rem) */
+        font-size: 0.9rem;
+    }
+
+    .dashboard-main {
+        margin-left: 220px !important;
+    }
+
+    .main-content .container-fluid {
+        max-width: 100%;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
+/* ========================================
+   WIDE DESKTOP (>1600px)
+   ======================================== */
+
+@media (min-width: 1600px) {
+    .kita-sidebar {
+        width: 300px;
+    }
+
+    .dashboard-main {
+        margin-left: 300px !important;
+    }
+
+    .main-content .container-fluid {
+        max-width: 1400px;
+    }
+
+    /* Selector hermano */
+    .kita-sidebar.collapsed ~ .dashboard-main {
+        margin-left: 90px !important;
+    }
+
+    /* Selector body (respaldo) */
+    body.sidebar-collapsed .dashboard-main {
+        margin-left: 90px !important;
+    }
+
+    /* Container en collapsed */
+    .kita-sidebar.collapsed ~ .dashboard-main .main-content .container-fluid,
+    body.sidebar-collapsed .dashboard-main .main-content .container-fluid {
+        max-width: 1600px;
+    }
+
+    .nav-link {
+        padding: 0.5rem 1.25rem;          /* ✅ MISMO padding vertical (0.5rem) */
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
+   MOBILE MODE (<768px)
+   ======================================== */
+
+@media (max-width: 767px) {
+    .kita-sidebar:not(.mobile-sidebar-drawer) {
+        display: none;
+    }
+
+    .dashboard-main {
+        margin-left: 0 !important;
+    }
+
+    .main-content {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: calc(56px + 1rem) !important;
+    }
+
+    .main-content .container-fluid {
+        max-width: 100%;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.skip-to-content {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(8px);
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    z-index: 10000;
+    transition: top 0.3s ease;
+    border-radius: 0 0 8px 0;
+}
+
+.skip-to-content:focus {
+    top: 0;
+    outline: 3px solid #15803d;
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .kita-sidebar,
+    .nav-link,
+    .sidebar-cta-primary,
+    .nav-icon,
+    .tenant-selector,
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .kita-sidebar {
+        border-right-width: 2px;
+        border-right-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-link {
+        border-width: 2px;
+    }
+
+    .nav-link.active {
+        border-color: #15803d;
+        box-shadow: inset 4px 0 0 0 #15803d;
+    }
+
+    .tenant-selector {
+        border-width: 2px;
+    }
+}
+
+/* Dark mode support (future-proofing) */
+@media (prefers-color-scheme: dark) {
+    /* En Ghost Mode, el dark mode se maneja diferente */
+    /* Los items flotantes tendrán fondos oscuros */
+
+    .tenant-selector {
+        background: rgba(17, 24, 39, 0.7);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .tenant-selector:hover {
+        background: rgba(17, 24, 39, 0.85);
+        border-color: rgba(21, 128, 61, 0.3);
+    }
+
+    .nav-link:hover {
+        background: rgba(17, 24, 39, 0.8);
+        border-color: rgba(21, 128, 61, 0.3);
+    }
+
+    .nav-link.active {
+        background: rgba(21, 128, 61, 0.15);
+        border-color: rgba(21, 128, 61, 0.4);
+    }
+
+    .tenant-name,
+    .nav-text {
+        color: #f9fafb;
+    }
+
+    .tenant-rfc,
+    .nav-subtitle,
+    .nav-section-title {
+        color: #9ca3af;
+    }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+    .kita-sidebar {
+        display: none;
+    }
+
+    .dashboard-main {
+        margin-left: 0 !important;
+    }
+
+    .main-content {
+        padding-left: 0 !important;
+    }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+/* GPU acceleration para animaciones */
+.nav-link,
+.tenant-selector,
+.sidebar-cta-primary,
+.nav-icon {
+    will-change: transform, box-shadow, background;
+}
+
+/* Contenedor de transformaciones */
+.kita-sidebar {
+    contain: layout style paint;
+}
+
+/* ========================================
+   LOADING STATE (Optional)
+   ======================================== */
+
+.kita-sidebar[data-loading="true"] {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.kita-sidebar[data-loading="true"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(21, 128, 61, 0.2);
+    border-top-color: #15803d;
+    border-radius: 50%;
+    animation: loading-spin 0.8s linear infinite;
+}
+
+@keyframes loading-spin {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}

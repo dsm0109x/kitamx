@@ -1,0 +1,179 @@
+{% comment %}
+Filters Panel Component - Collapsible filters for Links
+{% endcomment %}
+
+<div class="card mb-3" id="filters-panel">
+    <div class="card-header filters-header" onclick="toggleFilters()" style="cursor: pointer;">
+        <div class="d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <i class="iconoir-filter me-2"></i>
+                Filtros
+                <span class="badge bg-primary ms-2" id="active-filters-badge" style="display:none;">0</span>
+            </h6>
+            <i class="iconoir-nav-arrow-down" id="filters-toggle-icon" style="transition: transform 0.3s;"></i>
+        </div>
+    </div>
+    <div class="card-body collapse" id="filters-body">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label small">Estado</label>
+                <select class="form-select form-select-sm" id="status-filter" onchange="updateFiltersBadge()">
+                    <option value="">Todos</option>
+                    <option value="active">Activos</option>
+                    <option value="paid">Pagados</option>
+                    <option value="expired">Expirados</option>
+                    <option value="cancelled">Cancelados</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Factura</label>
+                <select class="form-select form-select-sm" id="invoice-filter" onchange="updateFiltersBadge()">
+                    <option value="">Todas</option>
+                    <option value="required">Requerida</option>
+                    <option value="not_required">No requerida</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Desde</label>
+                <input type="date" class="form-control form-control-sm" id="date-from" onchange="updateFiltersBadge()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Hasta</label>
+                <input type="date" class="form-control form-control-sm" id="date-to" onchange="updateFiltersBadge()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Cliente</label>
+                <input type="text" class="form-control form-control-sm" id="customer-filter"
+                       placeholder="Nombre o email" onchange="updateFiltersBadge()">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small">Monto</label>
+                <div class="input-group input-group-sm">
+                    <input type="number" class="form-control" id="amount-min" placeholder="Min" onchange="updateFiltersBadge()">
+                    <input type="number" class="form-control" id="amount-max" placeholder="Max" onchange="updateFiltersBadge()">
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-12">
+                <button type="button" class="btn btn-primary btn-sm" onclick="applyFilters()">
+                    <i class="iconoir-check me-1"></i>
+                    Aplicar Filtros
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm ms-2" onclick="clearFilters()">
+                    <i class="iconoir-refresh me-1"></i>
+                    Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.filters-header:hover {
+    background-color: var(--bg-secondary);
+}
+
+.filters-header .iconoir-nav-arrow-down.rotated {
+    transform: rotate(180deg);
+}
+
+.bulk-actions-bar {
+    position: sticky;
+    top: 70px;
+    z-index: 100;
+    background: var(--color-forest-700);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-lg);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.bulk-actions-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.bulk-selected-text {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.bulk-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.bulk-buttons .btn {
+    background: white;
+    border-color: white;
+}
+
+.bulk-buttons .btn:hover {
+    background: var(--bg-secondary);
+}
+
+@media (max-width: 768px) {
+    .bulk-actions-content {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .bulk-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+
+<script>
+function toggleFilters() {
+    const body = document.getElementById('filters-body');
+    const icon = document.getElementById('filters-toggle-icon');
+
+    if (body.classList.contains('show')) {
+        body.classList.remove('show');
+        icon.classList.remove('rotated');
+    } else {
+        body.classList.add('show');
+        icon.classList.add('rotated');
+    }
+}
+
+function updateFiltersBadge() {
+    let count = 0;
+
+    if (document.getElementById('status-filter').value) count++;
+    if (document.getElementById('invoice-filter').value) count++;
+    if (document.getElementById('date-from').value) count++;
+    if (document.getElementById('date-to').value) count++;
+    if (document.getElementById('customer-filter').value) count++;
+    if (document.getElementById('amount-min').value) count++;
+    if (document.getElementById('amount-max').value) count++;
+
+    const badge = document.getElementById('active-filters-badge');
+    if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+</script>

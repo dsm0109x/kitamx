@@ -1,0 +1,140 @@
+{% comment %}
+Empty State Component - Reusable across modules
+
+Usage:
+{% include 'components/empty_state.html' with icon='link' title='No hay links de pago' description='Los links de pago te permiten...' cta_text='Crear Mi Primer Link' cta_action='showCreateLinkModal()' features=features_list %}
+
+Note: All parameters must be on a single line to avoid rendering issues.
+{% endcomment %}
+
+<div class="empty-state-container">
+    <div class="empty-state-content">
+        <!-- Icon -->
+        <div class="empty-state-icon">
+            <i class="iconoir-{{ icon }}"></i>
+        </div>
+
+        <!-- Title -->
+        <h3 class="empty-state-title">{{ title }}</h3>
+
+        <!-- Description -->
+        {% if description %}
+        <p class="empty-state-description">{{ description }}</p>
+        {% endif %}
+
+        <!-- CTA Button -->
+        {% if cta_text %}
+        <button class="btn btn-accent btn-lg empty-state-cta" onclick="{{ cta_action }}">
+            <i class="iconoir-plus me-2"></i>
+            {{ cta_text }}
+        </button>
+        {% endif %}
+
+        <!-- Features List (optional) -->
+        {% if features %}
+        <div class="empty-state-features mt-4">
+            {% for feature in features %}
+            <div class="feature-item">
+                <i class="iconoir-check-circle"></i>
+                <span>{{ feature }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Help Link (optional) -->
+        {% if help_url %}
+        <div class="empty-state-help mt-3">
+            <a href="{{ help_url }}" class="text-muted">
+                <i class="iconoir-help-circle me-1"></i>
+                ¿Necesitas ayuda?
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.empty-state-container {
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-content {
+    max-width: 600px;
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 5rem;
+    color: var(--color-gray-300);
+    margin-bottom: 1.5rem;
+    opacity: 0.5;
+}
+
+.empty-state-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.empty-state-description {
+    font-size: 1.125rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.empty-state-cta {
+    padding: 0.875rem 2rem;
+    font-size: 1.125rem;
+    border-radius: var(--radius-button);
+}
+
+.empty-state-features {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.feature-item i {
+    color: var(--color-forest-700);
+    font-size: 1.25rem;
+}
+
+.empty-state-help a {
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.empty-state-help a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .empty-state-icon {
+        font-size: 4rem;
+    }
+
+    .empty-state-title {
+        font-size: 1.5rem;
+    }
+
+    .empty-state-description {
+        font-size: 1rem;
+    }
+}
+</style>

@@ -1,0 +1,218 @@
+<!-- MOBILE NAVIGATION COMPONENTS - REUSABLE -->
+<!-- Include this in each onboarding step -->
+
+<!-- Progress Header - Sticky Top (Mobile Only) -->
+<div class="progress-header-mobile d-lg-none">
+    <div class="progress-header-content">
+        {% load static %}
+        <!-- Logo + Brand -->
+        <div class="header-brand">
+            <img src="{% static logo_path %}" alt="Kita" height="28">
+            <span class="kita-brand-small">Kita</span>
+        </div>
+
+        <!-- Progress Compact -->
+        <div class="progress-compact">
+            <span class="step-current">{{ step }}</span>
+            <span class="step-divider">/</span>
+            <span class="step-total">{{ total_steps }}</span>
+        </div>
+
+        <!-- Menu Button -->
+        <button class="btn-menu-trigger" onclick="showStepsMenu()" aria-label="Abrir menú de pasos">
+            <span class="iconoir-menu"></span>
+        </button>
+    </div>
+
+    <div class="progress-bar-thin">
+        <div class="progress-fill" style="width: {% widthratio step total_steps 100 %}%;"></div>
+    </div>
+</div>
+
+<!-- Bottom Navigation - Sticky Bottom (Mobile Only) -->
+<div class="bottom-nav-mobile d-lg-none">
+    <div class="bottom-nav-progress">
+        <div class="progress-dots">
+            {% for i in "1234" %}
+                {% if forloop.counter < step %}
+                    <span class="dot completed"></span>
+                {% elif forloop.counter == step %}
+                    <span class="dot active"></span>
+                {% else %}
+                    <span class="dot"></span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <span class="progress-text">Paso {{ step }} de {{ total_steps }}</span>
+    </div>
+
+    <div class="bottom-nav-actions">
+        {% if step > 1 %}
+            <button class="btn btn-secondary btn-nav-secondary" onclick="goBack()" aria-label="Paso anterior">
+                <span class="iconoir-arrow-left"></span>
+            </button>
+        {% endif %}
+
+        <button type="button"
+                class="btn btn-primary btn-nav-primary"
+                id="mobileSubmitBtn"
+                aria-label="Continuar al siguiente paso">
+            <span>Continuar</span>
+            <span class="iconoir-arrow-right"></span>
+        </button>
+
+        <button class="btn btn-secondary btn-nav-menu" onclick="showStepsMenu()" aria-label="Ver todos los pasos">
+            <span class="iconoir-menu"></span>
+        </button>
+    </div>
+</div>
+
+<!-- Steps Menu - Bottom Sheet (Mobile Only) -->
+<div class="steps-sheet-overlay d-lg-none" id="stepsOverlay" onclick="hideStepsMenu()"></div>
+<div class="steps-sheet-mobile d-lg-none" id="stepsSheet">
+    <div class="sheet-handle"></div>
+
+    <!-- Branding Section -->
+    <div class="sheet-branding">
+        {% load static %}
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <img src="{% static logo_path %}" height="48" alt="Kita">
+            <span class="kita-brand">Kita</span>
+        </div>
+        <p class="kita-tagline">Kit de Ayuda para Emprendedores</p>
+    </div>
+
+    <!-- Steps Section -->
+    <div class="sheet-content">
+        <h6 class="sheet-title">Progreso del Setup</h6>
+
+        <div class="steps-list">
+            <!-- Step 1 -->
+            <a href="{% url 'onboarding:step1' %}"
+               class="step-item {% if user.onboarding_step >= 2 %}completed{% endif %} {% if step == 1 %}active{% endif %}">
+                <div class="step-icon">
+                    {% if user.onboarding_step >= 2 %}✓{% else %}1{% endif %}
+                </div>
+                <div class="step-info">
+                    <div class="step-name">Identidad de tu Empresa</div>
+                    <div class="step-status">
+                        {% if user.onboarding_step >= 2 %}Completado{% elif step == 1 %}En progreso{% else %}Pendiente{% endif %}
+                    </div>
+                </div>
+                <span class="iconoir-nav-arrow-right"></span>
+            </a>
+
+            <!-- Step 2 -->
+            <a href="{% url 'onboarding:step2' %}"
+               class="step-item {% if tenant.mercadopago_user_id %}completed{% endif %} {% if step == 2 %}active{% endif %}">
+                <div class="step-icon">
+                    {% if tenant.mercadopago_user_id %}✓{% else %}2{% endif %}
+                </div>
+                <div class="step-info">
+                    <div class="step-name">Conectar Mercado Pago®</div>
+                    <div class="step-status">
+                        {% if tenant.mercadopago_user_id %}Conectado{% elif step == 2 %}En progreso{% else %}Opcional{% endif %}
+                    </div>
+                </div>
+                <span class="iconoir-nav-arrow-right"></span>
+            </a>
+
+            <!-- Step 3 -->
+            <a href="{% url 'onboarding:step3' %}"
+               class="step-item {% if tenant.csdcertificate_set.exists %}completed{% endif %} {% if step == 3 %}active{% endif %}">
+                <div class="step-icon">
+                    {% if tenant.csdcertificate_set.exists %}✓{% else %}3{% endif %}
+                </div>
+                <div class="step-info">
+                    <div class="step-name">Certificado Digital (CSD)</div>
+                    <div class="step-status">
+                        {% if tenant.csdcertificate_set.exists %}CSD subido{% elif step == 3 %}En progreso{% else %}Opcional{% endif %}
+                    </div>
+                </div>
+                <span class="iconoir-nav-arrow-right"></span>
+            </a>
+
+            <!-- Step 4 -->
+            <a href="{% url 'onboarding:step4' %}"
+               class="step-item {% if user.onboarding_completed %}completed{% endif %} {% if step == 4 %}active{% endif %}">
+                <div class="step-icon">
+                    {% if user.onboarding_completed %}✓{% else %}4{% endif %}
+                </div>
+                <div class="step-info">
+                    <div class="step-name">Activar Trial</div>
+                    <div class="step-status">
+                        {% if user.onboarding_completed %}Completado{% elif step == 4 %}En progreso{% else %}Pendiente{% endif %}
+                    </div>
+                </div>
+                <span class="iconoir-nav-arrow-right"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Navigation JavaScript -->
+<script>
+function goBack() {
+    window.history.back();
+}
+
+function showStepsMenu() {
+    const overlay = document.getElementById('stepsOverlay');
+    const sheet = document.getElementById('stepsSheet');
+
+    if (overlay) overlay.classList.add('active');
+    if (sheet) sheet.classList.add('active');
+
+    // Prevent body scroll
+    document.body.style.overflow = 'hidden';
+}
+
+function hideStepsMenu() {
+    const overlay = document.getElementById('stepsOverlay');
+    const sheet = document.getElementById('stepsSheet');
+
+    if (overlay) overlay.classList.remove('active');
+    if (sheet) sheet.classList.remove('active');
+
+    // Restore body scroll
+    document.body.style.overflow = '';
+}
+
+// Sync mobile submit button con desktop buttons (context-aware)
+document.addEventListener('DOMContentLoaded', function() {
+    const mobileBtn = document.getElementById('mobileSubmitBtn');
+    if (!mobileBtn) return;
+
+    // Find the appropriate desktop button based on step context
+    let desktopBtn = null;
+
+    // Try different button IDs based on step
+    desktopBtn = document.getElementById('submitBtn') ||           // Step 1 (form submit)
+                 document.getElementById('connectBtn') ||          // Step 2 (connect MP)
+                 document.getElementById('continueToStep3Btn') ||  // Step 2 (MP ya conectado)
+                 document.getElementById('saveBtn') ||             // Step 3 (save CSD - priority)
+                 document.getElementById('validateBtn') ||         // Step 3 (validate CSD)
+                 document.getElementById('startTrialBtn') ||       // Step 4 (activate trial)
+                 document.getElementById('goToDashboardBtn');      // Step 4 (trial activo)
+
+    if (desktopBtn) {
+        mobileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Si el botón desktop está disabled o hidden, no hacer nada
+            if (desktopBtn.disabled || desktopBtn.style.display === 'none') {
+                console.log('[Mobile Nav] Desktop button not ready');
+                return;
+            }
+
+            desktopBtn.click();
+        });
+
+        console.log('[Mobile Nav] Synced with desktop button:', desktopBtn.id);
+    } else {
+        console.warn('[Mobile Nav] No desktop button found to sync');
+        // Fallback: Hide mobile button si no hay acción
+        mobileBtn.style.display = 'none';
+    }
+});
+</script>

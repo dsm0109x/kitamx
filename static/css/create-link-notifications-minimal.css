@@ -1,0 +1,368 @@
+/**
+ * Create Link - Notificaciones Minimalistas
+ * Propuesta 4: Grid Compacto Horizontal
+ *
+ * Layout horizontal, máxima densidad de información
+ */
+
+/* ========================================
+   SECCIÓN DE NOTIFICACIONES
+   ======================================== */
+
+#notifications-section {
+    margin-top: 1.5rem;
+}
+
+#notifications-section h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   SEPARADOR MINIMALISTA
+   ======================================== */
+
+.notification-separator {
+    height: 1px;
+    background: linear-gradient(to right, #f3f4f6 0%, #f3f4f6 40%, transparent 100%);
+    margin: 1rem 0;
+    border: none;
+}
+
+/* ========================================
+   ITEMS DE NOTIFICACIÓN - HORIZONTAL
+   ======================================== */
+
+.notification-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+    padding: 0;
+}
+
+.notification-item-bullet {
+    color: #d1d5db;
+    font-weight: 300;
+    font-size: 1rem;
+    line-height: 1;
+    min-width: 12px;
+}
+
+.notification-item-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+    margin: 0;
+    min-width: 110px;
+}
+
+/* ========================================
+   TOGGLE MINIMALISTA
+   ======================================== */
+
+.notification-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.notification-toggle input[type="checkbox"] {
+    appearance: none;
+    width: 36px;
+    height: 20px;
+    background: #e5e7eb;
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border: none;
+    outline: none;
+}
+
+.notification-toggle input[type="checkbox"]::before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.notification-toggle input[type="checkbox"]:checked {
+    background: #15803d;
+}
+
+.notification-toggle input[type="checkbox"]:checked::before {
+    transform: translateX(16px);
+}
+
+.notification-toggle-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.notification-toggle input[type="checkbox"]:checked ~ .notification-toggle-label {
+    color: #15803d;
+}
+
+/* ========================================
+   CONTEXTO INLINE - HORIZONTAL
+   ======================================== */
+
+.notification-context {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    flex-wrap: wrap;
+}
+
+.notification-context-text {
+    font-size: 0.8rem;
+    color: #d1d5db;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.notification-context-text.active {
+    color: #9ca3af;
+}
+
+/* Email preview destacado */
+#preview-email {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* ========================================
+   PILLS HORIZONTALES (Timing Selector) - COMPACTO
+   ======================================== */
+
+.timing-pills {
+    display: inline-flex;
+    gap: 0.25rem;
+    flex-wrap: nowrap;
+}
+
+.timing-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #9ca3af;
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    min-width: 38px;
+}
+
+.timing-pill:hover:not(.disabled) {
+    border-color: #15803d;
+    color: #15803d;
+    background: rgba(21, 128, 61, 0.05);
+}
+
+.timing-pill.active {
+    background: #15803d;
+    color: white;
+    border-color: #15803d;
+    font-weight: 600;
+}
+
+.timing-pill.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* ========================================
+   INFO SECUNDARIA - INLINE
+   ======================================== */
+
+.notification-info {
+    font-size: 0.75rem;
+    color: #d1d5db;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.notification-info i {
+    font-size: 0.85rem;
+}
+
+/* Alert contextual minimalista - inline */
+.notification-alert {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: transparent;
+    border-left: 2px solid #e5e7eb;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-left: 0.5rem;
+}
+
+.notification-alert.success {
+    border-left-color: #10b981;
+    color: #10b981;
+}
+
+.notification-alert.warning {
+    border-left-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.notification-alert.error {
+    border-left-color: #ef4444;
+    color: #ef4444;
+}
+
+/* ========================================
+   SECCIÓN AUTOMÁTICAS - COMPACTA
+   ======================================== */
+
+.automatic-notifications {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.automatic-notifications h6 {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.automatic-notifications-list {
+    display: inline-flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.auto-notification-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.auto-notification-item::before {
+    content: '•';
+    color: #d1d5db;
+    font-weight: bold;
+}
+
+/* ========================================
+   ESTADOS DE CONTEXTO
+   ======================================== */
+
+/* Contexto oculto cuando toggle está off */
+#notify_on_create_context,
+#send_reminders_context,
+#notify_on_expiry_context {
+    transition: opacity 0.2s ease;
+}
+
+/* ========================================
+   RESPONSIVE - MOBILE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .notification-item {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .notification-item-title {
+        min-width: 90px;
+        font-size: 0.8rem;
+    }
+
+    .timing-pills {
+        gap: 0.25rem;
+        width: 100%;
+    }
+
+    .timing-pill {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+        min-width: 34px;
+    }
+
+    .notification-context {
+        flex-wrap: wrap;
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .notification-info {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.25rem;
+    }
+
+    .automatic-notifications {
+        flex-wrap: wrap;
+    }
+
+    .automatic-notifications h6 {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   ANIMACIONES - SIMPLIFICADAS
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========================================
+   HOVER Y FOCUS STATES
+   ======================================== */
+
+.notification-item:hover {
+    background: rgba(249, 250, 251, 0.3);
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    border-radius: 4px;
+}
+
+.timing-pill:focus-visible {
+    outline: 2px solid #15803d;
+    outline-offset: 2px;
+}
+
+.notification-toggle input[type="checkbox"]:focus-visible {
+    outline: 2px solid #15803d;
+    outline-offset: 2px;
+}

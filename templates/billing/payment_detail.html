@@ -1,0 +1,192 @@
+<!-- Billing Payment Detail Panel -->
+<div class="d-flex align-items-center mb-3">
+    <div class="bg-success rounded-circle p-2 me-3">
+        <i class="fas fa-credit-card text-white"></i>
+    </div>
+    <div>
+        <h6 class="mb-0">Pago de Suscripción</h6>
+        <small class="text-muted">${{ payment.amount|floatformat:2 }} {{ payment.currency }}</small>
+    </div>
+</div>
+
+<!-- Payment Information -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Información del Pago
+        </h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <tr>
+                <td><strong>Monto:</strong></td>
+                <td>${{ payment.amount|floatformat:2 }} {{ payment.currency }}</td>
+            </tr>
+            <tr>
+                <td><strong>Estado:</strong></td>
+                <td>
+                    <span class="badge bg-{% if payment.is_successful %}success{% elif payment.is_failed %}danger{% else %}warning{% endif %}">
+                        {{ payment.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td><strong>Método:</strong></td>
+                <td>{{ payment.get_payment_method_display }}</td>
+            </tr>
+            <tr>
+                <td><strong>Creado:</strong></td>
+                <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% if payment.processed_at %}
+                <tr>
+                    <td><strong>Procesado:</strong></td>
+                    <td>{{ payment.processed_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+            {% endif %}
+            {% if payment.external_payment_id %}
+                <tr>
+                    <td><strong>ID Externo:</strong></td>
+                    <td><code>{{ payment.external_payment_id }}</code></td>
+                </tr>
+            {% endif %}
+            {% if payment.failure_reason %}
+                <tr>
+                    <td><strong>Motivo falla:</strong></td>
+                    <td class="text-danger">{{ payment.failure_reason }}</td>
+                </tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<!-- Billing Period -->
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="fas fa-calendar me-2"></i>
+            Período de Facturación
+        </h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-sm">
+            <tr>
+                <td><strong>Desde:</strong></td>
+                <td>{{ payment.billing_period_start|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Hasta:</strong></td>
+                <td>{{ payment.billing_period_end|date:"d/m/Y" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Días:</strong></td>
+                <td>{{ payment.billing_period_start|timesince:payment.billing_period_end }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<!-- Invoice Information -->
+{% if payment.invoice_generated %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="fas fa-file-invoice me-2"></i>
+            Factura Kita
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-bold">{{ payment.invoice_data.serie }}-{{ payment.invoice_data.folio }}</div>
+                <small class="text-muted">Factura de suscripción</small>
+            </div>
+            <div>
+                {% if payment.invoice_sent %}
+                    <span class="badge bg-success">
+                        <i class="fas fa-check me-1"></i>Enviada
+                    </span>
+                {% else %}
+                    <span class="badge bg-warning">
+                        <i class="fas fa-clock me-1"></i>Pendiente
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button class="btn btn-outline-primary btn-sm" onclick="downloadInvoice('{{ payment.invoice_data.invoice_id }}')">
+                <i class="fas fa-download me-1"></i>
+                Descargar Factura
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Retry Information -->
+{% if payment.can_retry %}
+<div class="card">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="fas fa-redo me-2"></i>
+            Reintentos
+        </h6>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">
+            Intentos: {{ payment.retry_count }} / {{ payment.max_retries }}
+        </p>
+        <button class="btn btn-warning btn-sm" onclick="retryPayment('{{ payment.id }}')">
+            <i class="fas fa-redo me-1"></i>
+            Reintentar Pago
+        </button>
+    </div>
+</div>
+{% endif %}
+
+<script>
+function downloadInvoice(invoiceId) {
+    // TODO: Replace with proper invoicing URL when available
+    window.open(`/facturas/descargar/${invoiceId}/xml/`, '_blank');  // 🇪🇸 Migrado
+}
+
+function retryPayment(paymentId) {
+    if (confirm('¿Reintentar este pago?')) {
+        fetch(`{% url 'billing:retry_payment' '00000000-0000-0000-0000-000000000000' %}`.replace('00000000-0000-0000-0000-000000000000', paymentId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Reintento iniciado', 'success');
+                if (data.payment_url) {
+                    window.open(data.payment_url, '_blank');
+                }
+            } else {
+                showToast(data.error || 'Error reintentando pago', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        });
+    }
+}
+
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+
+    const csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    if (csrfCookie) return csrfCookie.split('=')[1];
+
+    return '';
+}
+</script>

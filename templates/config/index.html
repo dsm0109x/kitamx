@@ -1,0 +1,900 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize static %}
+
+{% block title %}Mi Negocio - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/settings-panel.css' %}?v=1.0">
+<style>
+/* Modal CSD z-index fix - Override kita.css completely */
+/* kita.css tiene .modal-dialog { z-index: 1055 } que debemos sobrescribir */
+
+/* Modal container */
+#uploadCSDModal {
+    z-index: 99999 !important;
+    position: fixed !important;
+}
+#uploadCSDModal.show {
+    z-index: 99999 !important;
+}
+
+/* Modal dialog - Override kita.css line 1734 */
+#uploadCSDModal .modal-dialog {
+    z-index: 99999 !important;
+    position: relative !important;
+}
+
+/* Modal content */
+#uploadCSDModal .modal-content {
+    z-index: 99999 !important;
+    position: relative !important;
+}
+
+/* Backdrop - Must be LOWER than sidebar/topbar/bottom-nav */
+/* Sidebar: 100, Topbar: 150, Bottom Nav: 1500, so backdrop: 1040 is safe */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+.modal-backdrop.show {
+    z-index: 1040 !important;
+}
+body.modal-open .modal-backdrop {
+    z-index: 1040 !important;
+}
+
+/* Dropzone styles for CSD modal */
+#certificate-dropzone-settings.dropzone-clean,
+#privatekey-dropzone-settings.dropzone-clean {
+    border: 2px dashed #d1d5db !important;
+    border-radius: 12px !important;
+    background: #f9fafb !important;
+    min-height: 150px !important;
+    padding: 1.5rem !important;
+    cursor: pointer;
+}
+#certificate-dropzone-settings.dropzone-clean:hover,
+#privatekey-dropzone-settings.dropzone-clean:hover {
+    border-color: #0d9488 !important;
+}
+#certificate-dropzone-settings.file-ready,
+#privatekey-dropzone-settings.file-ready {
+    border-color: #10b981 !important;
+    border-style: solid !important;
+}
+
+/* Progress steps */
+.progress-step {
+    padding: 0.75rem;
+    border-left: 3px solid #e5e7eb;
+    margin-bottom: 0.5rem;
+}
+.progress-step.active {
+    border-color: #0d9488;
+    background: rgba(13, 148, 136, 0.05);
+}
+.progress-step.completed {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+</style>
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header -->
+<div class="settings-page-header">
+    <h1>Mi Negocio</h1>
+</div>
+
+<!-- Settings Sections (Vertical) -->
+<div>
+    <!-- Información Fiscal -->
+    <div class="settings-section">
+        <div class="settings-section-header">INFORMACIÓN FISCAL</div>
+                <div class="alert">
+                    <strong>Información Fiscal</strong>
+                    <p>Estos datos se usan para generar tus facturas CFDI 4.0.</p>
+                </div>
+
+                <form id="business-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Nombre Comercial</label>
+                                <input type="text" class="form-control" id="name" value="{{ tenant.name }}" required>
+                                <div class="form-text">El nombre con el que identificas tu negocio</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Razón Social</label>
+                                <input type="text" class="form-control" id="business_name" value="{{ tenant.business_name }}" required>
+                                <div class="form-text">Razón social exacta como aparece en tu RFC</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">RFC</label>
+                                <input type="text" class="form-control text-uppercase" id="rfc" value="{{ tenant.rfc }}" required readonly>
+                                <div class="form-text">No editable (configurado en onboarding)</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Régimen Fiscal</label>
+                                <select class="form-select" id="fiscal_regime" required>
+                                    <option value="">Selecciona...</option>
+                                    <option value="612" {% if tenant.fiscal_regime == '612' %}selected{% endif %}>612 - Personas Físicas con Actividades Empresariales</option>
+                                    <option value="605" {% if tenant.fiscal_regime == '605' %}selected{% endif %}>605 - Sueldos y Salarios e Ingresos Asimilados a Salarios</option>
+                                    <option value="606" {% if tenant.fiscal_regime == '606' %}selected{% endif %}>606 - Arrendamiento</option>
+                                    <option value="621" {% if tenant.fiscal_regime == '621' %}selected{% endif %}>621 - Incorporación Fiscal</option>
+                                    <option value="625" {% if tenant.fiscal_regime == '625' %}selected{% endif %}>625 - Actividades Agrícolas, Ganaderas, Silvícolas y Pesqueras</option>
+                                    <option value="626" {% if tenant.fiscal_regime == '626' %}selected{% endif %}>626 - Actividades Empresariales y Profesionales (Opcional)</option>
+                                </select>
+                                <div class="form-text">Régimen fiscal SAT</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Código Postal</label>
+                                <input type="text" class="form-control" id="id_codigo_postal" name="codigo_postal" value="{{ tenant.codigo_postal }}" maxlength="5" pattern="[0-9]{5}" required autocomplete="postal-code">
+                                <div class="invalid-feedback">Código postal inválido o no encontrado</div>
+                                <div class="valid-feedback">Código postal válido</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Colonia</label>
+                                <select class="form-select" id="id_colonia" name="colonia" required disabled>
+                                    <option value="">Selecciona primero un código postal</option>
+                                    {% if tenant.colonia %}
+                                    <option value="{{ tenant.colonia }}" selected>{{ tenant.colonia }}</option>
+                                    {% endif %}
+                                </select>
+                                <div class="form-text">Se llena automáticamente</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Municipio</label>
+                                <input type="text" class="form-control" id="id_municipio" name="municipio" value="{{ tenant.municipio }}" readonly required>
+                                <div class="form-text">Auto-completado desde código postal</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Estado</label>
+                                <input type="text" class="form-control" id="id_estado" name="estado" value="{{ tenant.estado }}" readonly required>
+                                <div class="form-text">Auto-completado desde código postal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label class="form-label">Calle</label>
+                                <input type="text" class="form-control" id="calle" value="{{ tenant.calle }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label class="form-label">Núm. Ext.</label>
+                                <input type="text" class="form-control" id="numero_exterior" value="{{ tenant.numero_exterior }}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-3">
+                                <label class="form-label">Núm. Int.</label>
+                                <input type="text" class="form-control" id="numero_interior" value="{{ tenant.numero_interior }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        Guardar Cambios
+                    </button>
+                </form>
+    </div>
+
+    <!-- Certificados CSD -->
+    <div class="settings-section">
+        <div class="settings-section-header">CERTIFICADOS CSD</div>
+
+                <div class="alert">
+                    <strong>Certificados CSD</strong>
+                    <p>Necesarios para timbrar facturas CFDI 4.0 con el SAT.</p>
+                </div>
+
+                <div class="mb-3">
+                    <button type="button" class="btn btn-success" onclick="showUploadCSDModal()">
+                        Subir Nuevo Certificado
+                    </button>
+                </div>
+
+                {% if certificates %}
+                <div class="list-group">
+                    {% for cert in certificates %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">
+                                    {% if cert.is_active %}
+                                        <span class="badge bg-success">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactivo</span>
+                                    {% endif %}
+                                </h6>
+                                <p class="mb-1"><strong>Serie:</strong> {{ cert.serial_number }}</p>
+                                <p class="mb-1"><strong>Titular:</strong> {{ cert.subject_name }}</p>
+                                <p class="mb-0">
+                                    <strong>Válido hasta:</strong> {{ cert.valid_to|date:"d/m/Y" }}
+                                    {% if cert.valid_to < now %}
+                                        <span class="badge bg-danger">Expirado</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div>
+                                {% if cert.is_active %}
+                                <button class="btn btn-outline-danger btn-sm" onclick="deactivateCSD('{{ cert.id }}', '{{ cert.serial_number }}')">
+                                    Desactivar
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-certificate text-muted" style="font-size: 3rem;"></i>
+                    <h6 class="text-muted mt-3">No hay certificados CSD</h6>
+                    <p class="text-muted">Sube tu certificado para poder facturar</p>
+                </div>
+                {% endif %}
+    </div>
+
+    <!-- Integraciones -->
+    <div class="settings-section">
+        <div class="settings-section-header">INTEGRACIONES</div>
+                <div>
+                        <div class="integration-card">
+                                <h6>Mercado Pago</h6>
+                                {% if mp_integration %}
+                                    <p class="mb-2">
+                                        Estado: <span class="badge">Conectado</span>
+                                    </p>
+                                    <small class="text-muted d-block mb-3">User ID: {{ mp_integration.user_id }}</small>
+                                    <small class="text-muted d-block mb-3">Última actualización: {{ mp_integration.last_token_refresh|date:"d/m/Y H:i" }}</small>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-outline-primary btn-sm" onclick="testConnection('mp')">
+                                            Probar Conexión
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="disconnectMercadoPago()">
+                                            Desconectar
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <p class="mb-3">
+                                        Estado: <span class="badge">No configurado</span>
+                                    </p>
+                                    <p class="small text-muted mb-3">
+                                        Para recibir pagos necesitas conectar tu cuenta de Mercado Pago®.
+                                    </p>
+                                    <button class="btn btn-primary" onclick="connectMercadoPago()">
+                                        Conectar Cuenta
+                                    </button>
+                                {% endif %}
+                        </div>
+                </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+
+<!-- Address Autocomplete for Postal Code -->
+<script src="{% static 'js/address-autocomplete.js' %}?v=1.3"></script>
+
+<script>
+// Business form submission
+document.getElementById('business-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const data = {
+        name: document.getElementById('name').value,
+        business_name: document.getElementById('business_name').value,
+        fiscal_regime: document.getElementById('fiscal_regime').value,
+        codigo_postal: document.getElementById('id_codigo_postal').value,
+        colonia: document.getElementById('id_colonia').value,
+        municipio: document.getElementById('id_municipio').value,
+        estado: document.getElementById('id_estado').value,
+        calle: document.getElementById('calle').value,
+        numero_exterior: document.getElementById('numero_exterior').value,
+        numero_interior: document.getElementById('numero_interior').value
+    };
+
+    fetch('{% url "config:update_business" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Información fiscal actualizada', 'success');
+        } else {
+            showToast(data.error || 'Error actualizando', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    });
+});
+
+// Test connection function
+function testConnection(type) {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled = true;
+
+    let endpoint = '';
+    if (type === 'mp') {
+        endpoint = '{% url "config:test_mp_connection" %}';
+    } else if (type === 'whatsapp') {
+        endpoint = '{% url "config:test_whatsapp" %}';
+    } else if (type === 'email') {
+        endpoint = '{% url "config:test_email" %}';
+    }
+
+    fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.error || 'Error en la prueba', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+// Deactivate CSD
+function deactivateCSD(certId, serialNumber) {
+    if (confirm(`¿Desactivar certificado ${serialNumber}?\n\nEsto impedirá generar nuevas facturas con este certificado.`)) {
+        fetch('{% url "config:deactivate_csd" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({certificate_id: certId})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Certificado desactivado', 'success');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast(data.error || 'Error', 'error');
+            }
+        });
+    }
+}
+
+// Connect Mercado Pago
+function connectMercadoPago() {
+    // Redirigir al mismo flujo OAuth pero sin onboarding requirement
+    showToast('Redirigiendo a Mercado Pago® para autorizar...', 'info');
+    setTimeout(() => {
+        window.location.href = '/incorporacion/paso2/';
+    }, 1000);
+}
+
+// Disconnect Mercado Pago
+function disconnectMercadoPago() {
+    if (!confirm('¿Desconectar Mercado Pago®?\n\nEsto desactivará tus links de pago activos.')) {
+        return;
+    }
+
+    fetch('/incorporacion/api/desconectar-mp/',  // 🇪🇸 Migrado {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Mercado Pago® desconectado', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            showToast(data.error || 'Error desconectando', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    });
+}
+
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+
+    const csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    if (csrfCookie) return csrfCookie.split('=')[1];
+
+    return '';
+}
+
+// ========================================
+// CSD UPLOAD MODAL - Settings
+// ========================================
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure Dropzone is available (loaded in base.html)
+    if (typeof Dropzone === 'undefined') {
+        console.error('Dropzone not loaded');
+        return;
+    }
+
+    Dropzone.autoDiscover = false;
+
+    let uploadedFilesSettings = {
+        certificateFile: null,
+        privateKeyFile: null,
+        validationData: null
+    };
+
+    const uploadSessionSettings = generateUUID();
+
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+            const r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    }
+
+    // Global function to show modal (creates dynamically and appends to body)
+    window.showUploadCSDModal = function() {
+        // Check if modal already exists
+        let modalElement = document.getElementById('uploadCSDModal');
+
+        // If doesn't exist, create it
+        if (!modalElement) {
+            modalElement = createUploadCSDModal();
+            document.body.appendChild(modalElement);
+
+            // Initialize Dropzones for this new modal
+            initializeDropzonesForModal();
+        }
+
+        // Show modal
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        modalInstance.show();
+    };
+
+    // Function to create modal HTML
+    function createUploadCSDModal() {
+        const modalHTML = `
+<div class="modal fade" id="uploadCSDModal" tabindex="-1" aria-labelledby="uploadCSDModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadCSDModalLabel">
+                    <i class="fas fa-certificate me-2"></i>
+                    Subir Certificado CSD
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info mb-4">
+                    <strong><i class="fas fa-info-circle me-2"></i>Certificado de Sello Digital (CSD)</strong>
+                    <p class="mb-0 small">Tu "firma digital" del SAT para timbrar facturas CFDI 4.0. Requiere archivos .cer, .key y contraseña.</p>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label fw-bold">Certificado (.cer)</label>
+                        <div id="certificate-dropzone-settings" class="dropzone dropzone-clean">
+                            <div class="dz-message">
+                                <div class="dz-icon">
+                                    <i class="fas fa-certificate dropzone-icon"></i>
+                                </div>
+                                <p class="dropzone-label mb-1">Certificado .cer</p>
+                                <small class="text-muted">Arrastra o haz clic</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Llave Privada (.key)</label>
+                        <div id="privatekey-dropzone-settings" class="dropzone dropzone-clean">
+                            <div class="dz-message">
+                                <div class="dz-icon">
+                                    <i class="fas fa-key dropzone-icon"></i>
+                                </div>
+                                <p class="dropzone-label mb-1">Llave Privada .key</p>
+                                <small class="text-muted">Arrastra o haz clic</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="csd-password-settings" class="form-label fw-bold">Contraseña del Certificado</label>
+                    <div class="position-relative">
+                        <input type="password"
+                               class="form-control"
+                               id="csd-password-settings"
+                               placeholder="Contraseña de tu CSD"
+                               minlength="8"
+                               required>
+                        <button type="button"
+                                class="btn-password-toggle"
+                                onclick="togglePasswordSettings()"
+                                style="position:absolute;right:10px;top:8px;background:none;border:none;">
+                            <i class="fas fa-eye" id="passwordToggleIconSettings"></i>
+                        </button>
+                    </div>
+                    <small class="form-text text-muted">Mínimo 8 caracteres. Se encripta con AES-256.</small>
+                </div>
+
+                <div id="validationResultsSettings" class="validation-results" style="display:none;">
+                    <div class="alert alert-success">
+                        <h6><i class="fas fa-check-circle me-2"></i>Certificado Validado</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Serie:</strong> <code id="cert-serial-settings">-</code>
+                            </div>
+                            <div class="col-md-6">
+                                <strong>Válido hasta:</strong> <span id="cert-valid-to-settings">-</span>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <strong>Titular:</strong> <span id="cert-subject-settings">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="uploadProgressSettings" style="display:none;">
+                    <h6 class="fw-bold mb-3">Guardando certificado:</h6>
+                    <div class="progress-step" id="step-validate-settings">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-validate-settings"></span>
+                        <i class="fas fa-check-circle me-2 text-success d-none" id="check-validate-settings"></i>
+                        <span>1. Validando...</span>
+                    </div>
+                    <div class="progress-step" id="step-upload-settings">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-upload-settings"></span>
+                        <i class="fas fa-check-circle me-2 text-success d-none" id="check-upload-settings"></i>
+                        <span>2. Subiendo a storage...</span>
+                    </div>
+                    <div class="progress-step" id="step-encrypt-settings">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-encrypt-settings"></span>
+                        <i class="fas fa-check-circle me-2 text-success d-none" id="check-encrypt-settings"></i>
+                        <span>3. Encriptando AES-256...</span>
+                    </div>
+                    <div class="progress-step" id="step-pac-settings">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-pac-settings"></span>
+                        <i class="fas fa-check-circle me-2 text-success d-none" id="check-pac-settings"></i>
+                        <span>4. Subiendo a FiscalAPI...</span>
+                    </div>
+                    <div class="progress-step" id="step-complete-settings">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" id="spinner-complete-settings"></span>
+                        <i class="fas fa-check-circle me-2 text-success d-none" id="check-complete-settings"></i>
+                        <span>5. Finalizando...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="validateBtnSettings" onclick="validateCSDSettings()" disabled>
+                    <i class="fas fa-check me-2"></i>
+                    Validar Certificados
+                </button>
+                <button type="button" class="btn btn-success" id="saveBtnSettings" onclick="saveCSDSettings()" style="display:none;">
+                    <i class="fas fa-save me-2"></i>
+                    Guardar y Subir
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+        `;
+
+        const template = document.createElement('div');
+        template.innerHTML = modalHTML.trim();
+        return template.firstChild;
+    }
+
+    // Function to initialize Dropzones
+    function initializeDropzonesForModal() {
+        // Initialize Dropzones immediately since modal is just created
+        if (window.certDropzoneSettings || window.keyDropzoneSettings) {
+            return; // Already initialized
+        }
+
+        window.certDropzoneSettings = new Dropzone('#certificate-dropzone-settings', {
+            url: '/facturas/subir/',  // 🇪🇸 Migrado
+            acceptedFiles: '.cer,.pem,.crt',
+            maxFiles: 1,
+            maxFilesize: 10,
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            dictDefaultMessage: "",
+            dictRemoveFile: "Eliminar",
+            params: { file_type: 'csd_certificate', upload_session: uploadSessionSettings },
+            headers: { 'X-CSRFToken': getCsrfToken() },
+            init: function() {
+                this.on("addedfile", file => {
+                    if (this.files.length > 1) this.removeFile(this.files[0]);
+                    uploadedFilesSettings.certificateFile = file;
+                    document.getElementById('certificate-dropzone-settings').classList.add('file-ready');
+                    checkValidationReadySettings();
+                });
+                this.on("removedfile", () => {
+                    uploadedFilesSettings.certificateFile = null;
+                    document.getElementById('certificate-dropzone-settings').classList.remove('file-ready');
+                    checkValidationReadySettings();
+                    resetValidationSettings();
+                });
+            }
+        });
+
+        window.keyDropzoneSettings = new Dropzone('#privatekey-dropzone-settings', {
+            url: '/facturas/subir/',  // 🇪🇸 Migrado
+            acceptedFiles: '.key,.pem',
+            maxFiles: 1,
+            maxFilesize: 10,
+            autoProcessQueue: false,
+            addRemoveLinks: true,
+            dictDefaultMessage: "",
+            dictRemoveFile: "Eliminar",
+            params: { file_type: 'csd_private_key', upload_session: uploadSessionSettings },
+            headers: { 'X-CSRFToken': getCsrfToken() },
+            init: function() {
+                this.on("addedfile", file => {
+                    if (this.files.length > 1) this.removeFile(this.files[0]);
+                    uploadedFilesSettings.privateKeyFile = file;
+                    document.getElementById('privatekey-dropzone-settings').classList.add('file-ready');
+                    checkValidationReadySettings();
+                });
+                this.on("removedfile", () => {
+                    uploadedFilesSettings.privateKeyFile = null;
+                    document.getElementById('privatekey-dropzone-settings').classList.remove('file-ready');
+                    checkValidationReadySettings();
+                    resetValidationSettings();
+                });
+            }
+        });
+
+        // Add event listener for modal close
+        const uploadModal = document.getElementById('uploadCSDModal');
+        if (uploadModal) {
+            uploadModal.addEventListener('hidden.bs.modal', function() {
+                resetValidationSettings();
+                const progress = document.getElementById('uploadProgressSettings');
+                const password = document.getElementById('csd-password-settings');
+                if (progress) progress.style.display = 'none';
+                if (password) password.value = '';
+                if (window.certDropzoneSettings) window.certDropzoneSettings.removeAllFiles();
+                if (window.keyDropzoneSettings) window.keyDropzoneSettings.removeAllFiles();
+            });
+
+            // Listen to password input
+            const passwordInput = document.getElementById('csd-password-settings');
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    checkValidationReadySettings();
+                    resetValidationSettings();
+                });
+            }
+        }
+    }
+
+    // Helper functions (expose globally for onclick)
+    function checkValidationReadySettings() {
+        const validateBtn = document.getElementById('validateBtnSettings');
+        const password = document.getElementById('csd-password-settings')?.value || '';
+
+        if (validateBtn) {
+            validateBtn.disabled = !(
+                uploadedFilesSettings.certificateFile &&
+                uploadedFilesSettings.privateKeyFile &&
+                password.length >= 8
+            );
+        }
+    }
+
+    function resetValidationSettings() {
+        const results = document.getElementById('validationResultsSettings');
+        const saveBtn = document.getElementById('saveBtnSettings');
+        if (results) results.style.display = 'none';
+        if (saveBtn) saveBtn.style.display = 'none';
+        uploadedFilesSettings.validationData = null;
+    }
+
+    // Expose functions globally for onclick
+    window.togglePasswordSettings = function() {
+        const field = document.getElementById('csd-password-settings');
+        const icon = document.getElementById('passwordToggleIconSettings');
+        if (!field || !icon) return;
+
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    };
+
+    window.validateCSDSettings = async function() {
+        const password = document.getElementById('csd-password-settings').value;
+        const validateBtn = document.getElementById('validateBtnSettings');
+
+        if (!uploadedFilesSettings.certificateFile || !uploadedFilesSettings.privateKeyFile || !password) {
+            showToast('Selecciona ambos archivos e ingresa la contraseña', 'error');
+            return;
+        }
+
+        validateBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('certificate_file', uploadedFilesSettings.certificateFile);
+        formData.append('private_key_file', uploadedFilesSettings.privateKeyFile);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch('/negocio/csd/validar-ajax/',  // 🇪🇸 Migrado
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() },
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!result.valid) {
+                throw new Error(result.error || 'Error validando certificados');
+            }
+
+            uploadedFilesSettings.validationData = result;
+
+            document.getElementById('cert-serial-settings').textContent = result.serial_number;
+            document.getElementById('cert-subject-settings').textContent = result.subject_name;
+            document.getElementById('cert-valid-to-settings').textContent = new Date(result.valid_to).toLocaleDateString('es-MX', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            document.getElementById('validationResultsSettings').style.display = 'block';
+            document.getElementById('saveBtnSettings').style.display = 'block';
+
+            showToast('¡Certificados validados correctamente! 🎉', 'success');
+
+        } catch (error) {
+            console.error('[CSD Settings] Validation error:', error);
+            showToast(error.message || 'Error validando certificados', 'error');
+        } finally {
+            validateBtn.disabled = false;
+        }
+    };
+
+    window.saveCSDSettings = async function() {
+        const password = document.getElementById('csd-password-settings').value;
+        const saveBtn = document.getElementById('saveBtnSettings');
+        const uploadProgress = document.getElementById('uploadProgressSettings');
+
+        if (!uploadedFilesSettings.validationData) {
+            showToast('Por favor valida los certificados primero', 'error');
+            return;
+        }
+
+        uploadProgress.style.display = 'block';
+        saveBtn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('certificate_file', uploadedFilesSettings.certificateFile);
+        formData.append('private_key_file', uploadedFilesSettings.privateKeyFile);
+        formData.append('password', password);
+        formData.append('upload_session', uploadSessionSettings);
+
+        try {
+            setStepActiveSettings('validate');
+            setStepCompletedSettings('validate');
+
+            setStepActiveSettings('upload');
+
+            const response = await fetch('/negocio/csd/subir-ajax/',  // 🇪🇸 Migrado
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCsrfToken() },
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Error guardando certificado');
+            }
+
+            setStepCompletedSettings('upload');
+            setStepActiveSettings('encrypt');
+            setStepCompletedSettings('encrypt');
+            setStepActiveSettings('pac');
+            setStepCompletedSettings('pac');
+            setStepActiveSettings('complete');
+            setStepCompletedSettings('complete');
+
+            showToast('¡Certificado guardado y subido a FiscalAPI exitosamente! 🎉', 'success');
+
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('uploadCSDModal'));
+                if (modal) modal.hide();
+                window.location.reload();
+            }, 1500);
+
+        } catch (error) {
+            console.error('[CSD Settings] Save error:', error);
+            uploadProgress.style.display = 'none';
+            showToast(error.message || 'Error guardando certificado', 'error');
+        } finally {
+            saveBtn.disabled = false;
+        }
+    };
+
+    function setStepActiveSettings(stepName) {
+        const step = document.getElementById(`step-${stepName}-settings`);
+        if (step) {
+            step.classList.add('active');
+            const spinner = document.getElementById(`spinner-${stepName}-settings`);
+            if (spinner) spinner.classList.remove('d-none');
+        }
+    }
+
+    function setStepCompletedSettings(stepName) {
+        const step = document.getElementById(`step-${stepName}-settings`);
+        if (step) {
+            step.classList.remove('active');
+            step.classList.add('completed');
+            const spinner = document.getElementById(`spinner-${stepName}-settings`);
+            const check = document.getElementById(`check-${stepName}-settings`);
+            if (spinner) spinner.classList.add('d-none');
+            if (check) check.classList.remove('d-none');
+        }
+    }
+
+}); // End DOMContentLoaded
+</script>
+
+{% endblock %}

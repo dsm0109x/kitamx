@@ -1,0 +1,232 @@
+/**
+ * COMPARISON SECTION - VERTICAL LAYOUT
+ * Before vs After con barras de tiempo animadas
+ */
+
+/* ===== CARDS VERTICALES ===== */
+
+.comparison-card-problem,
+.comparison-card-solution {
+    background: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 1.5rem;  /* Reducido de 2.5rem */
+    margin: 0 auto 1rem auto;  /* Reducido margin-bottom */
+    max-width: 700px;
+}
+
+.comparison-card-problem {
+    border-left: 4px solid #6b7280;  /* Gris oscuro para problema */
+}
+
+.comparison-card-solution {
+    border-left: 4px solid #059669;  /* Verde para solución */
+    padding: 2rem;  /* Ligeramente más grande que problema */
+}
+
+.comparison-card-problem h3,
+.comparison-card-solution h3 {
+    font-size: 1.5rem;  /* Reducido de 1.75rem */
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 1rem;  /* Reducido */
+}
+
+/* ===== TIME DISPLAY ===== */
+
+.time-display,
+.time-display-success {
+    text-align: center;
+    margin: 1rem 0;  /* Reducido de 2rem */
+}
+
+.time-number {
+    font-size: 3.5rem;  /* Reducido de 5rem */
+    font-weight: 700;
+    color: #111827;
+    display: block;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.time-unit {
+    font-size: 0.95rem;  /* Reducido de 1.1rem */
+    font-weight: 500;
+    color: #6b7280;
+    display: block;
+    margin-top: 0.25rem;  /* Reducido */
+}
+
+/* ===== TIME BARS (Visuales) ===== */
+
+.time-bar-container {
+    width: 100%;
+    height: 16px;  /* Reducido de 24px */
+    background: #e5e7eb;
+    border-radius: 0;
+    overflow: hidden;
+    margin: 1rem 0;  /* Reducido de 2rem */
+    position: relative;
+}
+
+.time-bar-fill,
+.time-bar-fill-success {
+    height: 100%;
+    background: #6b7280;  /* Gris para problema */
+    width: 0;
+    transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.time-bar-fill-success {
+    background: #059669;  /* Verde para solución */
+}
+
+/* Label de tiempo en la barra */
+.time-bar-container::after {
+    content: '';
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* ===== PROBLEM STEPS ===== */
+
+.problem-steps {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;  /* Reducido de 2rem */
+}
+
+.problem-steps li {
+    padding: 0.5rem 0;  /* Reducido de 0.75rem */
+    border-bottom: none;  /* Sin separadores */
+    font-size: 0.95rem;  /* Reducido */
+    color: #4b5563;
+    display: flex;
+    align-items: center;
+}
+
+.problem-steps .iconoir {
+    color: #6b7280;
+    font-size: 1rem;  /* Reducido */
+}
+
+.problem-total {
+    background: #f9fafb;
+    padding: 0.75rem;  /* Reducido de 1rem */
+    text-align: center;
+    font-size: 0.95rem;  /* Reducido */
+    color: #374151;
+    margin: 1rem 0 0 0;  /* Reducido */
+}
+
+.problem-total strong {
+    color: #111827;
+}
+
+/* ===== DIVIDER (Flecha) ===== */
+
+.comparison-divider {
+    text-align: center;
+    margin: 1rem 0;  /* Reducido de 2rem */
+}
+
+.arrow-pulse-vertical {
+    font-size: 2rem;  /* Reducido de 3rem */
+    color: #111827;
+    display: inline-block;
+    animation: arrow-bounce-vertical 2s ease-in-out infinite;
+}
+
+@keyframes arrow-bounce-vertical {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(8px);
+    }
+}
+
+/* ===== MAGIC CARD ===== */
+
+.magic-card {
+    background: rgba(5, 150, 105, 0.08);  /* Verde muy sutil */
+    padding: 1.25rem;  /* Reducido de 1.5rem */
+    border-radius: 0;
+    margin: 1rem 0;  /* Reducido de 2rem */
+    text-align: center;
+}
+
+.magic-card .iconoir {
+    font-size: 2rem;  /* Reducido de 2.5rem */
+    margin-bottom: 0.5rem;  /* Reducido */
+    display: block;
+}
+
+.magic-card strong {
+    font-size: 1.25rem;  /* Reducido de 1.5rem */
+    color: #111827;
+    display: block;
+    margin-bottom: 0.25rem;  /* Reducido */
+}
+
+.magic-card p {
+    font-size: 0.95rem;  /* Reducido de 1.05rem */
+    color: #4b5563;
+    margin: 0;
+}
+
+/* ===== SAVINGS HIGHLIGHT ===== */
+
+.savings-highlight {
+    background: #f9fafb;
+    padding: 1rem;  /* Reducido de 1.5rem */
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;  /* Reducido de 1.5rem */
+    margin-top: 1rem;  /* Reducido de 2rem */
+}
+
+.savings-highlight .iconoir {
+    font-size: 2rem;  /* Reducido de 2.5rem */
+    flex-shrink: 0;
+}
+
+.savings-highlight strong {
+    font-size: 1.1rem;  /* Reducido de 1.25rem */
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.savings-highlight p {
+    font-size: 0.9rem;  /* Reducido de 1rem */
+    color: #6b7280;
+    margin: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 768px) {
+    .time-number {
+        font-size: 3.5rem;
+    }
+
+    .comparison-card-problem,
+    .comparison-card-solution {
+        padding: 1.5rem;
+    }
+
+    .magic-card strong {
+        font-size: 1.25rem;
+    }
+
+    .savings-highlight {
+        flex-direction: column;
+        text-align: center;
+    }
+}

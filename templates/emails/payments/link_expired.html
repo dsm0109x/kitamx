@@ -1,0 +1,83 @@
+{% extends "emails/base.html" %}
+{% load email_filters %}
+
+{% block email_title %}Link de Pago Expirado - {{ tenant.name }}{% endblock %}
+
+{% block email_content %}
+<!-- Icon Hero -->
+<div style="text-align: center; margin-bottom: 24px;">
+    <div style="font-size: 64px; line-height: 1;">⏱️</div>
+</div>
+
+<!-- Title -->
+<h1 style="font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; color: #111827; text-align: center; margin: 0 0 16px 0; line-height: 1.3;">
+    Tu Link de Pago ha Expirado
+</h1>
+
+<!-- Lead Text -->
+<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
+    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+</p>
+
+<!-- Main Message -->
+<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
+    El link de pago que {{ tenant.name }} te envió ha expirado el {{ expired_at|friendly_datetime }}
+    y ya no está disponible para realizar pagos.
+</p>
+
+<!-- Info Box - Detalles del link expirado -->
+<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
+        📋 Detalles del Link
+    </h3>
+    <ul style="margin: 0; padding-left: 20px; color: #78350F;">
+        <li style="margin-bottom: 8px;">
+            <strong>Concepto:</strong> {{ title }}
+        </li>
+        <li style="margin-bottom: 8px;">
+            <strong>Monto:</strong> ${{ amount|currency_mx }} MXN
+        </li>
+        <li style="margin-bottom: 8px;">
+            <strong>Expiró:</strong> {{ expired_at|friendly_datetime }}
+        </li>
+    </ul>
+</div>
+
+<!-- Success Box - Qué hacer -->
+<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
+        ✅ ¿Aún Necesitas Pagar?
+    </h3>
+    <p style="margin: 0 0 12px 0; color: #166534;">
+        Si todavía deseas realizar el pago, contacta a {{ tenant.name }} para que te envíen un nuevo link.
+    </p>
+    <ul style="margin: 0; padding-left: 20px; color: #166534;">
+        <li style="margin-bottom: 8px;">
+            Email: <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>
+        </li>
+        {% if tenant.phone %}
+        <li style="margin-bottom: 8px;">
+            Teléfono: {{ tenant.phone }}
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+<!-- Security Note -->
+<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <p style="margin: 0; font-size: 14px; color: #6B7280;">
+        ℹ️ <strong>Ya realizaste el pago?</strong> Si completaste el pago antes de la expiración,
+        puedes ignorar este mensaje. Los pagos se procesan automáticamente.
+    </p>
+</div>
+
+<!-- Help -->
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
+    ¿Necesitas ayuda?{% if tenant.support_email or tenant.email %} Contáctanos en
+    <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>{% else %} Responde a este email{% endif %}
+</p>
+{% endblock %}
+
+{% block email_footer_note %}
+Notificación de expiración enviada por {{ tenant.name }} a través de Kita.
+{% endblock %}

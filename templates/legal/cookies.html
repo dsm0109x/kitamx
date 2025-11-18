@@ -1,0 +1,615 @@
+{% extends 'base_minimal.html' %}
+{% load static %}
+
+{% block title %}Política de Cookies - Kita{% endblock %}
+
+{% block extra_head %}
+<!-- SEO: No indexar páginas legales -->
+<meta name="robots" content="noindex, follow">
+
+<!-- Legal Pages Styles -->
+<link rel="stylesheet" href="{% static 'css/04-pages/legal.css' %}">
+{% endblock %}
+
+{% block content %}
+<main role="main" class="legal-page">
+    <div class="container py-5">
+        <div class="row">
+            <!-- Sidebar TOC - Colapsable (Desktop + Mobile) -->
+            <aside class="col-md-3">
+                <!-- Toggle Button (siempre visible) -->
+                <button class="legal-toc-toggle btn btn-outline-secondary btn-sm w-100 mb-3"
+                        type="button"
+                        id="legalTocToggle"
+                        aria-expanded="true"
+                        aria-controls="legalTocNav">
+                  <span class="iconoir-list me-2"></span>
+                  <span class="toggle-text-show" hidden>Mostrar índice</span>
+                  <span class="toggle-text-hide">Ocultar índice</span>
+                  <span class="iconoir-nav-arrow-down ms-auto toggle-icon"></span>
+                </button>
+
+                <nav class="legal-toc show"
+                     id="legalTocNav"
+                     aria-label="Tabla de contenidos">
+                    <h4 class="legal-toc-title d-none">
+                        <span class="iconoir-list me-2"></span>
+                        Contenido
+                    </h4>
+                    <ol class="legal-toc-list">
+                        <li><a href="#que-son" class="legal-toc-link">¿Qué son las cookies y tecnologías similares?</a></li>
+                        <li><a href="#responsable" class="legal-toc-link">Responsable</a></li>
+                        <li><a href="#base-legal" class="legal-toc-link">Base legal y consentimiento</a></li>
+                        <li><a href="#que-usamos" class="legal-toc-link">Tecnologías que utilizamos</a>
+                            <ol class="legal-toc-sublist">
+                                <li><a href="#necesarias" class="legal-toc-link">Estrictamente necesarias</a></li>
+                                <li><a href="#preferencias" class="legal-toc-link">Preferencias</a></li>
+                                <li><a href="#analiticas" class="legal-toc-link">Analíticas y rendimiento</a></li>
+                                <li><a href="#marketing" class="legal-toc-link">Marketing y comunicaciones</a></li>
+                                <li><a href="#pagos" class="legal-toc-link">Pagos e integraciones</a></li>
+                            </ol>
+                        </li>
+                        <li><a href="#gestionar" class="legal-toc-link">Cómo gestionar tus preferencias</a></li>
+                        <li><a href="#retencion" class="legal-toc-link">Retención</a></li>
+                        <li><a href="#transferencias" class="legal-toc-link">Transferencias internacionales</a></li>
+                        <li><a href="#enlaces-terceros" class="legal-toc-link">Enlaces de terceros</a></li>
+                        <li><a href="#localstorage" class="legal-toc-link">Almacenamiento local</a></li>
+                        <li><a href="#dnt" class="legal-toc-link">Señales “Do Not Track”</a></li>
+                        <li><a href="#actualizaciones" class="legal-toc-link">Actualizaciones</a></li>
+                        <li><a href="#contacto" class="legal-toc-link">Contacto y más información</a></li>
+                    </ol>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="col-md-9">
+
+                <!-- Header -->
+                <div class="legal-header mb-5">
+                    <h1 class="section-heading display-5 mb-3">Política de Cookies</h1>
+                    <p class="text-muted">
+                        <span class="iconoir-calendar me-1"></span>
+                        Última actualización: 17 de octubre de 2025
+                    </p>
+                </div>
+
+                <!-- Content -->
+                <div class="legal-content">
+
+                    <section class="legal-section" id="que-son">
+                        <h2>
+                            ¿Qué son las cookies y tecnologías similares?
+                            <a href="#que-son" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Las <strong>cookies</strong> son pequeños archivos que se almacenan en tu dispositivo cuando visitas un sitio web.
+                            También empleamos <strong>pixeles</strong>, <strong>web beacons</strong>, <strong>almacenamiento local</strong> (p. ej., <code>localStorage</code>/<code>sessionStorage</code>) y, cuando corresponda, <strong>SDKs</strong>.
+                            Estas tecnologías permiten que nuestro sitio/app funcionen, recuerdan tus preferencias, mejoran la seguridad,
+                            miden el desempeño y facilitan pagos y comunicaciones.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="responsable">
+                        <h2>
+                            Responsable
+                            <a href="#responsable" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Esta Política complementa nuestro <a href="{% url 'legal:privacy' %}">Aviso de Privacidad</a>.
+                            Responsable del tratamiento: <strong>Kita io, S.A.S.</strong>
+                            Domicilio: Sinanche, Lomas de Padierna, Tlalpan, Ciudad de México, México. Correo: <a href="mailto:hola@kita.mx">hola@kita.mx</a>.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="base-legal">
+                        <h2>
+                            Base legal y consentimiento
+                            <a href="#base-legal" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <ul>
+                            <li><strong>México (LFPDPPP):</strong> informamos el uso de tecnologías de rastreo y ofrecemos mecanismos para deshabilitar las no esenciales. Las estrictamente necesarias se usan para finalidades esenciales del servicio.</li>
+                            <li><strong>EEA/Reino Unido (GDPR/ePrivacy):</strong> no instalamos cookies no esenciales sin tu <strong>consentimiento previo</strong> (opt-in) mediante nuestro <em>banner</em>.</li>
+                            <li><strong>California (CPRA):</strong> no “vendemos” información personal. Si empleamos tecnologías que constituyan “compartir” para publicidad conductual, ofreceremos el enlace <em>“No vender/compartir mi información”</em> en el pie de página.</li>
+                        </ul>
+                    </section>
+
+                    <section class="legal-section" id="que-usamos">
+                        <h2>
+                            Tecnologías que utilizamos
+                            <a href="#que-usamos" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+
+                        <!-- Necesarias -->
+                        <div class="cookie-category" id="necesarias">
+                            <h3>
+                                <span class="iconoir-check-circle text-success me-2"></span>
+                                Estrictamente necesarias (obligatorias)
+                            </h3>
+                            <p class="text-muted mb-3">
+                                Permiten el funcionamiento básico del sitio, la creación y uso del <code>Link de Pago</code> (<code>/hola/{token}</code>),
+                                la gestión de sesión, la prevención de fraude y, cuando aplique, el timbrado CFDI 4.0 (PUE).
+                                No se pueden desactivar desde nuestros controles.
+                            </p>
+
+                            <div class="legal-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cookie/tecnología</th>
+                                            <th>Propósito</th>
+                                            <th>Proveedor</th>
+                                            <th>Duración</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>kita_session</code> / <code>sessionid</code></td>
+                                            <td>Autenticación y sesión segura</td>
+                                            <td>Kita</td>
+                                            <td>Sesión (hasta 2 semanas)</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>csrftoken</code></td>
+                                            <td>Protección CSRF</td>
+                                            <td>Kita</td>
+                                            <td>1 año</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>__cf_bm</code></td>
+                                            <td>Gestión de bots y rendimiento CDN</td>
+                                            <td>Cloudflare</td>
+                                            <td>30 minutos</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>cf_clearance</code></td>
+                                            <td>Verificación anti-bot completada (Cloudflare Turnstile)</td>
+                                            <td>Cloudflare</td>
+                                            <td>24 horas</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>kita_cookie_consent</code> (localStorage)</td>
+                                            <td>Recordar tu preferencia de cookies</td>
+                                            <td>Kita</td>
+                                            <td>Persistente (hasta que lo borres)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Cloudflare Turnstile Highlight -->
+                            <div class="legal-highlight mt-3">
+                                <span class="iconoir-shield-check me-2"></span>
+                                <strong>Verificación Anti-Bot (Cloudflare Turnstile):</strong>
+                                Utilizamos Cloudflare Turnstile en formularios críticos (registro, login, recuperación de contraseña)
+                                para distinguir usuarios humanos de bots automatizados. Este servicio procesa tu dirección IP y
+                                datos de navegador para generar un token de verificación. Los datos son procesados por
+                                <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">Cloudflare Inc.</a>
+                                conforme a su política de privacidad. Esta verificación es <strong>estrictamente necesaria</strong> para
+                                proteger tu cuenta y la plataforma de accesos no autorizados.
+                            </div>
+                        </div>
+
+                        <!-- Preferencias -->
+                        <div class="cookie-category mt-4" id="preferencias">
+                            <h3>
+                                <span class="iconoir-bookmark text-secondary me-2"></span>
+                                Preferencias
+                            </h3>
+                            <p class="text-muted mb-3">Guardan configuraciones como idioma, zona horaria y recordatorios de vigencia del link (1/3/7 días).</p>
+                            <div class="legal-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Clave</th>
+                                            <th>Propósito</th>
+                                            <th>Ubicación</th>
+                                            <th>Duración</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>kita_ui_lang</code></td>
+                                            <td>Idioma preferido</td>
+                                            <td>localStorage</td>
+                                            <td>Persistente</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>kita_link_reminders</code></td>
+                                            <td>Frecuencia de recordatorios (1/3/7 días)</td>
+                                            <td>localStorage</td>
+                                            <td>Persistente</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Analíticas -->
+                        <div class="cookie-category mt-4" id="analiticas">
+                            <h3>
+                                <span class="iconoir-graph-up text-primary me-2"></span>
+                                Analíticas y rendimiento (opcionales)
+                            </h3>
+
+                            <p class="text-muted mb-3">
+                                Utilizamos <strong>Google Analytics 4 (GA4)</strong> para comprender cómo usas Kita y mejorar la experiencia.
+                                Solo se activa si <strong>aceptas cookies analíticas</strong> mediante nuestro banner de consentimiento.
+                            </p>
+
+                            <div class="legal-highlight mb-3">
+                                <span class="iconoir-shield-check me-2"></span>
+                                <strong>Tu control:</strong> Puedes rechazar estas cookies en cualquier momento desde el banner o desde
+                                el botón "Gestionar Cookies" en el pie de página. Si las rechazas, solo usaremos cookies estrictamente necesarias.
+                            </div>
+
+                            <div class="legal-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cookie</th>
+                                            <th>Propósito</th>
+                                            <th>Proveedor</th>
+                                            <th>Duración</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>_ga</code></td>
+                                            <td>Identificador único de usuario para métricas agregadas y anónimas</td>
+                                            <td>Google Analytics 4</td>
+                                            <td>2 años</td>
+                                        </tr>
+                                        <tr>
+                                            <td><code>_ga_Y31EXM884N</code></td>
+                                            <td>Estado de sesión, páginas vistas, eventos de navegación</td>
+                                            <td>Google Analytics 4</td>
+                                            <td>2 años</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <p class="text-muted small mt-3">
+                                <strong>Datos recopilados:</strong> Páginas visitadas, tiempo en el sitio, eventos de interacción (clicks en botones),
+                                navegador, dispositivo, ubicación aproximada (ciudad/país). <strong>No recopilamos:</strong> datos personales identificables,
+                                información de pagos, ni datos sensibles.
+                            </p>
+                        </div>
+
+                        <!-- Marketing / Comunicaciones -->
+                        <div class="cookie-category mt-4" id="marketing">
+                            <h3>
+                                <span class="iconoir-megaphone text-warning me-2"></span>
+                                Marketing y comunicaciones
+                            </h3>
+                            <p class="text-muted mb-3">
+                                Medición de campañas, audiencias y atribución; envíos transaccionales y recordatorios por <strong>WhatsApp Cloud</strong> (principal) y <strong>Postmark</strong> (email transaccional), incluyendo confirmaciones de pago y facturación.
+                            </p>
+                            <div class="legal-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Tecnología</th>
+                                            <th>Propósito</th>
+                                            <th>Proveedor</th>
+                                            <th>Duración</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Pixel/SDK de WhatsApp Cloud</td>
+                                            <td>Mensajería transaccional y métricas</td>
+                                            <td>Meta</td>
+                                            <td>Sesión – 180 días</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pixel de apertura/click</td>
+                                            <td>Métricas de correos transaccionales (aperturas, clicks)</td>
+                                            <td>Postmark</td>
+                                            <td>Variable (sesión)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Pagos e Integraciones -->
+                        <div class="cookie-category mt-4" id="pagos">
+                            <h3>
+                                <span class="iconoir-credit-card text-info me-2"></span>
+                                Pagos e integraciones
+                            </h3>
+                            <p class="text-muted mb-3">
+                                <strong>Mercado Pago®</strong> (OAuth/SDK/pixel) para procesar pagos desde el link público y confirmar estatus vía <em>webhooks</em>.
+                            </p>
+                            <div class="legal-table">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cookie/SDK</th>
+                                            <th>Propósito</th>
+                                            <th>Proveedor</th>
+                                            <th>Duración</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><code>mp_*</code> / SDK</td>
+                                            <td>Iniciar/completar pagos; reducir fraude; conciliación</td>
+                                            <td>Mercado Pago®</td>
+                                            <td>Sesión – 1 año</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <p class="mt-3">
+                                Otros terceros técnicos (por ejemplo, CDNs y librerías de interfaz) pueden colocar cookies técnicas mínimas.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section class="legal-section" id="gestionar">
+                        <h2>
+                            Cómo gestionar tus preferencias
+                            <a href="#gestionar" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+
+                        <h3>En Kita</h3>
+                        <p>
+                            Puedes cambiar tu elección en cualquier momento haciendo click en el <strong>botón "Gestionar Cookies"</strong>
+                            ubicado en el pie de página de nuestro sitio. Esto volverá a mostrar el banner de cookies donde podrás
+                            aceptar o rechazar cookies analíticas. Para usuarios de EEA/UK, sólo activaremos analítica/marketing tras tu consentimiento (opt-in).
+                        </p>
+
+                        <h3>Navegador</h3>
+                        <p>Puedes bloquear o eliminar cookies desde la configuración de tu navegador:</p>
+                        <ul>
+                            <li><strong>Chrome:</strong> Configuración → Privacidad y seguridad → Cookies</li>
+                            <li><strong>Firefox:</strong> Preferencias → Privacidad y seguridad</li>
+                            <li><strong>Safari:</strong> Preferencias → Privacidad</li>
+                            <li><strong>Edge:</strong> Configuración → Cookies y permisos del sitio</li>
+                        </ul>
+
+                        <p class="legal-warning">
+                            <span class="iconoir-warning-triangle me-2"></span>
+                            <strong>Advertencia:</strong> Bloquear cookies estrictamente necesarias puede impedir el funcionamiento correcto de Kita (p. ej., no podrás iniciar sesión o completar pagos).
+                        </p>
+
+                        <h3 class="mt-4">California (CPRA)</h3>
+                        <p>
+                            Si implementamos tecnologías que constituyan "compartir" para publicidad conductual,
+                            pondremos a tu disposición el enlace <em>"No vender/compartir mi información"</em> en el pie de página.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="retencion">
+                        <h2>
+                            Retención
+                            <a href="#retencion" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Conservamos cookies por el tiempo <strong>estrictamente necesario</strong> para los fines indicados.
+                            Las de sesión se eliminan al cerrar el navegador; las persistentes expiran según su duración o cuando las borras.
+                            Los datos derivados (por ejemplo, métricas agregadas) pueden conservarse por periodos mayores en forma anonimizada o agregada.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="transferencias">
+                        <h2>
+                            Transferencias internacionales
+                            <a href="#transferencias" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Podemos transferir datos a proveedores ubicados fuera de México. Implementamos salvaguardas contractuales
+                            y de seguridad razonables y, cuando aplique, cláusulas contractuales estándar u otros mecanismos exigidos por la normativa aplicable.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="enlaces-terceros">
+                        <h2>
+                            Enlaces de terceros
+                            <a href="#enlaces-terceros" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Nuestros <strong>Links de Pago</strong> pueden dirigirte a entornos de <strong>Mercado Pago®</strong> para completar la transacción.
+                            Estos terceros tienen sus propias políticas de cookies y privacidad; te sugerimos revisarlas antes de usarlos.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="localstorage">
+                        <h2>
+                            Almacenamiento local (localStorage)
+                            <a href="#localstorage" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>Además de cookies, usamos almacenamiento local del navegador para:</p>
+                        <ul>
+                            <li>Recordar preferencias de interfaz (tema, idioma)</li>
+                            <li>Guardar borradores temporales (no sensibles)</li>
+                            <li>Preferencia de cookies (consentimiento)</li>
+                        </ul>
+                        <p>Estos datos se almacenan en tu dispositivo y no se transmiten a nuestros servidores.</p>
+                    </section>
+
+                    <section class="legal-section" id="dnt">
+                        <h2>
+                            Señales “Do Not Track”
+                            <a href="#dnt" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Nuestro sitio no responde actualmente a señales <strong>DNT</strong> del navegador.
+                            Ofrecemos controles equivalentes a través del banner de cookies (botón "Gestionar Cookies" en el pie de página) y de la configuración de tu navegador.
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="actualizaciones">
+                        <h2>
+                            Actualizaciones
+                            <a href="#actualizaciones" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Podemos actualizar esta Política para reflejar cambios tecnológicos, legales u operativos.
+                            Indicaremos la fecha de “Última actualización” y, cuando corresponda, te notificaremos cambios
+                            relevantes por los canales habituales (WhatsApp Cloud o email).
+                        </p>
+                    </section>
+
+                    <section class="legal-section" id="contacto">
+                        <h2>
+                            Contacto y más información
+                            <a href="#contacto" class="header-link" aria-label="Link a esta sección">#</a>
+                        </h2>
+                        <p>
+                            Si tienes dudas o deseas ejercer tus derechos de privacidad, contáctanos en
+                            <a href="mailto:hola@kita.mx">hola@kita.mx</a>. Para más información sobre cómo tratamos tus datos personales,
+                            consulta nuestro <a href="{% url 'legal:privacy' %}">Aviso de Privacidad</a>.
+                        </p>
+                    </section>
+
+                </div>
+
+                <!-- Footer Navigation -->
+                <div class="legal-footer mt-5 pt-4 border-top">
+                    <div class="row">
+                        <div class="col-md-6 mb-3 mb-md-0">
+                            <a href="{% url 'legal:terms' %}"
+                               class="btn btn-outline-secondary"
+                               data-tracking="cookies-to-terms"
+                               aria-label="Ir a Términos de Servicio">
+                                <span class="iconoir-arrow-left me-2" aria-hidden="true"></span>
+                                <span class="btn-text">Términos de Servicio</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <a href="mailto:hola@kita.mx"
+                               class="btn btn-accent"
+                               data-tracking="cookies-contact"
+                               aria-label="Enviar email a soporte de Kita">
+                                <span class="iconoir-mail me-2" aria-hidden="true"></span>
+                                <span class="btn-text">Contactar</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Legal Bundle - Loading states (sin ripple) -->
+<script src="{% static 'js/legal-bundle.js' %}?v=1.1" defer></script>
+
+<script>
+/* TOC Toggle (Mobile) */
+document.getElementById('legalTocToggle')?.addEventListener('click', function() {
+    const toc = document.getElementById('legalTocNav');
+    const isExpanded = this.getAttribute('aria-expanded') === 'true';
+
+    // Toggle
+    this.setAttribute('aria-expanded', String(!isExpanded));
+    toc.classList.toggle('show');
+
+    // Toggle text
+    this.querySelector('.toggle-text-show').hidden = !isExpanded;
+    this.querySelector('.toggle-text-hide').hidden = isExpanded;
+});
+
+/**
+ * Legal TOC Scroll Spy
+ * Detecta la sección visible y marca el link correspondiente en el TOC
+ */
+(function() {
+    'use strict';
+
+    const sections = document.querySelectorAll('.legal-section[id]');
+    const tocLinks = document.querySelectorAll('.legal-toc-link');
+
+    if (!sections.length || !tocLinks.length) return;
+
+    // Crear mapa de href -> link element
+    const linkMap = new Map();
+    tocLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href && href.startsWith('#')) {
+            linkMap.set(href, link);
+        }
+    });
+
+    // Función para activar link
+    function activateLink(id) {
+        // Remover todos los active
+        tocLinks.forEach(link => link.classList.remove('active'));
+
+        // Activar el correcto
+        const activeLink = linkMap.get('#' + id);
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+    }
+
+    // IntersectionObserver para detectar sección visible
+    const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -50% 0px', // Offset para header + trigger antes de mitad
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                activateLink(entry.target.id);
+            }
+        });
+    }, observerOptions);
+
+    // Observar todas las secciones
+    sections.forEach(section => observer.observe(section));
+
+    // Smooth scroll en clicks de TOC
+    tocLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    // Actualizar URL sin reload
+                    history.pushState(null, '', href);
+
+                    // En mobile, cerrar TOC después de click
+                    if (window.innerWidth < 768) {
+                        const toc = document.getElementById('legalTocNav');
+                        const toggle = document.getElementById('legalTocToggle');
+                        if (toc && toggle) {
+                            toc.classList.remove('show');
+                            toggle.setAttribute('aria-expanded', 'false');
+                            toggle.querySelector('.toggle-text-show').hidden = false;
+                            toggle.querySelector('.toggle-text-hide').hidden = true;
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    // Activar sección inicial (por si llega con #hash)
+    const hash = window.location.hash;
+    if (hash) {
+        const initialSection = document.querySelector(hash);
+        if (initialSection) {
+            activateLink(initialSection.id);
+        }
+    } else if (sections[0]) {
+        activateLink(sections[0].id);
+    }
+
+})();
+</script>
+{% endblock %}

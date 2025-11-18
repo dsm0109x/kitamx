@@ -1,0 +1,88 @@
+{% extends "emails/base.html" %}
+{% load email_filters %}
+
+{% block email_title %}Link de Pago Cancelado - {{ tenant.name }}{% endblock %}
+
+{% block email_content %}
+<!-- Icon Hero -->
+<div style="text-align: center; margin-bottom: 24px;">
+    <div style="font-size: 64px; line-height: 1;">🚫</div>
+</div>
+
+<!-- Title -->
+<h1 style="font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; color: #111827; text-align: center; margin: 0 0 16px 0; line-height: 1.3;">
+    Link de Pago Cancelado
+</h1>
+
+<!-- Lead Text -->
+<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
+    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+</p>
+
+<!-- Main Message -->
+<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
+    Te informamos que el link de pago que {{ tenant.name }} te envió ha sido cancelado
+    {{ cancellation_reason_text }}.
+</p>
+
+<!-- Info Box - Detalles del Link -->
+<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
+        📋 Detalles del Link Cancelado
+    </h3>
+    <ul style="margin: 0; padding-left: 20px; color: #78350F;">
+        <li style="margin-bottom: 8px;">
+            <strong>Concepto:</strong> {{ title }}
+        </li>
+        <li style="margin-bottom: 8px;">
+            <strong>Monto:</strong> ${{ amount|currency_mx }} MXN
+        </li>
+        {% if description %}
+        <li style="margin-bottom: 8px;">
+            <strong>Descripción:</strong> {{ description }}
+        </li>
+        {% endif %}
+        <li style="margin-bottom: 8px;">
+            <strong>Cancelado:</strong> {{ cancelled_at|friendly_datetime }}
+        </li>
+    </ul>
+</div>
+
+<!-- Success Box - Qué hacer -->
+<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
+        ✅ ¿Necesitas Realizar el Pago?
+    </h3>
+    <p style="margin: 0 0 12px 0; color: #166534;">
+        Si aún necesitas realizar este pago, contacta a {{ tenant.name }} para que te envíen un nuevo link actualizado.
+    </p>
+    <ul style="margin: 0; padding-left: 20px; color: #166534;">
+        <li style="margin-bottom: 8px;">
+            Email: <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>
+        </li>
+        {% if tenant.phone %}
+        <li style="margin-bottom: 8px;">
+            Teléfono: {{ tenant.phone }}
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+<!-- Security Note -->
+<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <p style="margin: 0; font-size: 14px; color: #6B7280;">
+        ℹ️ <strong>Nota:</strong> Si ya realizaste el pago antes de la cancelación,
+        tu transacción fue procesada correctamente y puedes ignorar este mensaje.
+    </p>
+</div>
+
+<!-- Help -->
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
+    ¿Alguna duda?{% if tenant.support_email or tenant.email %} Contáctanos en
+    <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>{% else %} Responde a este email{% endif %}
+</p>
+{% endblock %}
+
+{% block email_footer_note %}
+Notificación de cancelación enviada por {{ tenant.name }} a través de Kita.
+{% endblock %}

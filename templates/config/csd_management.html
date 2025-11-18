@@ -1,0 +1,222 @@
+<!-- CSD Management Panel -->
+<div class="d-flex align-items-center mb-3">
+    <div class="bg-success rounded-circle p-2 me-3">
+        <i class="fas fa-certificate text-white"></i>
+    </div>
+    <div>
+        <h6 class="mb-0">Gestión de Certificados CSD</h6>
+        <small class="text-muted">Administra tus certificados de sello digital</small>
+    </div>
+</div>
+
+<!-- Help Info -->
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>¿Qué es un CSD?</strong> El Certificado de Sello Digital es requerido por el SAT para timbrar CFDIs.
+    Obtienes tu CSD desde el portal del SAT con tu e.firma.
+</div>
+
+<!-- CSD Certificates -->
+{% if certificates %}
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Número de Serie</th>
+                    <th>Nombre del Titular</th>
+                    <th>Emisor</th>
+                    <th>Vigencia</th>
+                    <th>Estado</th>
+                    <th>Uso</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in certificates %}
+                <tr>
+                    <td>
+                        <code class="fs-6">{{ cert.serial_number }}</code>
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ cert.subject_name|truncatechars:30 }}</div>
+                        <small class="text-muted">{{ tenant.rfc }}</small>
+                    </td>
+                    <td>
+                        <small class="text-muted">{{ cert.issuer_name|truncatechars:25 }}</small>
+                    </td>
+                    <td>
+                        <div>
+                            <small class="text-muted">Desde:</small> {{ cert.valid_from|date:"d/m/Y" }}
+                        </div>
+                        <div>
+                            <small class="text-muted">Hasta:</small> {{ cert.valid_to|date:"d/m/Y" }}
+                            {% if cert.valid_to < today %}
+                                <span class="badge bg-danger ms-1">Expirado</span>
+                            {% elif cert.valid_to|timeuntil|slice:":2" == "1 " %}
+                                <span class="badge bg-warning ms-1">Por vencer</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if cert.is_active and cert.is_validated and cert.is_valid %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>Activo
+                            </span>
+                        {% elif cert.is_active and cert.is_validated %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-exclamation-triangle me-1"></i>Expirado
+                            </span>
+                        {% elif cert.is_active %}
+                            <span class="badge bg-warning">
+                                <i class="fas fa-clock me-1"></i>Sin validar
+                            </span>
+                        {% else %}
+                            <span class="badge bg-secondary">
+                                <i class="fas fa-times me-1"></i>Inactivo
+                            </span>
+                        {% endif %}
+
+                        {% if cert.validation_error %}
+                            <div class="mt-1">
+                                <small class="text-danger" title="{{ cert.validation_error }}">
+                                    <i class="fas fa-exclamation-circle me-1"></i>Error de validación
+                                </small>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cert.last_used %}
+                            <div class="fw-bold">{{ cert.usage_count }}</div>
+                            <small class="text-muted">{{ cert.last_used|timesince }} ago</small>
+                        {% else %}
+                            <span class="text-muted">
+                                <i class="fas fa-minus me-1"></i>No usado
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            {% if cert.is_active %}
+                                <button class="btn btn-outline-danger" onclick="deactivateCSD('{{ cert.id }}', '{{ cert.serial_number }}')" title="Desactivar">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            {% endif %}
+
+                            {% if cert.validation_error %}
+                                <button class="btn btn-outline-info" onclick="showValidationError('{{ cert.validation_error|escapejs }}')" title="Ver Error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            <small class="text-muted">
+                Total: {{ certificates|length }} certificado{{ certificates|length|pluralize }}
+                | Activos: {{ certificates|selectattr:"is_active"|list|length }}
+            </small>
+        </div>
+        <div>
+            <a href="/upload/" class="btn btn-success">
+                <i class="fas fa-plus me-1"></i>
+                Subir Nuevo Certificado
+            </a>
+        </div>
+    </div>
+
+    <!-- Renewal Warning -->
+    {% for cert in certificates %}
+        {% if cert.is_active and cert.valid_to|timeuntil|slice:":2" == "1 " %}
+            <div class="alert alert-warning mt-3">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Renovación Requerida:</strong> El certificado {{ cert.serial_number }} expira pronto ({{ cert.valid_to|date:"d/m/Y" }}).
+                <a href="/upload/" class="alert-link">Sube un nuevo certificado</a> antes de que expire.
+            </div>
+        {% endif %}
+    {% endfor %}
+
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-certificate fa-4x text-muted mb-3"></i>
+        <h5 class="text-muted">No hay certificados CSD</h5>
+        <p class="text-muted mb-4">
+            Para poder facturar necesitas subir tu Certificado de Sello Digital (CSD) del SAT.
+        </p>
+
+        <div class="card bg-light">
+            <div class="card-body">
+                <h6 class="card-title">
+                    <i class="fas fa-question-circle me-2"></i>
+                    ¿Cómo obtener mi CSD?
+                </h6>
+                <ol class="text-start">
+                    <li>Ingresa al <strong>portal del SAT</strong> con tu e.firma</li>
+                    <li>Ve a <strong>"Certificados"</strong> → <strong>"Solicitar certificado de sello digital"</strong></li>
+                    <li>Descarga tu certificado (.cer) y llave privada (.key)</li>
+                    <li>Sube ambos archivos aquí junto con la contraseña</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <a href="/upload/" class="btn btn-primary btn-lg">
+                <i class="fas fa-upload me-2"></i>
+                Subir Mi Primer Certificado CSD
+            </a>
+        </div>
+    </div>
+{% endif %}
+
+<script>
+function deactivateCSD(certId, serialNumber) {
+    if (confirm(`¿Desactivar certificado ${serialNumber}?\n\nEsto impedirá generar nuevas facturas con este certificado.`)) {
+        fetch('{% url "accounts:deactivate_csd" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                certificate_id: certId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                setTimeout(() => {
+                    loadUserSessions(); // Reload the panel
+                }, 1000);
+            } else {
+                showToast(data.error || 'Error desactivando certificado', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        });
+    }
+}
+
+function showValidationError(error) {
+    alert(`Error de Validación:\n\n${error}`);
+}
+
+function getCsrfToken() {
+    const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfInput) return csrfInput.value;
+
+    const csrfCookie = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrftoken='));
+    if (csrfCookie) return csrfCookie.split('=')[1];
+
+    return '';
+}
+</script>

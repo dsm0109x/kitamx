@@ -1,0 +1,35 @@
+# robots.txt para Kita
+User-agent: *
+
+# Permitir acceso público
+Allow: /
+Allow: /legal/
+Allow: /hola/
+Allow: /facturar/
+Allow: /descargar/
+
+# Bloquear áreas privadas
+Disallow: /admin/
+Disallow: /accounts/
+Disallow: /dashboard/
+Disallow: /links/
+Disallow: /kita-ia/
+Disallow: /subscription/
+Disallow: /invoices/
+Disallow: /reports/
+Disallow: /account/
+Disallow: /settings/
+Disallow: /logs/
+Disallow: /onboarding/
+Disallow: /webhooks/
+Disallow: /media/
+
+# Bloquear debug tools
+Disallow: /silk/
+Disallow: /__debug__/
+
+# Sitemap
+Sitemap: {{ app_base_url }}/sitemap.xml
+
+# Crawl delay (opcional)
+Crawl-delay: 1

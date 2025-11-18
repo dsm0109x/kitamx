@@ -1,0 +1,100 @@
+{% extends "emails/base.html" %}
+{% load email_filters %}
+
+{% block email_title %}Tu Link de Pago está Listo - {{ tenant.name }}{% endblock %}
+
+{% block email_content %}
+<!-- Icon Hero -->
+<div style="text-align: center; margin-bottom: 24px;">
+    <div style="font-size: 64px; line-height: 1;">🔗</div>
+</div>
+
+<!-- Title -->
+<h1 style="font-family: 'Inter', sans-serif; font-size: 26px; font-weight: 700; color: #111827; text-align: center; margin: 0 0 16px 0; line-height: 1.3;">
+    ¡Tu Link de Pago está Listo!
+</h1>
+
+<!-- Lead Text -->
+<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
+    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+</p>
+
+<!-- Main Message -->
+<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
+    {{ tenant.name }} te ha enviado un link de pago seguro. Puedes realizar el pago de forma rápida y segura a través de MercadoPago.
+</p>
+
+<!-- CTA Button -->
+<div style="text-align: center; margin: 32px 0;">
+    <a href="{{ link_url }}" class="btn-primary" style="background-color: #15803d; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(21, 128, 61, 0.15);">
+        Ver Link de Pago →
+    </a>
+</div>
+
+<!-- Success Box - Detalles -->
+<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
+        📋 Detalles del Pago
+    </h3>
+    <ul style="margin: 0; padding-left: 20px; color: #166534;">
+        <li style="margin-bottom: 8px;">
+            <strong>Concepto:</strong> {{ title }}
+        </li>
+        <li style="margin-bottom: 8px;">
+            <strong>Monto:</strong> ${{ amount|currency_mx }} MXN
+        </li>
+        {% if description %}
+        <li style="margin-bottom: 8px;">
+            <strong>Descripción:</strong> {{ description }}
+        </li>
+        {% endif %}
+        <li style="margin-bottom: 8px;">
+            <strong>Válido hasta:</strong> {{ expires_at|friendly_datetime }}
+        </li>
+    </ul>
+</div>
+
+<!-- Info Box - Qué esperar -->
+<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
+        ⏱️ ¿Qué sigue?
+    </h3>
+    <ol style="margin: 0; padding-left: 20px; color: #78350F;">
+        <li style="margin-bottom: 8px;">Haz clic en el botón "Ver Link de Pago"</li>
+        <li style="margin-bottom: 8px;">Revisa los detalles de tu compra</li>
+        <li style="margin-bottom: 8px;">Realiza el pago con tarjeta, débito o transferencia</li>
+        <li style="margin-bottom: 8px;">Recibirás confirmación inmediata por email</li>
+        {% if requires_invoice %}
+        <li>Podrás generar tu factura CFDI 4.0 después de pagar</li>
+        {% endif %}
+    </ol>
+</div>
+
+<!-- Security Box -->
+<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
+    <p style="margin: 0; font-size: 14px; color: #6B7280;">
+        🔒 <strong>Pago 100% seguro:</strong> Procesado por MercadoPago, líder en pagos en línea en México.
+        Tus datos están protegidos con cifrado de grado bancario.
+    </p>
+</div>
+
+<!-- Fallback Link -->
+<div class="link-fallback" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E5E7EB; text-align: center;">
+    <p style="font-size: 13px; color: #9CA3AF; margin: 0 0 8px 0;">
+        ¿El botón no funciona? Copia y pega este enlace en tu navegador:
+    </p>
+    <p style="margin: 0;">
+        <a href="{{ link_url }}" style="color: #15803d; word-break: break-all; font-size: 12px;">{{ link_url }}</a>
+    </p>
+</div>
+
+<!-- Help -->
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
+    ¿Necesitas ayuda? Responde a este email{% if tenant.support_email or tenant.email %} o escríbenos a
+    <a href="mailto:{{ tenant.support_email|default:tenant.email }}" style="color: #15803d; text-decoration: none;">{{ tenant.support_email|default:tenant.email }}</a>{% endif %}
+</p>
+{% endblock %}
+
+{% block email_footer_note %}
+Este link de pago fue enviado por {{ tenant.name }} a través de Kita.
+{% endblock %}

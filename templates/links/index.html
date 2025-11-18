@@ -1,0 +1,873 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize %}
+
+{% block title %}Links de Pago - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/links-spreadsheet.css' %}?v=1.0">
+<!-- Modals Mobile Optimized CSS -->
+<link rel="stylesheet" href="{% static 'css/modals-mobile-optimized.css' %}?v=1.0">
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header Spreadsheet -->
+<div class="links-page-header">
+    <h1>Links de Pago</h1>
+    <div class="btn-toolbar">
+        <div class="btn-group">
+            <button type="button" class="btn btn-primary" onclick="showCreateLinkModal()">
+                Crear Link
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onclick="refreshTable()">
+                Actualizar
+            </button>
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
+                Exportar
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#" onclick="exportLinks('csv')">CSV</a></li>
+                <li><a class="dropdown-item" href="#" onclick="exportLinks('xlsx')">Excel (próximamente)</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if stats.total == 0 %}
+    <!-- Empty State -->
+    {% include 'components/empty_state.html' with icon='link' title='No hay links de pago' description='Los links de pago te permiten cobrar a tus clientes de forma rápida y segura. Puedes crear links para productos, servicios, o cualquier concepto que necesites facturar.' cta_text='Crear Mi Primer Link' cta_action='showCreateLinkModal()' features=empty_features %}
+{% else %}
+    <!-- Stats Inline -->
+    <div class="stats-inline-bar">
+        Total: <strong>{{ stats.total }}</strong> |
+        Pagados: <strong>{{ stats.paid }}</strong> |
+        Activos: <strong>{{ stats.active }}</strong> |
+        Revenue: <strong>${{ stats.revenue|floatformat:2 }}</strong>
+    </div>
+
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions-bar" id="bulk-actions-bar" style="display:none;">
+        <div class="bulk-actions-content">
+            <span class="bulk-selected-text">
+                <i class="iconoir-check-circle me-2"></i>
+                <strong id="selected-count">0</strong> links seleccionados
+            </span>
+            <div class="bulk-buttons">
+                <button class="btn btn-sm btn-outline-danger" onclick="bulkCancel()">
+                    <i class="iconoir-xmark me-1"></i>
+                    Cancelar Seleccionados
+                </button>
+                <button class="btn btn-sm btn-link" onclick="clearSelection()">
+                    Limpiar selección
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Links DataTable -->
+<div class="card">
+    <div class="card-body">
+        <table id="linksTable" class="table w-100">
+            <thead>
+                <tr>
+                    <th style="width: 30px;">
+                        <input type="checkbox" id="select-all-links" onchange="toggleAllSelection()" title="Seleccionar todos">
+                    </th>
+                    <th>Título</th>
+                    <th>Cliente</th>
+                    <th>Monto</th>
+                    <th>Creado</th>
+                    <th>Estado</th>
+                    <th style="width: 40px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be loaded via AJAX -->
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+// Ensure utils are available (fallback if utils.js not loaded yet)
+if (typeof escapeHtml === 'undefined') {
+    window.escapeHtml = function(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+}
+
+if (typeof getCsrfToken === 'undefined') {
+    window.getCsrfToken = function() {
+        const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (csrfInput) return csrfInput.value;
+        const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+        return csrfCookie ? csrfCookie.split('=')[1] : '';
+    };
+}
+
+let linksTable;
+
+$(document).ready(function() {
+    // Initialize DataTable
+    linksTable = $('#linksTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '{% url "links:ajax_data" %}',
+            type: 'GET',
+            data: function(d) {
+                // Add custom filters
+                d.status = $('#status-filter').val();
+                d.requires_invoice = $('#invoice-filter').val();
+                d.date_from = $('#date-from').val();
+                d.date_to = $('#date-to').val();
+                d.customer = $('#customer-filter').val();
+                d.amount_min = $('#amount-min').val();
+                d.amount_max = $('#amount-max').val();
+            }
+        },
+        columns: [
+            {
+                data: 'id',
+                orderable: false,
+                className: 'select-checkbox',
+                render: function(data, type, row) {
+                    return `<input type="checkbox" class="link-checkbox" value="${data}" onchange="updateBulkActions()">`;
+                }
+            },
+            {
+                data: 'title',
+                render: function(data, type, row) {
+                    return `
+                        <div>
+                            <div class="fw-bold">${escapeHtml(data)}</div>
+                            ${row.description ? `<small class="text-muted">${escapeHtml(row.description)}</small>` : ''}
+                        </div>
+                    `;
+                }
+            },
+            {
+                data: 'customer_name',
+                render: function(data, type, row) {
+                    return `
+                        <div>
+                            <div>${escapeHtml(data || '-')}</div>
+                            ${row.customer_email ? `<small class="text-muted">${escapeHtml(row.customer_email)}</small>` : ''}
+                        </div>
+                    `;
+                }
+            },
+            {
+                data: 'amount',
+                className: 'amount-cell',
+                render: function(data, type, row) {
+                    return `<div>$${parseFloat(data).toFixed(2)}<br><small class="text-muted">MXN</small></div>`;
+                }
+            },
+            {
+                data: 'created_at',
+                render: function(data, type, row) {
+                    const date = new Date(data);
+                    return `
+                        <div>${date.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})}</div>
+                        <small class="text-muted">${date.toLocaleTimeString('es-MX', {hour: '2-digit', minute: '2-digit'})}</small>
+                    `;
+                }
+            },
+            {
+                data: 'status',
+                render: function(data, type, row) {
+                    return `<span class="badge">${row.status_display}</span>`;
+                }
+            },
+            {
+                data: 'id',
+                orderable: false,
+                render: function(data, type, row) {
+                    return `
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-link" type="button" data-bs-toggle="dropdown" title="Acciones">
+                                <i class="iconoir-more-vert"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="showDetailPanel('link', '${data}')">
+                                    Ver detalles
+                                </a></li>
+                                ${row.status === 'active' ? `
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="copyLinkUrl('${row.token}')">
+                                        Copiar URL
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="showEditLinkModal('${data}')">
+                                        Editar
+                                    </a></li>
+                                ` : ''}
+                                <li><a class="dropdown-item" href="javascript:void(0)" onclick="duplicateLink('${data}')">
+                                    Duplicar
+                                </a></li>
+                                ${row.status === 'active' && row.customer_email ? `
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item" href="javascript:void(0)" onclick="sendReminder('${data}')">
+                                        Enviar recordatorio
+                                    </a></li>
+                                ` : ''}
+                                ${row.status === 'active' ? `
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="javascript:void(0)" onclick="cancelLink('${data}')">
+                                        Cancelar
+                                    </a></li>
+                                ` : ''}
+                            </ul>
+                        </div>
+                    `;
+                }
+            }
+        ],
+        order: [[4, 'desc']], // Order by creation date (column index updated for checkbox)
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]],
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-MX.json'
+        },
+        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+             '<"row"<"col-sm-12"<"table-responsive"tr>>>' +
+             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        responsive: true,
+        stateSave: true,
+        drawCallback: function(settings) {
+            // Update stats after table draw
+            updateStats();
+            // Update bulk actions state
+            updateBulkActions();
+        }
+    });
+});
+
+function applyFilters() {
+    linksTable.ajax.reload();
+}
+
+function clearFilters() {
+    $('#status-filter').val('');
+    $('#invoice-filter').val('');
+    $('#date-from').val('');
+    $('#date-to').val('');
+    $('#customer-filter').val('');
+    $('#amount-min').val('');
+    $('#amount-max').val('');
+    updateFiltersBadge();
+    linksTable.ajax.reload();
+}
+
+// ============================================
+// BULK ACTIONS
+// ============================================
+
+function updateBulkActions() {
+    const checkboxes = document.querySelectorAll('.link-checkbox:checked');
+    const count = checkboxes.length;
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const selectedCount = document.getElementById('selected-count');
+
+    if (count > 0) {
+        bulkBar.style.display = 'block';
+        selectedCount.textContent = count;
+    } else {
+        bulkBar.style.display = 'none';
+    }
+
+    // Update select all checkbox
+    const selectAll = document.getElementById('select-all-links');
+    const totalCheckboxes = document.querySelectorAll('.link-checkbox').length;
+    selectAll.checked = count === totalCheckboxes && count > 0;
+    selectAll.indeterminate = count > 0 && count < totalCheckboxes;
+}
+
+function toggleAllSelection() {
+    const selectAll = document.getElementById('select-all-links');
+    const checkboxes = document.querySelectorAll('.link-checkbox');
+
+    checkboxes.forEach(cb => {
+        cb.checked = selectAll.checked;
+    });
+
+    updateBulkActions();
+}
+
+function clearSelection() {
+    document.querySelectorAll('.link-checkbox').forEach(cb => {
+        cb.checked = false;
+    });
+    document.getElementById('select-all-links').checked = false;
+    updateBulkActions();
+}
+
+function getSelectedLinks() {
+    const checkboxes = document.querySelectorAll('.link-checkbox:checked');
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
+// ⚠️ DEPRECATED - Removido de la UI
+function bulkDuplicate() {
+    console.warn('⚠️ DEPRECATED: bulkDuplicate() - Función removida de la UI');
+    return;
+    /* CÓDIGO COMENTADO
+    const selected = getSelectedLinks();
+
+    if (selected.length === 0) {
+        showToast('Selecciona al menos un link', 'warning');
+        return;
+    }
+
+    if (!confirm(`¿Duplicar ${selected.length} link${selected.length > 1 ? 's' : ''}?\n\nSe crearán ${selected.length} nuevos links con los mismos datos pero nuevos tokens.`)) {
+        return;
+    }
+
+    let completed = 0;
+    let errors = 0;
+
+    showToast(`Duplicando ${selected.length} links...`, 'info');
+
+    selected.forEach((linkId, index) => {
+        setTimeout(() => {
+            fetch('{% url "links:duplicate" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ link_id: linkId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    completed++;
+                } else {
+                    errors++;
+                }
+
+                // Check if last one
+                if (completed + errors === selected.length) {
+                    if (errors === 0) {
+                        showToast(`${completed} links duplicados exitosamente`, 'success');
+                    } else {
+                        showToast(`${completed} links duplicados, ${errors} errores`, 'warning');
+                    }
+                    linksTable.ajax.reload();
+                    clearSelection();
+                }
+            })
+            .catch(error => {
+                errors++;
+                if (completed + errors === selected.length) {
+                    showToast(`${completed} links duplicados, ${errors} errores`, 'warning');
+                    linksTable.ajax.reload();
+                    clearSelection();
+                }
+            });
+        }, index * 200); // Stagger requests
+    });
+    */
+}
+
+// ⚠️ DEPRECATED - Removido de la UI
+function bulkSendReminder() {
+    console.warn('⚠️ DEPRECATED: bulkSendReminder() - Función removida de la UI');
+    return;
+    /* CÓDIGO COMENTADO
+    const selected = getSelectedLinks();
+
+    if (selected.length === 0) {
+        showToast('Selecciona al menos un link', 'warning');
+        return;
+    }
+
+    if (!confirm(`¿Enviar recordatorio de pago a ${selected.length} cliente${selected.length > 1 ? 's' : ''}?\n\nSolo se enviarán a links activos que tengan email del cliente.`)) {
+        return;
+    }
+
+    let completed = 0;
+    let errors = 0;
+
+    showToast(`Enviando recordatorios a ${selected.length} clientes...`, 'info');
+
+    selected.forEach((linkId, index) => {
+        setTimeout(() => {
+            fetch('{% url "links:send_reminder" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ link_id: linkId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    completed++;
+                } else {
+                    errors++;
+                }
+
+                if (completed + errors === selected.length) {
+                    if (errors === 0) {
+                        showToast(`${completed} recordatorios enviados`, 'success');
+                    } else {
+                        showToast(`${completed} enviados, ${errors} errores`, 'warning');
+                    }
+                    clearSelection();
+                }
+            })
+            .catch(error => {
+                errors++;
+                if (completed + errors === selected.length) {
+                    showToast(`${completed} enviados, ${errors} errores`, 'warning');
+                    clearSelection();
+                }
+            });
+        }, index * 500); // Stagger requests (slower for email)
+    });
+    */
+}
+
+function bulkCancel() {
+    const selected = getSelectedLinks();
+
+    if (selected.length === 0) {
+        showToast('Selecciona al menos un link', 'warning');
+        return;
+    }
+
+    // Crear modal de confirmación bulk
+    const bulkCancelModal = document.createElement('div');
+    bulkCancelModal.className = 'modal fade';
+    bulkCancelModal.id = 'bulkCancelModal';
+    bulkCancelModal.innerHTML = `
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">
+                        <i class="iconoir-warning-triangle me-2"></i>
+                        Cancelar Múltiples Links
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="alert alert-warning mb-4">
+                        <strong>⚠️ Esta acción NO se puede deshacer</strong>
+                    </div>
+
+                    <p>Estás a punto de cancelar <strong>${selected.length}</strong> link${selected.length > 1 ? 's' : ''} de pago.</p>
+
+                    <!-- Razón global -->
+                    <div class="mb-3">
+                        <label class="form-label">¿Por qué cancelas estos links? <span class="text-danger">*</span></label>
+                        <select class="form-select" id="bulk-cancel-reason" required>
+                            <option value="">Selecciona una razón...</option>
+                            <option value="duplicate">Links duplicados</option>
+                            <option value="campaign_ended">Campaña finalizada</option>
+                            <option value="wrong_data">Error en datos</option>
+                            <option value="expired_intent">Ya no se requieren</option>
+                            <option value="other">Otra razón</option>
+                        </select>
+                    </div>
+
+                    <!-- Confirmación: Escribe CANCELAR -->
+                    <div class="mb-3">
+                        <label for="bulk-type-confirm" class="form-label text-danger">
+                            <strong>⚠️ Para confirmar, escribe <code>CANCELAR</code>:</strong>
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="bulk-type-confirm"
+                               placeholder="Escribe CANCELAR en mayúsculas"
+                               autocomplete="off">
+                    </div>
+
+                    <!-- Progress section (hidden initially) -->
+                    <div id="bulk-cancel-progress" style="display: none;">
+                        <h6 class="mb-2 mt-4">Progreso de Cancelación</h6>
+                        <div class="progress mb-2" style="height: 24px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
+                                 id="bulk-progress-bar"
+                                 role="progressbar"
+                                 style="width: 0%"
+                                 aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                                0 de ${selected.length}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between small text-muted">
+                            <span>✅ <span id="bulk-success-count">0</span> exitosos</span>
+                            <span>❌ <span id="bulk-error-count">0</span> errores</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="bulk-cancel-close">
+                        Volver
+                    </button>
+                    <button type="button" class="btn btn-danger" id="bulk-confirm-cancel-btn" disabled>
+                        <i class="iconoir-xmark me-2"></i>
+                        Cancelar ${selected.length} Link${selected.length > 1 ? 's' : ''}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(bulkCancelModal);
+    const modal = new bootstrap.Modal(bulkCancelModal);
+    modal.show();
+
+    // Validar formulario
+    const reasonSelect = document.getElementById('bulk-cancel-reason');
+    const typeConfirm = document.getElementById('bulk-type-confirm');
+    const confirmBtn = document.getElementById('bulk-confirm-cancel-btn');
+
+    const validateBulkForm = () => {
+        const hasReason = reasonSelect.value !== '';
+        const hasTyped = typeConfirm.value === 'CANCELAR';
+        confirmBtn.disabled = !(hasReason && hasTyped);
+    };
+
+    reasonSelect.addEventListener('change', validateBulkForm);
+    typeConfirm.addEventListener('input', validateBulkForm);
+
+    // Handle confirm
+    confirmBtn.addEventListener('click', () => {
+        executeBulkCancel(selected, reasonSelect.value, modal);
+    });
+
+    // Cleanup
+    bulkCancelModal.addEventListener('hidden.bs.modal', () => {
+        if (document.body.contains(bulkCancelModal)) {
+            document.body.removeChild(bulkCancelModal);
+        }
+    });
+}
+
+function executeBulkCancel(linkIds, reason, confirmModal) {
+    // Hide confirm button, show progress
+    document.getElementById('bulk-confirm-cancel-btn').style.display = 'none';
+    document.getElementById('bulk-cancel-close').disabled = true;
+    document.getElementById('bulk-cancel-progress').style.display = 'block';
+
+    const progressBar = document.getElementById('bulk-progress-bar');
+    const successCount = document.getElementById('bulk-success-count');
+    const errorCount = document.getElementById('bulk-error-count');
+
+    let completed = 0;
+    let errors = 0;
+
+    // Process sequentially
+    const processNext = (index) => {
+        if (index >= linkIds.length) {
+            // All done
+            setTimeout(() => {
+                confirmModal.hide();
+
+                if (errors === 0) {
+                    showToast(`✅ ${completed} links cancelados correctamente`, 'success');
+                } else {
+                    showToast(`⚠️ ${completed} cancelados, ${errors} errores`, 'warning');
+                }
+
+                linksTable.ajax.reload();
+                clearSelection();
+            }, 1000);
+            return;
+        }
+
+        const linkId = linkIds[index];
+
+        fetch('{% url "links:cancel" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({
+                link_id: linkId,
+                cancellation_reason: reason,
+                notify_customer: false  // Bulk no notifica (demasiados emails)
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                completed++;
+                successCount.textContent = completed;
+            } else {
+                errors++;
+                errorCount.textContent = errors;
+                console.error(`Failed to cancel ${linkId}:`, data.error);
+            }
+        })
+        .catch(error => {
+            errors++;
+            errorCount.textContent = errors;
+            console.error(`Error cancelling ${linkId}:`, error);
+        })
+        .finally(() => {
+            // Update progress bar
+            const progress = ((index + 1) / linkIds.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressBar.innerHTML = `${index + 1} de ${linkIds.length}`;
+
+            // Process next after delay
+            setTimeout(() => processNext(index + 1), 200);
+        });
+    };
+
+    // Start processing
+    processNext(0);
+}
+
+// ⚠️ DEPRECATED - Removido de la UI (recordatorios automáticos vía Celery)
+function sendReminder(linkId) {
+    console.warn('⚠️ DEPRECATED: sendReminder() - Función removida de la UI');
+    return;
+    /* CÓDIGO COMENTADO
+    if (!confirm('¿Enviar recordatorio de pago al cliente?')) {
+        return;
+    }
+
+    fetch('{% url "links:send_reminder" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCsrfToken()
+        },
+        body: JSON.stringify({ link_id: linkId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Recordatorio enviado exitosamente', 'success');
+        } else {
+            showToast(data.error || 'Error enviando recordatorio', 'error');
+        }
+    })
+    .catch(error => {
+        showToast('Error de conexión', 'error');
+    });
+    */
+}
+
+function refreshTable() {
+    linksTable.ajax.reload();
+    showToast('Tabla actualizada', 'success');
+}
+
+function updateStats() {
+    fetch('{% url "links:stats" %}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Actualizar solo si los elementos existen (defensive programming)
+                const totalLinks = document.getElementById('total-links');
+                if (totalLinks) totalLinks.textContent = data.stats.total;
+
+                const paidLinks = document.getElementById('paid-links');
+                if (paidLinks) paidLinks.textContent = data.stats.paid;
+
+                const activeLinks = document.getElementById('active-links');
+                if (activeLinks) activeLinks.textContent = data.stats.active;
+
+                const totalRevenue = document.getElementById('total-revenue');
+                if (totalRevenue) totalRevenue.textContent = `$${parseFloat(data.stats.revenue).toFixed(2)}`;
+            }
+        })
+        .catch(error => console.error('Error updating stats:', error));
+}
+
+// Use global showDetailPanel from dashboard/base.html
+// No need to redefine - function already exists globally
+
+function copyLinkUrl(token) {
+    const url = `{{ request.build_absolute_uri }}`.replace(/\/[^\/]*$/, '') + `/hola/${token}/`;
+    navigator.clipboard.writeText(url).then(function() {
+        showToast('URL copiada al portapapeles', 'success');
+    }, function(err) {
+        showToast('Error al copiar URL', 'error');
+    });
+}
+
+function duplicateLink(linkId) {
+    if (confirm('¿Duplicar este link de pago?')) {
+        fetch('{% url "links:duplicate" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ link_id: linkId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Link duplicado exitosamente', 'success');
+                linksTable.ajax.reload();
+            } else {
+                showToast(data.error || 'Error duplicando link', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        });
+    }
+}
+
+function cancelLink(linkId) {
+    if (confirm('¿Estás seguro de cancelar este link? Esta acción no se puede deshacer.')) {
+        fetch('{% url "links:cancel" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify({ link_id: linkId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Link cancelado', 'success');
+                linksTable.ajax.reload();
+            } else {
+                showToast(data.error || 'Error cancelando link', 'error');
+            }
+        })
+        .catch(error => {
+            showToast('Error de conexión', 'error');
+        });
+    }
+}
+
+function exportLinks(format) {
+    if (format === 'xlsx') {
+        showToast('Exportación Excel próximamente. Usa CSV.', 'info');
+        return;
+    }
+
+    const params = new URLSearchParams();
+
+    // Add current filters (usando jQuery ya que DataTable usa jQuery)
+    const status = $('#status-filter').val();
+    if (status) params.append('status', status);
+
+    const dateFrom = $('#date-from').val();
+    if (dateFrom) params.append('date_from', dateFrom);
+
+    const dateTo = $('#date-to').val();
+    if (dateTo) params.append('date_to', dateTo);
+
+    const customer = $('#customer-filter').val();
+    if (customer) params.append('customer', customer);
+
+    const amountMin = $('#amount-min').val();
+    if (amountMin) params.append('amount_min', amountMin);
+
+    const amountMax = $('#amount-max').val();
+    if (amountMax) params.append('amount_max', amountMax);
+
+    // Download CSV
+    const url = `/enlaces/exportar/${format}/?${params.toString()}`;  // 🇪🇸 Migrado
+    window.location.href = url;
+
+    showToast('Descargando CSV...', 'info');
+
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'export_links', {
+            'event_category': 'links',
+            'event_label': format
+        });
+    }
+}
+
+function showCreateLinkModal() {
+    // Use global KitaModalLoader system
+    if (window.modalLoader) {
+        window.modalLoader.loadModal(
+            'createLinkModal',
+            '{% url "dashboard:create_link_form" %}',
+            {
+                targetElementId: 'create-link-form',
+                cacheKey: 'create-link-form'
+            }
+        );
+    } else {
+        // Fallback if modalLoader not available
+        console.error('[Links] Global modalLoader not available');
+        showToast('Error del sistema', 'error');
+    }
+}
+
+// Utility functions now centralized in static/js/utils.js
+// Available globally as: window.escapeHtml(), window.getCsrfToken()
+
+// Global edit link functions
+function showEditLinkModal(linkId) {
+    console.log('Loading edit data for link:', linkId);
+
+    fetch(`/enlaces/editar-datos/${linkId}/`)  // 🇪🇸 Migrado
+        .then(response => {
+            console.log('Edit data response status:', response.status);
+            return response.json();
+        })
+        .then(data => {
+            console.log('Edit data response:', data);
+            if (data.success) {
+                // Close detail panel first
+                const offcanvas = bootstrap.Offcanvas.getInstance(document.getElementById('detailPanel'));
+                if (offcanvas) {
+                    offcanvas.hide();
+                }
+
+                // Wait for panel to close, then show edit modal
+                setTimeout(() => {
+                    createEditModal(data.link);
+                }, 300);
+            } else {
+                showToast(data.error || 'Error cargando datos del link', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading edit data:', error);
+            showToast('Error de conexión', 'error');
+        });
+}
+
+// ✅ REMOVIDO: Duplicado de link-actions.js
+// Usar KitaLinkActions.createEditModal() en su lugar
+
+function createEditModal(linkData) {
+    // ✅ Delegar a implementación global
+    if (typeof KitaLinkActions !== 'undefined' && KitaLinkActions.createEditModal) {
+        KitaLinkActions.createEditModal(linkData);
+        return;
+    }
+
+    // Fallback si no está cargado (no debería pasar)
+    console.error('❌ KitaLinkActions not loaded');
+    showToast('Error: Sistema de modales no cargado', 'error');
+
+    /* CÓDIGO DUPLICADO REMOVIDO - VER link-actions.js líneas 253-603 */
+}
+
+</script>
+{% endblock %}

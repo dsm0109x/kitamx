@@ -1,0 +1,23 @@
+[Unit]
+Description=Kita Celery Worker
+After=network.target
+
+[Service]
+Type=forking
+User=kita
+Group=kita
+WorkingDirectory=/home/kita/kita
+Environment="PATH=/home/kita/kita/venv/bin"
+ExecStart=/home/kita/kita/venv/bin/celery -A kita worker \
+    --loglevel=info \
+    --logfile=/home/kita/logs/celery-worker.log \
+    --pidfile=/home/kita/kita/celery-worker.pid \
+    --detach \
+    --concurrency=4 \
+    --queues=high,default,low
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

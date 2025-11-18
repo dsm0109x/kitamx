@@ -1,0 +1,454 @@
+/**
+ * Home Page - Apple Liquid Glass Override
+ *
+ * Transforms Kita landing page to Apple design language
+ * Applies glassmorphism, depth, and premium interactions
+ *
+ * @version 1.0
+ */
+
+/* ===== GLOBAL OVERRIDES ===== */
+
+/* Remove ALL hard borders with color */
+.timeline-step,
+.timeline-detail,
+.example-field,
+.timeline-result-card,
+.invoice-result-card,
+.whatsapp-preview,
+.payment-method-item,
+.flow-step,
+.file-badge,
+.timeline-checklist li,
+.comparison-card,
+.comparison-step,
+.calc-card,
+.calculator-roi,
+.pricing-card,
+.faq-item,
+.cta-step-card {
+    border-radius: var(--radius-lg) !important;
+}
+
+/* ===== TIMELINE SECTION ===== */
+
+.timeline-step {
+    background: linear-gradient(
+        135deg,
+        var(--glass-regular) 0%,
+        var(--glass-ultra-thin) 100%
+    ) !important;
+    backdrop-filter: var(--blur-medium) !important;
+    -webkit-backdrop-filter: var(--blur-medium) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-md) !important;
+    padding: var(--space-4) var(--space-3) !important;
+}
+
+.timeline-step:hover {
+    background: var(--glass-regular) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.timeline-step.active {
+    background: linear-gradient(
+        135deg,
+        var(--glass-ultra-thick) 0%,
+        var(--glass-thick) 100%
+    ) !important;
+    backdrop-filter: var(--blur-heavy) saturate(200%) !important;
+    transform: scale(1.03) !important;
+    box-shadow:
+        0 20px 60px rgba(0, 122, 255, 0.12),
+        0 8px 24px rgba(0, 122, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 0 0 1px rgba(0, 122, 255, 0.1) !important;
+    border: 1px solid rgba(0, 122, 255, 0.2) !important;
+}
+
+.timeline-number {
+    background: var(--accent-gradient) !important;
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow:
+        0 4px 16px rgba(0, 122, 255, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    filter: drop-shadow(0 2px 8px rgba(0, 122, 255, 0.3));
+}
+
+.timeline-step.active .timeline-number {
+    transform: scale(1.1) !important;
+    box-shadow:
+        0 8px 24px rgba(0, 122, 255, 0.5),
+        inset 0 1px 0 var(--glass-thin) !important;
+    filter: drop-shadow(0 4px 16px rgba(0, 122, 255, 0.4));
+}
+
+/* Timeline detail panel */
+.timeline-detail {
+    background: transparent !important;
+    border: none !important;
+    border-top: 1px solid var(--border-light) !important;
+    padding: var(--space-6) 0 !important;
+}
+
+/* Timeline internal components */
+.example-field {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+    padding: var(--space-2) var(--space-3) !important;
+    margin-bottom: var(--space-2) !important;
+}
+
+.timeline-result-card,
+.invoice-result-card {
+    background: var(--glass-thick) !important;
+    backdrop-filter: var(--blur-medium) !important;
+    border: 1px solid rgba(52, 199, 89, 0.2) !important;
+    box-shadow: var(--shadow-success) !important;
+    padding: var(--space-4) !important;
+}
+
+.whatsapp-preview {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-medium) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.whatsapp-header {
+    background: linear-gradient(135deg, rgba(37, 211, 102, 0.9) 0%, rgba(37, 211, 102, 0.8) 100%) !important;
+    border-bottom: none !important;
+}
+
+.payment-method-item {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+    transition: var(--transition-normal) !important;
+}
+
+.payment-method-item:hover {
+    background: var(--glass-thick) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.flow-step {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.file-badge,
+.timeline-checklist li {
+    background: var(--glass-thin) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* ===== COMPARISON SECTION ===== */
+
+.comparison-card {
+    background: transparent !important;
+    border-left: none !important;
+    border: none !important;
+}
+
+.comparison-card-before,
+.comparison-card-after {
+    padding-left: 0 !important;
+}
+
+.comparison-step {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: var(--space-3) !important;
+    margin-bottom: var(--space-2) !important;
+}
+
+.comparison-step-before:hover,
+.comparison-step-after:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* Step numbers - gradient circles */
+.comparison-step-number-before {
+    background: linear-gradient(135deg, #FF3B30 0%, #FF6259 100%) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3) !important;
+}
+
+.comparison-step-number-after {
+    background: linear-gradient(135deg, #34C759 0%, #30D158 100%) !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3) !important;
+}
+
+.comparison-total {
+    background: var(--glass-thin) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: var(--space-3) !important;
+    margin-top: var(--space-3) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* ===== PRICING SECTION ===== */
+
+.pricing-card {
+    background: linear-gradient(
+        145deg,
+        var(--glass-thick) 0%,
+        var(--glass-regular) 100%
+    ) !important;
+    backdrop-filter: var(--blur-heavy) !important;
+    -webkit-backdrop-filter: var(--blur-heavy) !important;
+    border: 1px solid var(--border-white) !important;
+    border-radius: var(--radius-2xl) !important;
+    box-shadow: var(--shadow-xl) !important;
+    transition: var(--transition-normal) !important;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px) scale(1.01) !important;
+    box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.16),
+        0 12px 32px rgba(0, 0, 0, 0.08) !important;
+}
+
+.pricing-card-kita {
+    background: linear-gradient(
+        145deg,
+        var(--glass-ultra-thick) 0%,
+        var(--glass-thick) 100%
+    ) !important;
+    box-shadow:
+        0 24px 80px rgba(0, 122, 255, 0.15),
+        0 8px 32px rgba(0, 122, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 0 0 1px rgba(0, 122, 255, 0.08) !important;
+    border: 1px solid rgba(0, 122, 255, 0.2) !important;
+    border-left: none !important;
+}
+
+.pricing-badge {
+    background: var(--accent-primary) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3) !important;
+    border: none !important;
+}
+
+/* ===== FAQ SECTION ===== */
+
+.faq-item {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-medium) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+    margin-bottom: var(--space-2) !important;
+    border-left: none !important;
+    border-top: 1px solid var(--border-white) !important;
+    transition: var(--transition-normal) !important;
+}
+
+.faq-item:hover {
+    background: var(--glass-thick) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+.faq-item.active {
+    background: var(--glass-ultra-thick) !important;
+    box-shadow:
+        0 8px 32px rgba(0, 122, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 0 0 1px rgba(0, 122, 255, 0.05) !important;
+}
+
+.faq-question .iconoir {
+    transition: transform 0.4s var(--ease-spring) !important;
+}
+
+/* ===== ROI CALCULATOR ===== */
+
+.roi-calculator {
+    background: white !important;
+    border: 1px solid var(--border-light) !important;
+    border-top: 4px solid var(--accent-primary) !important;
+    border-radius: var(--radius-2xl) !important;
+    box-shadow: var(--shadow-lg) !important;
+    padding: var(--space-6) var(--space-5) !important;
+}
+
+.roi-calculator-left {
+    border-right: none !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.roi-calculator-right {
+    border-left: 1px solid var(--border-light) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+/* iOS-style slider */
+.roi-slider {
+    height: 4px !important;
+    background: var(--border-medium) !important;
+    border-radius: 2px !important;
+}
+
+.roi-slider::-webkit-slider-thumb {
+    width: 28px !important;
+    height: 28px !important;
+    background: white !important;
+    border: none !important;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        0 1px 4px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+    cursor: grab !important;
+}
+
+.roi-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15) !important;
+    box-shadow:
+        0 4px 16px rgba(0, 122, 255, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.roi-slider::-webkit-slider-thumb:active {
+    cursor: grabbing !important;
+    transform: scale(1.05) !important;
+}
+
+.calc-card {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid var(--border-white) !important;
+    box-shadow: var(--shadow-sm) !important;
+    border-left: none !important;
+    border-top: none !important;
+}
+
+.calc-card-before {
+    border-left: 3px solid var(--error) !important;
+}
+
+.calc-card-after {
+    border-left: 3px solid var(--success) !important;
+}
+
+.calculator-roi {
+    background: var(--glass-thin) !important;
+    backdrop-filter: var(--blur-light) !important;
+    border: 1px solid rgba(52, 199, 89, 0.2) !important;
+    border-left: 3px solid var(--success) !important;
+    box-shadow: var(--shadow-success) !important;
+}
+
+/* ===== CTA SECTION ===== */
+
+.cta-step-card {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-medium) !important;
+    border: 1px solid var(--border-white) !important;
+    border-top: none !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+/* ===== BUTTONS ===== */
+
+.btn-accent,
+.btn-primary {
+    background: var(--accent-gradient) !important;
+    border: none !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow:
+        0 4px 16px rgba(0, 122, 255, 0.3),
+        0 2px 8px rgba(0, 122, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    transition: var(--transition-fast) !important;
+    font-weight: var(--weight-semibold) !important;
+}
+
+.btn-accent:hover,
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0077ED 0%, #5350D6 100%) !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow:
+        0 12px 32px rgba(0, 122, 255, 0.4),
+        0 4px 16px rgba(0, 122, 255, 0.3) !important;
+}
+
+.btn-accent:active,
+.btn-primary:active {
+    transform: translateY(0) scale(0.98) !important;
+}
+
+.btn-secondary,
+.btn-outline-secondary {
+    background: var(--glass-regular) !important;
+    backdrop-filter: var(--blur-medium) !important;
+    border: 1px solid var(--border-white) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-sm) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-secondary:hover,
+.btn-outline-secondary:hover {
+    background: var(--glass-thick) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-md) !important;
+}
+
+/* ===== MOBILE MENU ===== */
+
+@media (max-width: 991.98px) {
+    .navbar-collapse {
+        background: var(--glass-thick) !important;
+        backdrop-filter: var(--blur-heavy) !important;
+        border: 1px solid var(--border-white) !important;
+        border-radius: var(--radius-xl) !important;
+        box-shadow: var(--shadow-lg) !important;
+        margin-top: var(--space-2) !important;
+        padding: var(--space-3) !important;
+    }
+
+    .navbar-nav .nav-link {
+        border-radius: var(--radius-md) !important;
+        transition: var(--transition-fast) !important;
+    }
+
+    .navbar-nav .nav-link:hover {
+        background: rgba(0, 122, 255, 0.08) !important;
+    }
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+
+@media (max-width: 767px) {
+    .roi-calculator-left,
+    .roi-calculator-right {
+        border-radius: var(--radius-2xl) !important;
+        margin-bottom: var(--space-3) !important;
+        border: 1px solid var(--border-light) !important;
+    }
+}

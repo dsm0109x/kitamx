@@ -1,0 +1,331 @@
+/**
+ * BASE COMPONENTS - Single Source of Truth
+ *
+ * Este archivo define los estilos base de:
+ * - Botones (.btn)
+ * - Cards (.card)
+ * - Inputs (.form-control, .form-select)
+ *
+ * REGLA DE ORO:
+ * - Otros archivos NO deben redefinir estos selectores base
+ * - Solo usar CSS variables (--btn-*, --card-*, --input-*) para customización
+ * - Usar !important SOLO aquí para forzar consistencia
+ *
+ * Creado: 2025-10-23
+ * Sistema: DRY (Don't Repeat Yourself)
+ */
+
+/* ========================================
+   BUTTONS - Base Definition
+   ======================================== */
+
+.btn {
+    /* Layout */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--btn-gap, 0.5rem) !important;
+
+    /* Spacing */
+    padding: var(--btn-padding, 0.625rem 1.25rem) !important;
+
+    /* Typography */
+    font-family: var(--font-sans) !important;
+    font-size: var(--btn-font-size, 0.9rem) !important;
+    font-weight: var(--btn-font-weight, 500);
+    letter-spacing: -0.01em;
+
+    /* Visual */
+    border-radius: var(--radius-button) !important;  /* 16px - MUY REDONDO */
+    border: var(--btn-border, none);
+    cursor: pointer;
+    user-select: none;
+
+    /* Animation */
+    transition: all var(--transition-base);
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Icons in buttons */
+.btn [class^="iconoir-"],
+.btn [class*="iconoir-"] {
+    font-size: var(--btn-icon-size, 1.25rem);
+    stroke-width: 2.5px;
+    line-height: 1;
+}
+
+/* Size modifiers */
+.btn-sm {
+    --btn-padding: 0.375rem 0.875rem;
+    --btn-font-size: 0.8rem;
+    --btn-icon-size: 1rem;
+    border-radius: var(--radius-button-sm) !important;  /* 12px */
+}
+
+.btn-lg {
+    --btn-padding: 0.875rem 1.75rem;
+    --btn-font-size: 1rem;
+    --btn-icon-size: 1.5rem;
+    border-radius: var(--radius-button-lg) !important;  /* 20px */
+}
+
+.btn-xl {
+    --btn-padding: 1rem 2rem;
+    --btn-font-size: 1.1rem;
+    --btn-icon-size: 1.75rem;
+    border-radius: var(--radius-button-lg) !important;  /* 20px */
+}
+
+/* ========================================
+   CARDS - Base Definition
+   ======================================== */
+
+.card {
+    /* Visual */
+    background: var(--bg-card) !important;
+    border: none !important;
+    border-radius: var(--radius-card) !important;  /* 8px - REDONDO */
+    box-shadow: var(--card-shadow, 0 1px 2px rgba(0, 0, 0, 0.04)) !important;
+
+    /* Spacing */
+    padding: var(--card-padding, 0);  /* Default 0, el card-body maneja padding */
+}
+
+.card:hover {
+    /* Cards NO tienen hover por defecto */
+    /* Si una card específica necesita hover, definirlo en su archivo */
+}
+
+.card-header {
+    background: transparent !important;
+    border-bottom: none;
+    padding: var(--card-header-padding, 1rem 1.5rem);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.card-body {
+    padding: var(--card-body-padding, 1.5rem);
+}
+
+.card-title {
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 0.5rem;
+}
+
+.card-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* Card anidada (debe ser transparente) */
+.card .card {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* ========================================
+   INPUTS - Base Definition
+   ======================================== */
+
+.form-control,
+.form-select,
+textarea.form-control {
+    /* Visual */
+    border: 2px solid var(--border-default) !important;
+    background: var(--bg-card) !important;
+
+    /* Spacing */
+    padding: var(--input-padding, 0.875rem 1rem) !important;
+
+    /* Typography */
+    font-size: var(--input-font-size, 0.95rem) !important;
+    color: var(--text-primary) !important;
+
+    /* Animation */
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Hover state (muy sutil) */
+.form-control:hover:not(:focus):not(:disabled),
+.form-select:hover:not(:focus):not(:disabled),
+textarea.form-control:hover:not(:focus):not(:disabled) {
+    border-color: var(--border-hover) !important;
+    background: var(--input-bg-hover, var(--bg-card)) !important;
+    border-radius: 8px !important; 
+}
+
+/* Focus state */
+.form-control:focus,
+.form-select:focus,
+textarea.form-control:focus {
+    border-color: var(--text-primary) !important;
+    border-radius: 8px !important; 
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08) !important;
+    background: var(--bg-card) !important;
+    outline: none !important;
+    transform: scale(1.01);
+}
+
+/* Valid state */
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: var(--color-forest-700) !important;
+    background: var(--color-forest-50) !important;
+    box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.08) !important;
+    background-image: none !important;
+    border-radius: 8px !important; 
+}
+
+/* Invalid state */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--color-gray-700) !important;
+    background: #fef2f2 !important;
+    box-shadow: 0 0 0 3px rgba(55, 65, 81, 0.08) !important;
+    background-image: none !important;
+    animation: shake 0.4s cubic-bezier(.36,.07,.19,.97);
+    border-radius: 8px !important; 
+}
+
+/* Disabled state */
+.form-control:disabled,
+.form-select:disabled,
+textarea.form-control:disabled {
+    background: #e9ecef !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+    border-radius: 8px !important; 
+}
+
+/* ========================================
+   CHECKBOXES & RADIOS
+   ======================================== */
+
+.form-check-input {
+    border-radius: var(--radius-input) !important;  /* 8px - mismo que inputs */
+    border: 2px solid var(--border-default);
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.form-check-input:checked {
+    background-color: var(--color-forest-700);
+    border-color: var(--color-forest-700);
+}
+
+.form-check-input:focus {
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.08);
+}
+
+/* ========================================
+   PLACEHOLDER & HELPERS
+   ======================================== */
+
+.form-control::placeholder,
+.form-select::placeholder,
+textarea.form-control::placeholder {
+    color: var(--color-gray-400);
+    opacity: 1;
+}
+
+.form-control:focus::placeholder,
+.form-select:focus::placeholder {
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+}
+
+/* Form text helpers */
+.form-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* ========================================
+   VALIDATION FEEDBACK
+   ======================================== */
+
+.invalid-feedback,
+.valid-feedback {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.invalid-feedback {
+    color: var(--color-gray-700);
+}
+
+.valid-feedback {
+    color: var(--color-forest-700);
+}
+
+/* Show feedback when invalid/valid */
+.form-control.is-invalid ~ .invalid-feedback,
+.form-select.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.form-control.is-valid ~ .valid-feedback,
+.form-select.is-valid ~ .valid-feedback {
+    display: block;
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+/* Enhanced focus for keyboard navigation */
+.btn:focus-visible {
+    outline: 3px solid var(--color-forest-700);
+    outline-offset: 2px;
+}
+
+.form-control:focus-visible,
+.form-select:focus-visible {
+    outline: 3px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+/* Touch targets (móvil) */
+@media (max-width: 768px) {
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 44px;
+    }
+}

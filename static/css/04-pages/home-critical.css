@@ -1,0 +1,490 @@
+/**
+ * CRITICAL CSS - HOME PAGE (Above the Fold)
+ *
+ * Este archivo contiene SOLO los estilos necesarios para renderizar
+ * la sección Hero y Navbar (above-the-fold) sin bloqueo.
+ *
+ * Se debe incluir INLINE en el <head> para máxima performance.
+ * El resto del CSS (home-consolidated.css) se carga async.
+ *
+ * Tamaño objetivo: <15 KB
+ */
+
+/* ========================================
+   NAVBAR BRUTALIST - STICKY TOP
+   ======================================== */
+
+.navbar-brutalist {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: none;
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+    padding: 0.75rem 0;
+}
+
+.navbar-brutalist.navbar-scrolled {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    background: rgba(255, 255, 255, 1);
+}
+
+.navbar-brutalist .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+
+.navbar-brutalist .kita-logo-navbar {
+    height: 40px;
+    width: auto;
+}
+
+.navbar-brutalist .kita-brand {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: #111827;
+    margin: 0;
+}
+
+.navbar-brutalist .nav-link {
+    color: #4b5563;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    transition: color 0.2s ease;
+}
+
+.navbar-brutalist .nav-link:hover {
+    color: #111827;
+}
+
+.navbar-brutalist .btn {
+    margin-left: 0.5rem;
+}
+
+/* ========================================
+   HERO SECTION - NAVY PREMIUM
+   ======================================== */
+
+.hero-brutalist-centered {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+    color: #f1f5f9;
+    padding: 4rem 0 3rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content-left {
+    max-width: 600px;
+}
+
+/* Brand combo */
+.hero-brand-combo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.hero-logo-inline {
+    width: 56px;
+    height: 56px;
+}
+
+.hero-brand-inline {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 3rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin: 0;
+}
+
+/* Tagline */
+.hero-tagline-navy {
+    font-size: 0.95rem;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Headline principal */
+.hero-headline-navy {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    letter-spacing: -0.03em;
+}
+
+.highlight-forest {
+    color: #22c55e;
+    position: relative;
+}
+
+/* Subheadline */
+.hero-subheadline-navy {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    color: #cbd5e1;
+    margin-bottom: 2rem;
+}
+
+.text-forest {
+    color: #22c55e;
+    font-weight: 600;
+}
+
+/* CTA Section */
+.hero-cta-section {
+    margin-bottom: 2rem;
+}
+
+.btn-hero-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #15803d 0%, #16a34a 50%, #22c55e 100%);
+    background-size: 200% 200%;
+    background-position: 0% 50%;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1.125rem;
+    padding: 1rem 2.5rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 8px 24px rgba(21, 128, 61, 0.35);
+}
+
+.btn-hero-primary:hover {
+    background-position: 100% 50%;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(21, 128, 61, 0.45);
+    color: #ffffff;
+}
+
+.btn-hero-primary .iconoir {
+    font-size: 1.5rem;
+}
+
+.cta-details-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+}
+
+.cta-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.cta-detail .iconoir {
+    color: #22c55e;
+}
+
+/* Trust badges inline */
+.hero-trust-inline {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.trust-badge-inline {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.trust-badge-inline .iconoir {
+    color: #22c55e;
+    font-size: 1.125rem;
+}
+
+/* ========================================
+   ANIMATIONS (Inline for Critical)
+   ======================================== */
+
+.animate-fade-in {
+    animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.animate-scale-in {
+    animation: scaleIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ========================================
+   VIDEO HERO CONTAINER (Right Column)
+   ======================================== */
+
+.video-hero-container {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    max-width: 100%;
+}
+
+.video-hero-thumbnail {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.video-hero-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-thumbnail-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    transition: background 0.3s ease;
+}
+
+.video-hero-thumbnail:hover .video-thumbnail-overlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.video-play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.play-button-circle {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.video-play-button:hover .play-button-circle {
+    transform: scale(1.1);
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.play-button-icon {
+    font-size: 2rem;
+    color: #15803d;
+    margin-left: 4px;
+}
+
+.play-button-text {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Video badges flotantes */
+.video-badge {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    animation: badgeFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.video-badge-1 {
+    top: 12%;
+    right: 10%;
+    animation-delay: 0.4s;
+}
+
+.video-badge-2 {
+    bottom: 30%;
+    left: 8%;
+    animation-delay: 0.6s;
+}
+
+.video-badge-3 {
+    bottom: 12%;
+    right: 12%;
+    animation-delay: 0.8s;
+}
+
+.video-badge-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+}
+
+.video-badge-icon .iconoir {
+    font-size: 1.25rem;
+}
+
+.video-badge-value {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #111827;
+}
+
+.video-badge-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+@keyframes badgeFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ========================================
+   RESPONSIVE (Mobile First)
+   ======================================== */
+
+@media (max-width: 991px) {
+    .hero-headline-navy {
+        font-size: 2rem;
+    }
+
+    .hero-brand-inline {
+        font-size: 2.5rem;
+    }
+
+    .btn-hero-primary {
+        font-size: 1rem;
+        padding: 0.875rem 2rem;
+    }
+
+    .video-badge {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .video-badge-value {
+        font-size: 0.85rem;
+    }
+
+    .play-button-circle {
+        width: 64px;
+        height: 64px;
+    }
+
+    .play-button-icon {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .hero-brutalist-centered {
+        padding: 3rem 0 2rem;
+    }
+
+    .hero-headline-navy {
+        font-size: 1.75rem;
+    }
+
+    .hero-brand-inline {
+        font-size: 2rem;
+    }
+
+    .hero-subheadline-navy {
+        font-size: 1rem;
+    }
+
+    .cta-details-row {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .video-badge-1,
+    .video-badge-2 {
+        display: none;
+    }
+
+    .video-badge-3 {
+        bottom: 8%;
+        right: 8%;
+    }
+}

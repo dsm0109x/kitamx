@@ -1,0 +1,710 @@
+/**
+ * DETAIL PANEL - DATA SHEET STYLE
+ * =================================
+ *
+ * Rediseño del detail panel como hoja de datos técnica minimalista.
+ * Sin cards, sin colores, solo tipografía y líneas.
+ *
+ * Features:
+ * - ✅ Sin cards (secciones planas)
+ * - ✅ Funnel sin barras coloridas (lista tabular)
+ * - ✅ Números en DM Serif Display
+ * - ✅ Headers en Inter UPPERCASE
+ * - ✅ Tabla simple sin bordes completos
+ * - ✅ Botones como lista de links
+ * - ✅ Monocromático (negro + grises)
+ * - ✅ Verde solo en hover
+ *
+ * @version 1.0 - Data Sheet
+ * @created 2025-11-10
+ */
+
+/* ============================================
+   OFFCANVAS OVERRIDES
+   ============================================ */
+
+.offcanvas-detail-panel {
+    width: 400px;                             /* Ancho del panel */
+}
+
+.offcanvas-detail-panel .offcanvas-header {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.25rem;
+}
+
+.offcanvas-detail-panel .offcanvas-title {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #111827;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0;
+}
+
+.offcanvas-detail-panel .offcanvas-body {
+    background: #ffffff;
+    padding: 0;                               /* Sin padding general */
+}
+
+/* ============================================
+   CARDS - CONVERTIR A SECCIONES PLANAS
+   ============================================ */
+
+.offcanvas-detail-panel .card {
+    background: #ffffff;
+    border: none !important;                  /* ✅ SIN bordes */
+    border-radius: 0;
+    box-shadow: none !important;              /* ✅ SIN sombras */
+    margin-bottom: 0;
+}
+
+.offcanvas-detail-panel .card:not(:last-child) {
+    border-bottom: 1px solid #f3f4f6 !important; /* Solo entre cards */
+}
+
+.offcanvas-detail-panel .card-header {
+    background: #ffffff;
+    border: none !important;                  /* ✅ SIN bordes */
+    padding: 1rem 1.25rem 0.5rem;
+}
+
+.offcanvas-detail-panel .card-header h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.75rem !important;            /* Pequeño */
+    font-weight: 700 !important;
+    color: #9ca3af !important;                /* Gris claro */
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin: 0 !important;
+}
+
+.offcanvas-detail-panel .card-header h6 i {
+    display: none;                            /* ✅ Sin iconos */
+}
+
+.offcanvas-detail-panel .card-subtitle {
+    display: none;                            /* ✅ Sin subtítulos */
+}
+
+.offcanvas-detail-panel .card-body {
+    background: #ffffff;
+    padding: 1rem 1.25rem;
+}
+
+.offcanvas-detail-panel .card-footer {
+    background: #ffffff;
+    border: none;
+    padding: 0.75rem 1.25rem;
+}
+
+/* ============================================
+   LINK HEADER - TÍTULO + TOKEN
+   ============================================ */
+
+.offcanvas-detail-panel .d-flex.align-items-center.mb-3 {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 0 !important;
+}
+
+.offcanvas-detail-panel .bg-primary.rounded-circle {
+    display: none;                            /* ✅ Sin icono circular */
+}
+
+.offcanvas-detail-panel .d-flex.align-items-center h6 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #111827 !important;
+    margin: 0 0 0.25rem 0 !important;
+}
+
+.offcanvas-detail-panel .d-flex.align-items-center small {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-family: monospace;
+}
+
+/* ============================================
+   FUNNEL - LISTA TABULAR (SIN BARRAS)
+   ============================================ */
+
+.offcanvas-detail-panel .funnel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.offcanvas-detail-panel .funnel-step {
+    display: grid;
+    grid-template-columns: 1fr auto auto;     /* label | número | % */
+    gap: 1rem;
+    align-items: baseline;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.offcanvas-detail-panel .funnel-step:last-child {
+    border-bottom: 2px solid #e5e7eb;         /* ✅ Último con borde más marcado */
+}
+
+/* ✅ NUEVO: Hacer que el funnel funcione sin las barras */
+.offcanvas-detail-panel .funnel-bar {
+    /* No ocultar, reestructurar */
+    height: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-width: auto !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto auto;
+    gap: 1rem;
+    width: 100% !important;
+    align-items: baseline;
+}
+
+/* Barras de colores eliminadas visualmente */
+.offcanvas-detail-panel .funnel-bar-views,
+.offcanvas-detail-panel .funnel-bar-clicks,
+.offcanvas-detail-panel .funnel-bar-attempts,
+.offcanvas-detail-panel .funnel-bar-success {
+    background: transparent !important;
+}
+
+.offcanvas-detail-panel .funnel-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #6b7280 !important;
+    display: flex;
+    align-items: center;
+}
+
+.offcanvas-detail-panel .funnel-label i {
+    display: none;                            /* Sin iconos */
+}
+
+.offcanvas-detail-panel .funnel-count {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;
+    text-align: right;
+}
+
+.offcanvas-detail-panel .funnel-percent {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 400;
+    color: #9ca3af !important;
+    text-align: right;
+    min-width: 50px;
+    position: static !important;              /* Override positioning */
+}
+
+/* ============================================
+   FUNNEL INSIGHT - MINIMALISTA
+   ============================================ */
+
+.offcanvas-detail-panel .funnel-insight {
+    background: #f9fafb !important;           /* ✅ Gray-50 (no azul) */
+    border: none !important;
+    border-left: 2px solid #111827 !important; /* ✅ Negro (no azul) */
+    padding: 0.75rem !important;
+    margin-top: 0.75rem !important;
+}
+
+.offcanvas-detail-panel .funnel-insight strong {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+}
+
+.offcanvas-detail-panel .funnel-insight p {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 0;
+}
+
+.offcanvas-detail-panel .funnel-insight::before {
+    content: none;                            /* Sin emoji */
+}
+
+/* ============================================
+   ENGAGEMENT - LISTA SIMPLE
+   ============================================ */
+
+.offcanvas-detail-panel .engagement-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.offcanvas-detail-panel .engagement-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 0 !important;
+}
+
+.offcanvas-detail-panel .engagement-item:last-child {
+    border-bottom: none;
+}
+
+.offcanvas-detail-panel .engagement-item .d-flex {
+    margin-bottom: 0 !important;
+}
+
+.offcanvas-detail-panel .engagement-item span {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.offcanvas-detail-panel .engagement-item span i {
+    display: none;                            /* Sin iconos */
+}
+
+.offcanvas-detail-panel .engagement-item strong {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 1.25rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;                /* ✅ Negro (no colores) */
+}
+
+.offcanvas-detail-panel .engagement-item .progress {
+    display: none !important;                 /* ✅ Sin progress bars */
+}
+
+/* ============================================
+   TABLAS - SIN BORDES COMPLETOS
+   ============================================ */
+
+.offcanvas-detail-panel .table {
+    margin-bottom: 0;
+    border-collapse: collapse;
+}
+
+.offcanvas-detail-panel .table tr {
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.offcanvas-detail-panel .table tr:last-child {
+    border-bottom: none;
+}
+
+/* ✅ Asegurar que todas las filas sean visibles */
+.offcanvas-detail-panel .table tr,
+.offcanvas-detail-panel .table tbody tr {
+    display: table-row !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.offcanvas-detail-panel .table td {
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    border: none;
+}
+
+.offcanvas-detail-panel .table td:first-child {
+    color: #9ca3af;
+    font-weight: 500;
+    width: 35%;                               /* ✅ Ancho fijo para labels */
+}
+
+.offcanvas-detail-panel .table td:last-child {
+    color: #111827;
+    font-weight: 400;
+    text-align: right;
+}
+
+.offcanvas-detail-panel .table td strong {
+    font-weight: 600;
+    color: #111827;
+    display: inline !important;               /* ✅ Asegurar que se muestre */
+}
+
+/* ✅ Forzar visibilidad de todas las filas */
+.offcanvas-detail-panel .table tr {
+    display: table-row !important;
+}
+
+/* ============================================
+   BADGES - MOSTRAR COMO TEXTO SIMPLE
+   ============================================ */
+
+/* ✅ Badges en tabla (Estado, Factura) - VISIBLES */
+.offcanvas-detail-panel .table .badge {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 0.25rem 0.5rem !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+    display: inline-block !important;         /* ✅ Forzar visibilidad */
+}
+
+.offcanvas-detail-panel .table .badge.bg-success,
+.offcanvas-detail-panel .table .badge.bg-primary,
+.offcanvas-detail-panel .table .badge.bg-warning,
+.offcanvas-detail-panel .table .badge.bg-danger,
+.offcanvas-detail-panel .table .badge.bg-info {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* ✅ Badges en botones - OCULTOS */
+.offcanvas-detail-panel .btn .badge {
+    display: none !important;
+}
+
+/* ✅ Texto en celdas de tabla - VISIBLE */
+.offcanvas-detail-panel .table td .text-muted {
+    color: #6b7280 !important;
+    display: inline !important;
+}
+
+/* ============================================
+   INPUT GROUP - MINIMALISTA
+   ============================================ */
+
+.offcanvas-detail-panel .input-group {
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+}
+
+.offcanvas-detail-panel .input-group .form-control {
+    border: none;
+    border-right: 1px solid #f3f4f6;
+    border-radius: 0;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    background: #fafbfc;
+}
+
+.offcanvas-detail-panel .input-group .btn {
+    border: none;
+    border-left: 1px solid #f3f4f6;
+    border-radius: 0;
+    background: #ffffff;
+    color: #6b7280;
+    padding: 0.5rem 0.75rem;
+}
+
+.offcanvas-detail-panel .input-group .btn:hover {
+    background: #111827;
+    color: #ffffff;
+}
+
+/* ============================================
+   BOTONES - LISTA DE ACCIONES
+   ============================================ */
+
+.offcanvas-detail-panel .d-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 0;
+}
+
+.offcanvas-detail-panel .d-grid .btn {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 0;
+    color: #111827;
+    text-align: left;
+    padding: 0.75rem 1.25rem 0.75rem 0;       /* ✅ DENTRO del área del botón */
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.offcanvas-detail-panel .d-grid .btn:last-child {
+    border-bottom: none;
+}
+
+.offcanvas-detail-panel .d-grid .btn::after {
+    content: '→';
+    color: #9ca3af;
+    transition: all 0.2s ease;
+    margin-left: auto;                        /* ✅ Empujar a la derecha */
+    flex-shrink: 0;
+}
+
+.offcanvas-detail-panel .d-grid .btn:hover {
+    color: #15803d;
+    padding-left: 0.5rem;
+    background: transparent;
+}
+
+.offcanvas-detail-panel .d-grid .btn:hover::after {
+    transform: translateX(4px);
+    color: #15803d;
+}
+
+.offcanvas-detail-panel .d-grid .btn i {
+    display: none !important;                 /* ✅ Ocultar TODOS los iconos */
+}
+
+/* ✅ Eliminar badges de los botones */
+.offcanvas-detail-panel .d-grid .btn .badge,
+.offcanvas-detail-panel .d-grid .btn .position-absolute {
+    display: none !important;
+}
+
+/* Colores específicos de botones - todos iguales */
+.offcanvas-detail-panel .btn-outline-info,
+.offcanvas-detail-panel .btn-outline-secondary,
+.offcanvas-detail-panel .btn-outline-primary,
+.offcanvas-detail-panel .btn-outline-warning,
+.offcanvas-detail-panel .btn-outline-danger,
+.offcanvas-detail-panel .btn-outline-success {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+    color: #111827 !important;
+}
+
+.offcanvas-detail-panel .btn-outline-danger:hover {
+    color: #ef4444 !important;                /* Rojo solo para cancelar */
+}
+
+/* ============================================
+   ALERTS - MINIMALISTAS
+   ============================================ */
+
+.offcanvas-detail-panel .alert {
+    background: #f9fafb !important;
+    border: none !important;
+    border-left: 1px solid #e5e7eb !important;
+    border-radius: 0 !important;
+    padding: 0.75rem !important;
+    margin: 0.75rem 0 !important;
+}
+
+.offcanvas-detail-panel .alert-info,
+.offcanvas-detail-panel .alert-warning,
+.offcanvas-detail-panel .alert-success {
+    background: #f9fafb !important;
+    border-left-color: #e5e7eb !important;
+}
+
+.offcanvas-detail-panel .alert strong {
+    font-weight: 600;
+    color: #111827;
+}
+
+.offcanvas-detail-panel .alert small,
+.offcanvas-detail-panel .alert p {
+    font-size: 0.8125rem;
+    color: #6b7280;
+}
+
+/* ============================================
+   LIST GROUP - LISTA SIMPLE
+   ============================================ */
+
+.offcanvas-detail-panel .list-group {
+    border: none;
+}
+
+.offcanvas-detail-panel .list-group-item {
+    background: #ffffff;
+    border: none;
+    border-bottom: 1px solid #f3f4f6;
+    border-radius: 0;
+    padding: 0.75rem 0;
+}
+
+.offcanvas-detail-panel .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.offcanvas-detail-panel .list-group-item strong {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 1.25rem !important;
+    font-weight: 400 !important;
+    color: #111827;
+}
+
+.offcanvas-detail-panel .list-group-item small {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.offcanvas-detail-panel .list-group-item .badge {
+    background: transparent !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6875rem;
+}
+
+/* ============================================
+   MÉTRICAS RÁPIDAS - CENTRADAS
+   ============================================ */
+
+.offcanvas-detail-panel .row.text-center {
+    text-align: center !important;            /* ✅ CENTRADAS */
+    margin: 0;
+}
+
+.offcanvas-detail-panel .row.text-center .col-4 {
+    padding: 0.75rem 0;
+    border-right: 1px solid #f3f4f6;
+}
+
+.offcanvas-detail-panel .row.text-center .col-4:last-child {
+    border-right: none;
+}
+
+.offcanvas-detail-panel .row.text-center .h4 {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 1.75rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.offcanvas-detail-panel .row.text-center small {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    display: block;
+}
+
+/* Eliminar colores de texto */
+.offcanvas-detail-panel .text-primary,
+.offcanvas-detail-panel .text-info,
+.offcanvas-detail-panel .text-warning,
+.offcanvas-detail-panel .text-success {
+    color: #111827 !important;
+}
+
+/* ============================================
+   PROGRESS BARS - OCULTAS
+   ============================================ */
+
+.offcanvas-detail-panel .progress {
+    display: none !important;                 /* ✅ Sin barras de progreso */
+}
+
+/* ============================================
+   EMPTY STATES - MINIMALISTAS
+   ============================================ */
+
+.offcanvas-detail-panel .text-center.py-4,
+.offcanvas-detail-panel .text-center.py-3 {
+    padding: 1.5rem !important;
+}
+
+.offcanvas-detail-panel .text-center i {
+    font-size: 2rem !important;
+    opacity: 0.2;
+    color: #9ca3af;
+}
+
+.offcanvas-detail-panel .text-center p {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* ============================================
+   BADGES EN BOTONES - OCULTOS
+   ============================================ */
+
+.offcanvas-detail-panel .btn .badge.rounded-pill {
+    display: none !important;                 /* ✅ Sin badges en botones */
+}
+
+.offcanvas-detail-panel .position-absolute.badge {
+    display: none !important;
+}
+
+/* ============================================
+   LINKS - VERDE EN HOVER
+   ============================================ */
+
+.offcanvas-detail-panel a {
+    color: #111827;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.offcanvas-detail-panel a:hover {
+    color: #15803d;
+    text-decoration: underline;
+}
+
+.offcanvas-detail-panel a i {
+    color: inherit;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 576px) {
+    .offcanvas-detail-panel {
+        width: 90vw;                          /* Más ancho en mobile */
+    }
+
+    .offcanvas-detail-panel .funnel-step {
+        grid-template-columns: 1fr auto;      /* Sin % en mobile */
+    }
+
+    .offcanvas-detail-panel .funnel-percent {
+        display: none;
+    }
+
+    .offcanvas-detail-panel .row.text-center .col-4 {
+        border-right: none;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 0.5rem 0;
+    }
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.offcanvas-detail-panel .text-muted {
+    color: #6b7280 !important;
+}
+
+.offcanvas-detail-panel .small {
+    font-size: 0.75rem;
+}
+
+.offcanvas-detail-panel .fw-bold {
+    font-weight: 600;
+}
+
+/* ============================================
+   BOTÓN REFRESH - MINIMALISTA
+   ============================================ */
+
+.offcanvas-detail-panel .btn-outline-secondary[onclick*="refresh"] {
+    background: transparent;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    color: #6b7280;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.offcanvas-detail-panel .btn-outline-secondary[onclick*="refresh"]:hover {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+}

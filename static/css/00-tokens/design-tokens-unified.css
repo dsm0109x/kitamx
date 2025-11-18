@@ -1,0 +1,476 @@
+/**
+ * KITA UNIFIED DESIGN TOKENS
+ * Sistema unificado combinando lo mejor de ambos sistemas
+ *
+ * Fusión de:
+ * - design-tokens.css (Gray Primary + Teal Accent)
+ * - apple-design-tokens.css (Apple Liquid Glass)
+ *
+ * Filosofía: Professional Gray palette + Premium Glass effects
+ * Fecha de fusión: 2025-10-09
+ */
+
+:root {
+    /* ========================================
+       GRAY SCALE - Primary System
+       ======================================== */
+    --color-gray-50: #f9fafb;
+    --color-gray-100: #f3f4f6;
+    --color-gray-200: #e5e7eb;
+    --color-gray-300: #d1d5db;
+    --color-gray-400: #9ca3af;
+    --color-gray-500: #6b7280;
+    --color-gray-600: #4b5563;
+    --color-gray-700: #374151;
+    --color-gray-800: #1f2937;
+    --color-gray-900: #111827;
+
+    /* ========================================
+       NAVY BLUE SCALE - Hero Background System
+       ======================================== */
+    --color-navy-50: #f0f4f8;
+    --color-navy-100: #d9e2ec;
+    --color-navy-200: #bcccdc;
+    --color-navy-300: #9fb3c8;
+    --color-navy-400: #829ab1;
+    --color-navy-500: #627d98;
+    --color-navy-600: #486581;
+    --color-navy-700: #334e68;  /* Azul marino principal */
+    --color-navy-800: #243b53;
+    --color-navy-900: #102a43;
+    --color-navy-950: #0a1929;
+
+    /* ========================================
+       FOREST GREEN SCALE - New Accent System
+       ======================================== */
+    --color-forest-50: #f0fdf4;
+    --color-forest-100: #dcfce7;
+    --color-forest-200: #bbf7d0;
+    --color-forest-300: #86efac;
+    --color-forest-400: #4ade80;
+    --color-forest-500: #22c55e;
+    --color-forest-600: #16a34a;
+    --color-forest-700: #15803d;  /* VERDE OSCURO PRINCIPAL */
+    --color-forest-800: #166534;
+    --color-forest-900: #14532d;
+
+    /* ========================================
+       TEAL SCALE - Legacy (mantener por compatibilidad)
+       ======================================== */
+    --color-teal-50: #f0fdfa;
+    --color-teal-100: #ccfbf1;
+    --color-teal-200: #99f6e4;
+    --color-teal-300: #5eead4;
+    --color-teal-400: #2dd4bf;
+    --color-teal-500: #14b8a6;
+    --color-teal-600: #0d9488;  /* OLD ACCENT */
+    --color-teal-700: #0f766e;
+    --color-teal-800: #115e59;
+    --color-teal-900: #134e4a;
+
+    /* ========================================
+       SEMANTIC COLORS (Desaturated - Monochrome)
+       ======================================== */
+    --color-success: #4b5563;   /* Gray-600 (monocromático) */
+    --color-success-bg: #f3f4f6;
+    --color-success-text: #1f2937;
+    --color-success-light: rgba(75, 85, 99, 0.1);
+
+    --color-warning: #6b7280;   /* Gray-500 (monocromático) */
+    --color-warning-bg: #f9fafb;
+    --color-warning-text: #374151;
+    --color-warning-light: rgba(107, 114, 128, 0.1);
+
+    --color-error: #374151;     /* Gray-700 (monocromático) */
+    --color-error-bg: #f3f4f6;
+    --color-error-text: #1f2937;
+    --color-error-light: rgba(55, 65, 81, 0.1);
+
+    --color-info: #6b7280;      /* Gray-500 (monocromático) */
+    --color-info-bg: #f9fafb;
+    --color-info-text: #374151;
+
+    /* ========================================
+       SEMANTIC ALIASES (Con Verde Accent)
+       ======================================== */
+    --color-primary: #111827;                    /* Black-ish (gray-900) */
+    --color-primary-hover: #000000;              /* True black */
+    --color-primary-light: #1f2937;              /* Gray-800 */
+    --color-primary-lighter: #374151;            /* Gray-700 */
+
+    /* Verde OSCURO para CTAs y elementos destacados */
+    --color-accent: #15803d;                     /* Verde forest-700 (oscuro profesional) */
+    --color-accent-hover: #166534;               /* Verde forest-800 (más oscuro) */
+    --color-accent-light: #16a34a;               /* Verde forest-600 */
+    --color-accent-lighter: #22c55e;             /* Verde forest-500 */
+
+    /* Navy para backgrounds especiales */
+    --color-navy-bg: #334e68;                    /* Navy-700 para backgrounds */
+    --color-navy-bg-dark: #243b53;               /* Navy-800 */
+
+    /* ========================================
+       BACKGROUNDS (Brutalist - Muy Claro)
+       ======================================== */
+    --bg-body: #f0f4f8;                  /* ✅ Navy-50 - Azul muy claro */
+    --bg-section: #f9fafb;               /* Gray-50 - MISMO en todas las sections */
+    --bg-section-alt: #f9fafb;           /* Gray-50 - NO alterna */
+    --bg-card: #ffffff;                  /* Blanco - SOLO CARDS (destacan) */
+    --bg-primary: #ffffff;               /* Blanco - Cards */
+    --bg-secondary: #f3f4f6;             /* Gray-100 */
+    --bg-tertiary: #e5e7eb;              /* Gray-200 */
+    --bg-subtle: #e5e7eb;                /* Gray-200 */
+    --bg-elevated: #f3f4f6;              /* Gray-100 */
+    --bg-overlay: rgba(31, 41, 55, 0.75);
+
+    /* ========================================
+       GLASS MATERIALS (Apple-inspired)
+       ======================================== */
+    --glass-ultra-thin: rgba(255, 255, 255, 0.7);
+    --glass-thin: rgba(255, 255, 255, 0.8);
+    --glass-regular: rgba(255, 255, 255, 0.85);
+    --glass-thick: rgba(255, 255, 255, 0.9);
+    --glass-ultra-thick: rgba(255, 255, 255, 0.95);
+
+    /* Glass con blur */
+    --glass-sidebar: rgba(255, 255, 255, 0.85);
+    --glass-header: rgba(255, 255, 255, 0.85);
+
+    /* ========================================
+       BLUR LEVELS
+       ======================================== */
+    --blur-light: blur(8px) saturate(180%);
+    --blur-medium: blur(16px) saturate(180%);
+    --blur-heavy: blur(24px) saturate(180%);
+    --blur-ultra: blur(32px) saturate(200%);
+
+    /* ========================================
+       GRADIENTS (Removed - Monochrome System)
+       ======================================== */
+    --gradient-primary: #111827;                                  /* Solid black (gray-900) */
+    --gradient-primary-dark: #000000;                             /* True black */
+    --gradient-accent: #111827;                                   /* Solid black (gray-900) */
+    --gradient-accent-apple: #111827;                             /* Solid black (gray-900) */
+    --gradient-subtle: #f9fafb;                                   /* Solid light gray (gray-50) */
+
+    /* ========================================
+       BORDERS
+       ======================================== */
+    --border-default: #e5e7eb;           /* Gray-200 */
+    --border-hover: #d1d5db;             /* Gray-300 */
+    --border-focus: #111827;             /* Primary (gray-900) */
+    --border-accent: #15803d;            /* Verde forest-700 (Accent) */
+    --border-error: #374151;             /* Error (gray-700) */
+    --border-success: #4b5563;           /* Success (gray-600) */
+
+    /* Borders ultra sutiles (Apple) */
+    --border-light: rgba(0, 0, 0, 0.04);
+    --border-medium: rgba(0, 0, 0, 0.08);
+    --border-heavy: rgba(0, 0, 0, 0.12);
+    --border-white: rgba(255, 255, 255, 0.18);
+
+    /* ========================================
+       TEXT COLORS (WCAG AAA Compliant)
+       ======================================== */
+    --text-primary: #111827;             /* Gray-900 (WCAG AAA 15.8:1) */
+    --text-secondary: #4b5563;           /* Gray-600 (WCAG AAA 7.1:1) */
+    --text-tertiary: #4b5563;            /* Gray-600 (WCAG AAA 7.1:1) - CORREGIDO */
+    --text-muted: #6b7280;               /* Gray-500 - SOLO para texto >16px (WCAG AA 4.9:1) */
+    --text-disabled: #6b7280;            /* Gray-500 (WCAG AA 4.9:1) - CORREGIDO */
+    --text-link: #15803d;                /* Verde forest-700 (Accent) */
+    --text-link-hover: #166534;          /* Verde forest-800 (Accent hover) */
+    --text-on-primary: #ffffff;
+    --text-on-accent: #ffffff;
+
+    /* Apple-style text alphas */
+    --text-primary-alpha: rgba(0, 0, 0, 0.9);
+    --text-secondary-alpha: rgba(0, 0, 0, 0.6);
+    --text-tertiary-alpha: rgba(0, 0, 0, 0.4);
+    --text-quaternary-alpha: rgba(0, 0, 0, 0.25);
+
+    /* ========================================
+       SHADOWS (Multi-layer Apple style) - SUAVIZADAS 50%
+       ======================================== */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.02);
+
+    --shadow-sm:
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 1px 4px rgba(0, 0, 0, 0.01),
+        inset 0 1px 0 var(--glass-thick);
+
+    --shadow-md:
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 4px 12px rgba(0, 0, 0, 0.02),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    --shadow-lg:
+        0 16px 48px rgba(0, 0, 0, 0.06),
+        0 8px 24px rgba(0, 0, 0, 0.03),
+        inset 0 1px 0 rgba(255, 255, 255, 1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.025);
+
+    --shadow-xl:
+        0 24px 64px rgba(0, 0, 0, 0.08),
+        0 12px 32px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+
+    --shadow-focus: 0 0 0 3px rgba(31, 41, 55, 0.05);
+    --shadow-focus-accent: 0 0 0 3px rgba(21, 128, 61, 0.1);  /* Verde forest-700 - suavizado */
+
+    /* Colored shadows */
+    --shadow-accent:
+        0 8px 32px rgba(21, 128, 61, 0.075),   /* Verde forest-700 - suavizado */
+        0 4px 16px rgba(21, 128, 61, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+    --shadow-accent-hover:
+        0 16px 48px rgba(21, 128, 61, 0.1),   /* Verde forest-700 - suavizado */
+        0 8px 24px rgba(21, 128, 61, 0.075),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+
+    --shadow-success:
+        0 8px 32px rgba(52, 199, 89, 0.075),
+        0 4px 16px rgba(52, 199, 89, 0.05);
+
+    /* ========================================
+       SPACING SCALE (8pt Grid)
+       ======================================== */
+    --spacing-xs: 0.25rem;   /* 4px */
+    --spacing-sm: 0.5rem;    /* 8px */
+    --spacing-md: 1rem;      /* 16px */
+    --spacing-lg: 1.5rem;    /* 24px */
+    --spacing-xl: 2rem;      /* 32px */
+    --spacing-2xl: 3rem;     /* 48px */
+    --spacing-3xl: 4rem;     /* 64px */
+    --spacing-4xl: 5rem;     /* 80px */
+
+    /* Apple spacing aliases */
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --space-4: 32px;
+    --space-5: 40px;
+    --space-6: 48px;
+    --space-8: 64px;
+    --space-10: 80px;
+    --space-12: 96px;
+    --space-16: 128px;
+    --space-20: 160px;
+
+    /* ========================================
+       BORDER RADIUS (Angular - Sharp Corners)
+       ======================================== */
+    --radius-none: 0px;
+    --radius-xs: 0px;     /* Angular design */
+    --radius-sm: 0px;     /* Angular design */
+    --radius-md: 0px;     /* Angular design */
+    --radius-lg: 0px;     /* Angular design */
+    --radius-xl: 0px;     /* Angular design */
+    --radius-2xl: 0px;    /* Angular design */
+    --radius-3xl: 0px;    /* Angular design */
+    --radius-4xl: 0px;    /* Angular design */
+
+    /* Solo para botones (permitido ser redondo) */
+    /* SISTEMA DE BORDER-RADIUS DOCUMENTADO:
+     * --radius-card (15px): Cards, panels, contenedores - ACTUALIZADO para más suavidad
+     * --radius-input (15px): Inputs, form fields (mismo que cards)
+     * --radius-button (9999px): TODOS los botones (REDONDO COMPLETO - pills)
+     * --radius-button-sm (9999px): Botones pequeños (redondo completo)
+     * --radius-button-lg (9999px): Botones XL (redondo completo)
+     * --radius-full (9999px): Elementos circulares (avatars, badges, slider thumbs)
+     */
+    --radius-card: 15px;         /* Cards y contenedores - MÁS SUAVE */
+    --radius-input: 15px;        /* Inputs - mismo que cards */
+    --radius-button: 9999px;     /* Botones - REDONDO COMPLETO (pill shape) */
+    --radius-button-sm: 9999px;  /* Botones pequeños - redondo completo */
+    --radius-button-lg: 9999px;  /* Botones XL - redondo completo */
+    --radius-full: 9999px;       /* Circular elements */
+
+    /* ========================================
+       TRANSITIONS
+       ======================================== */
+    /* Easing curves */
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+
+    /* Durations */
+    --duration-instant: 100ms;
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+
+    /* Combined transitions */
+    --transition-fast: 0.15s var(--ease-in-out);
+    --transition-base: 0.3s var(--ease-in-out);
+    --transition-slow: 0.5s var(--ease-in-out);
+    --transition-spring: 0.4s var(--ease-spring);
+
+    /* ========================================
+       TYPOGRAPHY
+       ======================================== */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+
+    /* Font weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Apple SF Pro Display Scale */
+    --font-size-hero: 96px;
+    --font-size-title1: 48px;
+    --font-size-title2: 36px;
+    --font-size-title3: 28px;
+    --font-size-headline: 17px;
+    --font-size-body: 15px;
+    --font-size-callout: 14px;
+    --font-size-caption: 13px;
+    --font-size-caption2: 11px;
+
+    /* Line heights */
+    --line-height-tight: 1.05;
+    --line-height-snug: 1.1;
+    --line-height-normal: 1.2;
+    --line-height-relaxed: 1.3;
+    --line-height-loose: 1.5;
+
+    /* Letter spacing (tracking) */
+    --tracking-tighter: -0.04em;
+    --tracking-tight: -0.02em;
+    --tracking-normal: -0.01em;
+    --tracking-wide: 0.01em;
+    --tracking-wider: 0.05em;
+
+    /* ========================================
+       Z-INDEX SCALE
+       ======================================== */
+    --z-base: 0;
+    --z-dropdown: 1000;
+    --z-sticky: 1100;
+    --z-fixed: 1200;
+    --z-modal-backdrop: 1300;
+    --z-modal: 1400;
+    --z-popover: 1500;
+    --z-tooltip: 1600;
+
+    /* ========================================
+       SECTION SPACING
+       ======================================== */
+    --section-padding-desktop: 3.5rem;
+    --section-padding-mobile: 2.5rem;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+
+/* Text Colors */
+.text-primary { color: var(--text-primary) !important; }
+.text-secondary { color: var(--text-secondary) !important; }
+.text-tertiary { color: var(--text-tertiary) !important; }
+.text-muted { color: var(--text-muted) !important; }  /* Solo para texto >16px */
+.text-accent { color: var(--color-accent) !important; }
+.text-success { color: var(--color-success) !important; }
+.text-warning { color: var(--color-warning) !important; }
+.text-error { color: var(--color-error) !important; }
+
+/* Background Colors */
+.bg-primary { background-color: var(--color-primary) !important; }
+.bg-accent { background-color: var(--color-accent) !important; }
+.bg-subtle { background-color: var(--bg-subtle) !important; }
+.bg-card { background-color: var(--bg-card) !important; }
+
+/* Border Colors */
+.border-default { border-color: var(--border-default) !important; }
+.border-accent { border-color: var(--border-accent) !important; }
+.border-primary { border-color: var(--color-primary) !important; }
+
+/* Gradient Backgrounds */
+.bg-gradient-primary { background: var(--gradient-primary) !important; }
+.bg-gradient-primary-dark { background: var(--gradient-primary-dark) !important; }
+.bg-gradient-accent { background: var(--gradient-accent) !important; }
+
+/* ========================================
+   GLOBAL RESET (Apple Standards)
+   ======================================== */
+
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Selection color (Verde Brand) */
+::selection {
+    background: rgba(21, 128, 61, 0.2);  /* Verde forest-700 */
+    color: var(--color-accent);
+}
+
+::-moz-selection {
+    background: rgba(21, 128, 61, 0.2);  /* Verde forest-700 */
+    color: var(--color-accent);
+}
+
+/* Focus outline (accessible) */
+*:focus-visible {
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Remove default focus for mouse users */
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* ========================================
+   SKIP LINK (Accessibility)
+   ======================================== */
+
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: var(--color-primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    z-index: 10000;
+    transition: top 0.3s ease;
+    border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--color-accent);
+    outline-offset: 2px;
+}
+
+/* ========================================
+   LEGACY COLOR MAPPINGS (For Reference)
+   ======================================== */
+/*
+OLD SYSTEM → NEW SYSTEM:
+
+var(--color-accent) (teal legacy)    → var(--color-accent) for CTAs
+                          → var(--color-primary) for UI elements
+var(--color-accent-hover) (teal dark)      → var(--color-accent-hover)
+var(--color-teal-700) (teal medium)    → var(--color-teal-700)
+#2d2d2d (gray legacy)    → var(--color-primary)
+var(--color-primary) (gray-800)       → var(--color-primary) ✓ CORRECT
+#4a4a4a (gray-700 ish)   → var(--color-gray-600)
+#1D70A2 (blue legacy)    → var(--color-info) or remove
+
+DECISION RULES:
+- CTA/conversion → use teal accent
+- Navigation/UI → use gray primary
+- Informational → use gray scale
+- Status → use semantic colors
+*/

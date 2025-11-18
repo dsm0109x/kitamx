@@ -1,0 +1,794 @@
+/**
+ * PUBLIC PAYMENT LINK - COMPLETE UX
+ * ==================================
+ *
+ * UX integral para página pública de pago /hola/{token}/
+ * Incluye: branding, trust signals, FAQ, legal, seguridad, soporte
+ *
+ * Features:
+ * - ✅ Header con logo Kita
+ * - ✅ Trust signals (checkmarks)
+ * - ✅ FAQ accordion
+ * - ✅ Footer legal completo
+ * - ✅ Cookie consent
+ * - ✅ Status banners
+ * - ✅ Responsive
+ *
+ * @version 2.0 - Complete UX
+ * @created 2025-11-11
+ */
+
+/* ============================================
+   BASE
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.payment-page {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #fafbfc;
+    color: #111827;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ============================================
+   HEADER - BRANDING + SECURITY
+   ============================================ */
+
+.payment-header-main {
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.kita-logo {
+    height: 32px;
+    width: auto;
+}
+
+.kita-wordmark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #111827;
+    letter-spacing: -0.01em;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+.security-badge-header {
+    font-size: 0.75rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* ============================================
+   MAIN CONTAINER
+   ============================================ */
+
+.payment-container {
+    max-width: 640px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.payment-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* ============================================
+   STATUS BANNERS
+   ============================================ */
+
+.status-banner {
+    padding: 1rem 1.5rem;
+    text-align: center;
+    font-size: 0.9375rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.status-banner.expired {
+    background: #fffbeb;
+    border-left: 3px solid #f59e0b;
+    color: #92400e;
+}
+
+.status-banner.paid {
+    background: #f0fdf4;
+    border-left: 3px solid #15803d;
+    color: #14532d;
+}
+
+.status-banner.cancelled {
+    background: #f9fafb;
+    border-left: 3px solid #6b7280;
+    color: #374151;
+}
+
+.status-banner a {
+    color: inherit;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+/* ============================================
+   MERCHANT INFO
+   ============================================ */
+
+.merchant-section {
+    padding: 1rem 1.5rem;
+    background: #fafbfc;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.payment-to-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.375rem;
+}
+
+.merchant-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.merchant-rfc {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* ============================================
+   PAYMENT DETAILS
+   ============================================ */
+
+.payment-details {
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.payment-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.payment-description {
+    font-size: 0.9375rem;
+    color: #6b7280;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   AMOUNT SECTION - ENORME
+   ============================================ */
+
+.amount-section {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    background: #fafbfc;
+    border-top: 2px solid #111827;
+    border-bottom: 2px solid #111827;
+}
+
+.amount-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #9ca3af;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}
+
+.amount-display .amount {
+    font-family: 'DM Serif Display', Georgia, serif !important;
+    font-size: 4rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;
+    line-height: 1 !important;
+    letter-spacing: -0.02em !important;
+    display: block;
+}
+
+.amount-display .currency {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    margin-top: 0.5rem;
+    display: block;
+}
+
+/* ============================================
+   TRUST SIGNALS - CHECKMARKS
+   ============================================ */
+
+.trust-signals {
+    padding: 1.5rem;
+    background: #ffffff;
+}
+
+.trust-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.8125rem;
+    color: #111827;
+}
+
+.trust-item:last-child {
+    margin-bottom: 0;
+}
+
+.trust-item::before {
+    content: '✓';
+    color: #15803d;
+    font-weight: 700;
+    font-size: 1.125rem;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   CTA BUTTON - PRINCIPAL
+   ============================================ */
+
+.cta-section {
+    padding: 2rem 1.5rem;
+    background: #ffffff;
+}
+
+.payment-cta-button {
+    width: 100%;
+    background: #15803d;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 1.125rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.payment-cta-button:hover {
+    background: #16a34a;
+    transform: translateY(-2px);
+}
+
+.payment-cta-button:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ============================================
+   METADATA - VÁLIDO HASTA, PARA QUIÉN
+   ============================================ */
+
+.payment-metadata {
+    padding: 1rem 1.5rem;
+    background: #fafbfc;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.metadata-item {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.metadata-item:last-child {
+    margin-bottom: 0;
+}
+
+.metadata-item strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* ============================================
+   FAQ - ACCORDION
+   ============================================ */
+
+.help-section {
+    padding: 2rem 1.5rem;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+}
+
+.help-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.faq-item {
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-item summary {
+    padding: 0.75rem 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111827;
+    cursor: pointer;
+    list-style: none;
+}
+
+.faq-item summary::-webkit-details-marker {
+    display: none;
+}
+
+.faq-item summary::before {
+    content: '▼';
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-right: 0.5rem;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.faq-item[open] summary::before {
+    transform: rotate(-180deg);
+}
+
+.faq-item summary:hover {
+    color: #15803d;
+}
+
+.faq-answer {
+    padding: 0 0 0.75rem 1.5rem;
+    font-size: 0.8125rem;
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.faq-answer a {
+    color: #15803d;
+    text-decoration: none;
+}
+
+.faq-answer a:hover {
+    text-decoration: underline;
+}
+
+/* ============================================
+   FOOTER - LEGAL + SUPPORT + TRUST
+   ============================================ */
+
+.payment-footer-main {
+    background: #f9fafb;
+    border-top: 2px solid #111827;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.footer-branding {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.footer-branding strong {
+    font-family: 'DM Serif Display', serif;
+    color: #111827;
+}
+
+.footer-links {
+    font-size: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.footer-links a {
+    color: #6b7280;
+    text-decoration: none;
+    margin: 0 0.5rem;
+}
+
+.footer-links a:hover {
+    color: #15803d;
+    text-decoration: underline;
+}
+
+.footer-support {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.footer-support a {
+    color: #111827;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer-support a:hover {
+    color: #15803d;
+}
+
+.trust-badges {
+    font-size: 0.6875rem;
+    color: #9ca3af;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+/* ============================================
+   COOKIE CONSENT BANNER
+   ============================================ */
+
+.cookie-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #111827;
+    color: #ffffff;
+    padding: 1rem 1.5rem;
+    display: none;
+    z-index: 1000;
+    border-top: 2px solid #15803d;
+}
+
+.cookie-banner.show {
+    display: block;
+}
+
+.cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.cookie-content p {
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.cookie-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.btn-accept-cookies {
+    background: #15803d;
+    color: #ffffff;
+    border: none;
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-accept-cookies:hover {
+    background: #16a34a;
+}
+
+.cookie-actions a {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    text-decoration: none;
+}
+
+.cookie-actions a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* ============================================
+   FORM ELEMENTS - BILLING FORM
+   ============================================ */
+
+.form-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.375rem;
+    display: block;
+}
+
+.form-control,
+.form-select {
+    width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+    font-family: 'Inter', sans-serif;
+    color: #111827;
+    background: #ffffff;
+    transition: border-color 0.2s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
+}
+
+.form-control.is-invalid {
+    border-color: #ef4444;
+}
+
+.form-control.is-valid {
+    border-color: #15803d;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.invalid-feedback {
+    font-size: 0.75rem;
+    color: #ef4444;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.form-control.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.valid-feedback {
+    font-size: 0.75rem;
+    color: #15803d;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.form-control.is-valid ~ .valid-feedback {
+    display: block;
+}
+
+.input-group {
+    display: flex;
+    width: 100%;
+}
+
+.input-group .form-control {
+    flex: 1;
+    border-right: none;
+}
+
+.input-group-text {
+    padding: 0.625rem 0.875rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-left: none;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+    padding-right: 2.5rem;
+}
+
+.text-uppercase {
+    text-transform: uppercase;
+}
+
+.mb-3 {
+    margin-bottom: 1rem;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.d-grid {
+    display: grid;
+}
+
+.btn-primary {
+    width: 100%;
+    background: #15803d;
+    color: #ffffff;
+    border: none;
+    border-radius: 0;
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #16a34a;
+}
+
+.btn-primary:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+}
+
+.btn-lg {
+    padding: 1.125rem 1.75rem;
+}
+
+.alert {
+    background: #f9fafb;
+    border: none;
+    border-left: 2px solid #111827;
+    padding: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.alert-danger {
+    border-left-color: #ef4444;
+    color: #7f1d1d;
+}
+
+/* ============================================
+   STATE MESSAGES - EXPIRADO/CANCELADO
+   ============================================ */
+
+.state-message {
+    padding: 2rem 1.5rem;
+    font-size: 0.9375rem;
+    color: #111827;
+    line-height: 1.6;
+}
+
+.state-message p {
+    margin-bottom: 1rem;
+}
+
+.state-message ul {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+}
+
+.state-message li {
+    margin-bottom: 0.5rem;
+    color: #6b7280;
+}
+
+.state-message code {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.8125rem;
+    background: #f9fafb;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+.invoice-download {
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+    .payment-header-main {
+        padding: 0.875rem 1rem;
+    }
+
+    .kita-wordmark {
+        font-size: 1.25rem;
+    }
+
+    .payment-container {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+
+    .payment-card {
+        border-left: none;
+        border-right: none;
+    }
+
+    .payment-details,
+    .amount-section,
+    .trust-signals,
+    .cta-section,
+    .payment-metadata,
+    .help-section {
+        padding: 1.5rem 1rem;
+    }
+
+    .payment-title {
+        font-size: 1.25rem;
+    }
+
+    .amount-display .amount {
+        font-size: 3rem !important;
+    }
+
+    .cookie-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .cookie-actions {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .payment-header-main {
+        position: relative;
+    }
+
+    .header-right {
+        display: none;
+    }
+
+    .amount-display .amount {
+        font-size: 2.5rem !important;
+    }
+
+    .payment-cta-button {
+        position: sticky;
+        bottom: 0;
+        z-index: 10;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    }
+}

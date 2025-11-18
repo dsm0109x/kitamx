@@ -1,0 +1,61 @@
+{% extends "emails/base.html" %}
+
+{% block email_title %}Cuenta Ya Existe - Kita{% endblock %}
+
+{% block email_content %}
+    <!-- Icono Grande -->
+    <div class="email-icon">🔔</div>
+
+    <h1>Ya Tienes una Cuenta</h1>
+
+    <p class="lead">
+        Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+    </p>
+
+    <p>
+        Alguien intentó crear una cuenta en <strong>Kita</strong> con este email,
+        pero ya existe una cuenta registrada con esta dirección.
+    </p>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p><strong>¿Olvidaste que ya tenías cuenta?</strong></p>
+        <p>
+            Si fuiste tú, simplemente inicia sesión con tu email y contraseña.
+            Si olvidaste tu contraseña, puedes recuperarla fácilmente.
+        </p>
+    </div>
+
+    <!-- Botones -->
+    <p class="text-center" style="margin-top: 32px;">
+        <a href="https://kita.mx/ingresar/" class="btn-primary" style="text-decoration: none; margin-bottom: 12px; display: inline-block;">
+            Iniciar Sesión
+        </a>
+    </p>
+
+    <p class="text-center">
+        <a href="https://kita.mx/recuperar-contrasena/" style="color: #15803d; font-weight: 600; text-decoration: underline;">
+            ¿Olvidaste tu contraseña?
+        </a>
+    </p>
+
+    <!-- Security Box -->
+    <div class="security-box">
+        <p><strong>¿No fuiste tú?</strong></p>
+        <p>
+            Si no intentaste crear una cuenta, tu cuenta existente está segura.
+            Puedes ignorar este email. Por seguridad, considera cambiar tu contraseña
+            si sospechas actividad no autorizada.
+        </p>
+    </div>
+
+    <p class="text-muted text-center" style="margin-top: 24px;">
+        ¿Tienes dudas? Escríbenos a
+        <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+    </p>
+{% endblock %}
+
+{% block email_footer_note %}
+    Este email fue enviado porque alguien intentó registrarse con tu email.<br>
+    Tu cuenta existente está segura. Si no fuiste tú, puedes ignorar este mensaje.
+{% endblock %}

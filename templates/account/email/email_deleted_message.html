@@ -1,0 +1,48 @@
+{% extends "emails/base.html" %}
+
+{% block email_title %}Email Eliminado - Kita{% endblock %}
+
+{% block email_content %}
+    <!-- Icono Grande -->
+    <div class="email-icon">🗑️</div>
+
+    <h1>Email Eliminado de tu Cuenta</h1>
+
+    <p class="lead">
+        Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
+    </p>
+
+    <p>
+        Este email ha sido eliminado de tu cuenta de <strong>Kita</strong>.
+    </p>
+
+    <!-- Info Box -->
+    <div class="info-box">
+        <p><strong>Email eliminado:</strong></p>
+        <p style="font-family: 'Courier New', monospace; font-size: 16px; color: #111827; font-weight: 600;">
+            {{ email }}
+        </p>
+        <p>
+            Ya no podrás usar este email para iniciar sesión o recibir notificaciones.
+        </p>
+    </div>
+
+    <!-- Security Box -->
+    <div class="security-box">
+        <p><strong>¿No fuiste tú?</strong></p>
+        <p>
+            Si no eliminaste este email, tu cuenta podría estar comprometida.
+            Cambia tu contraseña inmediatamente y contacta con soporte.
+        </p>
+    </div>
+
+    <p class="text-muted text-center" style="margin-top: 32px;">
+        ¿Tienes dudas? Escríbenos a
+        <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+    </p>
+{% endblock %}
+
+{% block email_footer_note %}
+    Este email fue enviado porque se eliminó de tu cuenta.<br>
+    Si no fuiste tú, contacta inmediatamente con hola@kita.mx
+{% endblock %}

@@ -1,0 +1,235 @@
+{% extends 'dashboard/base.html' %}
+
+{% block title %}Logs de Auditoría - {{ tenant.name }}{% endblock %}
+
+{% block extra_head %}
+{{ block.super }}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/logs-activity.css' %}?v=1.0">
+{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header -->
+<div class="logs-page-header">
+    <h1>Logs de Auditoría</h1>
+    <div class="btn-toolbar">
+        <button class="btn btn-outline-primary" onclick="refreshLogs()">
+            Actualizar
+        </button>
+        <button class="btn btn-outline-success ms-2" onclick="exportLogs()">
+            Exportar CSV
+        </button>
+    </div>
+</div>
+
+<!-- Retention Notice -->
+<div class="alert alert-info d-flex align-items-start mb-3">
+    <i class="iconoir-info-circle me-2 mt-1"></i>
+    <div>
+        <small>
+            <strong>Retención de logs:</strong> Los registros de auditoría se conservan por 90 días
+            y se eliminan automáticamente después de este período para cumplir con nuestra
+            <a href="{% url 'legal:privacy' %}" target="_blank" class="alert-link">Política de Privacidad</a>
+            y la LFPDPPP.
+        </small>
+    </div>
+</div>
+
+<!-- Stats Inline -->
+<div class="stats-inline-logs">
+    Total: <strong id="total-logs">{{ stats.total_logs }}</strong> |
+    Usuarios: <strong id="unique-users">{{ stats.unique_users }}</strong> |
+    Período: {{ start_date|date:"d/m" }} - {{ end_date|date:"d/m" }} |
+    24h: <strong id="recent-logs">...</strong>
+</div>
+
+<!-- Filters Inline -->
+<div class="filters-inline-logs">
+    <select class="form-select" id="action-filter" style="width: auto;">
+        <option value="">Acción</option>
+        <option value="create">Crear</option>
+        <option value="update">Actualizar</option>
+        <option value="delete">Eliminar</option>
+        <option value="cancel">Cancelar</option>
+        <option value="login">Login</option>
+    </select>
+    <select class="form-select" id="entity-filter" style="width: auto;">
+        <option value="">Entidad</option>
+        <option value="PaymentLink">Links</option>
+        <option value="Payment">Pagos</option>
+        <option value="Invoice">Facturas</option>
+        <option value="User">Usuarios</option>
+    </select>
+    <input type="date" class="form-control" id="date-from" value="{{ start_date|date:'Y-m-d' }}" style="width: auto;" />
+    <input type="date" class="form-control" id="date-to" value="{{ end_date|date:'Y-m-d' }}" style="width: auto;" />
+    <button class="btn btn-primary" onclick="applyFilters()">Aplicar</button>
+    <button class="btn btn-outline-secondary" onclick="clearFilters()">Limpiar</button>
+</div>
+
+<!-- Audit Logs Table -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="mb-0">
+            <i class="iconoir-list me-2"></i>
+            Registro de Actividad
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="audit-table" class="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Usuario</th>
+                        <th>Acción</th>
+                        <th>Entidad</th>
+                        <th>IP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data loaded via AJAX -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+let auditTable;
+
+$(document).ready(function() {
+    // Initialize DataTable
+    auditTable = $('#audit-table').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+            url: '{% url "audit:ajax_logs" %}',
+            data: function(d) {
+                d.action = $('#action-filter').val();
+                d.entity_type = $('#entity-filter').val();
+                d.date_from = $('#date-from').val();
+                d.date_to = $('#date-to').val();
+            }
+        },
+        columns: [
+            {
+                data: 'created_at',
+                render: function(data, type, row) {
+                    const date = new Date(data);
+                    return `<div>${date.toLocaleDateString('es-MX', {day: '2-digit', month: '2-digit'})}</div><small class="text-muted">${date.toLocaleTimeString('es-MX', {hour: '2-digit', minute: '2-digit'})}</small>`;
+                }
+            },
+            {
+                data: 'user_name',
+                render: function(data, type, row) {
+                    return `<div>${data}</div><small class="text-muted">${row.user_email}</small>`;
+                }
+            },
+            {
+                data: 'action_display',
+                render: function(data, type, row) {
+                    return `<span class="badge bg-primary">${data}</span>`;
+                }
+            },
+            {
+                data: 'entity_type_display',
+                render: function(data, type, row) {
+                    let html = `<div>${data}</div>`;
+                    if (row.entity_name) {
+                        html += `<small class="text-muted">${row.entity_name}</small>`;
+                    }
+                    if (row.has_changes) {
+                        const changes = Object.keys(row.new_values || {}).join(', ');
+                        html += `<br><small class="text-muted">Cambios: ${changes}</small>`;
+                        html += `<br><button class="btn btn-outline-primary btn-sm mt-1" onclick="showLogDetail('${row.id}')" title="Ver">👁</button>`;
+                    }
+                    return html;
+                }
+            },
+            {
+                data: 'ip_address',
+                render: function(data, type, row) {
+                    return `<code>${data}</code>`;
+                }
+            }
+        ],
+        order: [[0, 'desc']],
+        pageLength: 25,
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/es-MX.json'
+        },
+        responsive: true
+    });
+});
+
+function applyFilters() {
+    auditTable.ajax.reload();
+    updateStats();
+}
+
+function clearFilters() {
+    $('#action-filter').val('');
+    $('#entity-filter').val('');
+    $('#date-from').val('');
+    $('#date-to').val('');
+    applyFilters();
+}
+
+function refreshLogs() {
+    auditTable.ajax.reload();
+    updateStats();
+}
+
+function updateStats() {
+    const params = new URLSearchParams({
+        date_from: $('#date-from').val(),
+        date_to: $('#date-to').val()
+    });
+
+    fetch(`{% url "audit:ajax_stats" %}?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                $('#total-logs').text(data.stats.total_logs);
+                $('#unique-users').text(data.stats.unique_users);
+            }
+        })
+        .catch(error => {
+            showToast('Error actualizando estadísticas', 'error');
+        });
+}
+
+function showLogDetail(logId) {
+    fetch(`{% url "audit:log_detail" "00000000-0000-0000-0000-000000000000" %}`.replace('00000000-0000-0000-0000-000000000000', logId))
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('detail-panel-content').innerHTML = html;
+            document.getElementById('detailPanelTitle').textContent = 'Detalle del Log';
+            const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailPanel'));
+            offcanvas.show();
+        })
+        .catch(error => {
+            showToast('Error cargando detalles', 'error');
+        });
+}
+
+function showChanges(logId) {
+    showToast('Funcionalidad de cambios disponible en el detalle', 'info');
+    showLogDetail(logId);
+}
+
+function exportLogs() {
+    const params = new URLSearchParams({
+        action: $('#action-filter').val(),
+        entity_type: $('#entity-filter').val(),
+        date_from: $('#date-from').val(),
+        date_to: $('#date-to').val()
+    });
+
+    window.open(`{% url "audit:export_logs" %}?${params}`, '_blank');
+}
+</script>
+{% endblock %}

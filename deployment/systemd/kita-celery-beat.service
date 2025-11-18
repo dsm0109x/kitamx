@@ -1,0 +1,20 @@
+[Unit]
+Description=Kita Celery Beat Scheduler
+After=network.target
+
+[Service]
+Type=simple
+User=kita
+Group=kita
+WorkingDirectory=/home/kita/kita
+Environment="PATH=/home/kita/kita/venv/bin"
+ExecStart=/home/kita/kita/venv/bin/celery -A kita beat \
+    --loglevel=info \
+    --logfile=/home/kita/logs/celery-beat.log \
+    --pidfile=/home/kita/kita/celery-beat.pid
+ExecStop=/bin/kill -s TERM $MAINPID
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

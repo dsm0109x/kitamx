@@ -1,0 +1,119 @@
+/**
+ * LOGS PAGE - ACTIVITY LOG STYLE
+ * ================================
+ *
+ * Diseño tipo registro de actividad para /logs/
+ * Tabla compacta, sin badges coloridos, minimalista.
+ *
+ * Features:
+ * - ✅ Header UPPERCASE
+ * - ✅ Stats inline
+ * - ✅ Tabla 5 columnas
+ * - ✅ Acción como texto (no badge)
+ * - ✅ IP en monospace
+ * - ✅ Sin colores
+ *
+ * @version 1.0 - Activity Log
+ * @created 2025-11-10
+ */
+
+/* Reutilizar estilos de invoices-ledger.css */
+@import url('invoices-ledger.css');
+
+/* ============================================
+   PAGE HEADER
+   ============================================ */
+
+.logs-page-header {
+    background: #ffffff;
+    padding: 1rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logs-page-header h1 {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 1.5rem !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+    color: #111827 !important;
+    margin: 0 !important;
+}
+
+.logs-page-header h1 i {
+    display: none !important;
+}
+
+/* ============================================
+   STATS INLINE
+   ============================================ */
+
+.stats-inline-logs {
+    background: #f9fafb;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.stats-inline-logs strong {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #111827;
+    margin: 0 0.25rem;
+}
+
+/* ============================================
+   FILTERS INLINE
+   ============================================ */
+
+.filters-inline-logs {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* ============================================
+   TABLE - LOG STYLE
+   ============================================ */
+
+#audit-table tbody td:nth-child(3) {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    color: #111827 !important;
+    text-transform: lowercase;
+}
+
+#audit-table tbody td:nth-child(6) code {
+    font-family: 'SF Mono', Monaco, monospace;
+    font-size: 0.75rem;
+    color: #6b7280;
+    background: transparent;
+}
+
+/* ============================================
+   OCULTAR STATS CARDS
+   ============================================ */
+
+.row.mb-4:has(.col-lg-3) {
+    display: none !important;
+}
+
+/* ============================================
+   OCULTAR FILTERS CARD
+   ============================================ */
+
+.card.mb-4:has(.fa-filter) {
+    display: none !important;
+}

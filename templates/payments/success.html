@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Recibido - {{ tenant.business_name }}</title>
+
+    <!-- SEO -->
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Serif+Display:wght@400&display=swap" rel="stylesheet">
+
+    <!-- Iconoir Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/iconoir-icons/iconoir@main/css/iconoir.css">
+
+    {% load static %}
+    <!-- SPLIT SCREEN EDITORIAL CSS -->
+    <link rel="stylesheet" href="{% static 'css/public-payments-landing-style.css' %}?v=4.3">
+</head>
+<body class="payment-page">
+
+    {% if payment_link %}
+    <!-- SPLIT SCREEN LAYOUT -->
+    <div class="payment-split-container">
+
+        <!-- LEFT PANEL - INFO STICKY (Navy-50) -->
+        <div class="left-panel-sticky">
+
+            <!-- Kita Branding -->
+            <div class="panel-section" style="margin-bottom: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <img src="{% static 'images/kita-logo-negro.png' %}" alt="Kita" style="height: 32px; width: auto;">
+                    <div style="font-family: var(--font-display); font-size: 1.5rem; color: var(--color-black);">Kita</div>
+                </div>
+                <div style="font-size: 0.6875rem; color: var(--color-gray-500);">
+                    <i class="iconoir-lock"></i> Pago Seguro
+                </div>
+            </div>
+
+            <!-- Status Badge Success -->
+            <div class="panel-section status-badge-success" style="background: rgba(21, 128, 61, 0.1); padding: 1rem; margin-bottom: 1.5rem; border-left: 3px solid #15803d;">
+                <div style="font-size: 0.875rem; color: #14532d; font-weight: 600;">
+                    ✓ Pago procesado exitosamente
+                </div>
+            </div>
+
+            <!-- Merchant Info -->
+            <div class="panel-section">
+                <div class="panel-label">PAGADO A</div>
+                <div class="merchant-name-large">{{ tenant.business_name }}</div>
+                <div class="merchant-rfc-large">RFC: {{ tenant.rfc }}</div>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Amount HERO -->
+            <div class="panel-section amount-editorial">
+                <div class="panel-label">MONTO PAGADO</div>
+                <div class="amount-hero-editorial">${{ payment_link.amount }}</div>
+                <span class="currency-editorial">{{ payment_link.currency }}</span>
+            </div>
+
+            <div class="panel-divider"></div>
+
+            <!-- Trust Badge -->
+            <div class="trust-badge-editorial">
+                <i class="iconoir-shield-check"></i>
+                <span>Procesado por Mercado Pago</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT PANEL - MESSAGE (White) -->
+        <div class="right-panel-action">
+
+            {% if processing %}
+                <!-- Webhook no procesó aún - Mostrar "Procesando" -->
+                <div class="right-panel-section">
+                    <div class="section-title-editorial">PROCESANDO</div>
+                    <h1 class="payment-title-editorial">Tu pago está siendo registrado</h1>
+                    <p class="payment-description-editorial">
+                        Mercado Pago confirmó tu pago. Estamos registrándolo en nuestro sistema.
+                    </p>
+                </div>
+
+                <div class="right-panel-section">
+                    <div class="state-message-editorial" style="background: #fffbeb; border-left-color: #f59e0b; color: #92400e;">
+                        <p><strong>⏳ Estamos procesando tu pago</strong></p>
+                        <p>Mercado Pago aprobó la transacción. Nuestro sistema lo está registrando.</p>
+                        <p><strong>Esta página se refrescará automáticamente en 30 segundos.</strong></p>
+                        <p style="font-size: 0.75rem; margin-top: 1rem;">ID de pago: <code>{{ payment_id }}</code></p>
+                    </div>
+                </div>
+
+                <script>
+                    // Auto-refresh después de 30 segundos
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 30000);
+
+                    // Mostrar countdown
+                    let countdown = 30;
+                    const countdownInterval = setInterval(() => {
+                        countdown--;
+                        const msg = document.querySelector('.state-message-editorial strong');
+                        if (msg) {
+                            msg.textContent = `⏳ Refrescando en ${countdown} segundos...`;
+                        }
+                        if (countdown <= 0) {
+                            clearInterval(countdownInterval);
+                        }
+                    }, 1000);
+                </script>
+
+            {% else %}
+                <!-- Payment procesado correctamente -->
+                <div class="right-panel-section">
+                    <div class="section-title-editorial">CONFIRMACIÓN</div>
+                    <h1 class="payment-title-editorial">¡Pago recibido exitosamente!</h1>
+                    <p class="payment-description-editorial">
+                        Gracias por tu pago. La transacción se procesó correctamente.
+                    </p>
+                </div>
+
+                <div class="right-panel-section">
+                    <div class="state-message-editorial success">
+                        <p><strong>Tu pago fue aprobado por Mercado Pago</strong></p>
+                        <p>Recibirás un comprobante de pago por email en los próximos minutos.</p>
+                        {% if payment_link.requires_invoice %}
+                        <p><strong>Puedes generar tu factura CFDI 4.0 ahora.</strong></p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if payment_link.requires_invoice %}
+                <div class="cta-editorial">
+                    <a href="/facturar/{{ payment_link.token }}/" class="btn-cta-editorial">
+                        Generar Mi Factura CFDI →
+                    </a>
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <!-- FAQ -->
+            <div class="faq-editorial">
+                <div class="faq-title-editorial">¿NECESITAS AYUDA?</div>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Qué sigue ahora?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>{% if payment_link.requires_invoice %}Click en "Generar Mi Factura" para obtener tu CFDI 4.0.{% else %}Recibirás confirmación de pago por email de Mercado Pago.{% endif %}</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>¿Cuándo recibo mi comprobante?</summary>
+                    <div class="faq-answer-editorial">
+                        <p>Mercado Pago envía el comprobante de pago por email en 1-5 minutos. Revisa tu bandeja de entrada y spam.</p>
+                    </div>
+                </details>
+
+                <details class="faq-item-editorial">
+                    <summary>Contactar a {{ tenant.business_name }}</summary>
+                    <div class="faq-answer-editorial">
+                        {% if tenant.email %}
+                        <p><strong>Email:</strong> <a href="mailto:{{ tenant.email }}">{{ tenant.email }}</a></p>
+                        {% endif %}
+                        {% if tenant.phone %}
+                        <p><strong>Teléfono:</strong> {{ tenant.phone }}</p>
+                        {% endif %}
+                    </div>
+                </details>
+            </div>
+
+        </div>
+
+        <!-- FOOTER (Spans both columns) -->
+        <footer class="payment-footer-editorial">
+            <div class="footer-branding">
+                Procesado por <strong>Kita</strong> · Plataforma de pagos mexicana
+            </div>
+            <div class="footer-links">
+                <a href="/legal/privacidad/" target="_blank">Privacidad</a> ·
+                <a href="/legal/terminos/" target="_blank">Términos</a> ·
+                <a href="mailto:hola@kita.mx">Soporte</a>
+            </div>
+            <div class="trust-badges">
+                🔒 SSL 256-bit · 🛡️ PCI DSS · ✓ Mercado Pago Oficial
+            </div>
+            <div style="font-size: 0.6875rem; color: #9ca3af; margin-top: 1rem;">
+                © 2025 Kita
+            </div>
+        </footer>
+
+    </div>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+</body>
+</html>

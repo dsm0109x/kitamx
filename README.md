@@ -1,5 +1,5 @@
 # Kita - Plataforma de Facturación Electrónica 🚀
-*v1.0.0*
+*v1.0.1*
 
 Plataforma SaaS multi-tenant para generación y gestión de facturas electrónicas CFDI (Comprobante Fiscal Digital por Internet) en México.
 

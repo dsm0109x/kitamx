@@ -57,17 +57,24 @@ class MercadoPagoWebhookHandler:
             HTTP response indicating webhook processing result
         """
         try:
-            # Step 1: Verify webhook signature
-            if not self._verify_signature(request):
-                self.logger.warning(f"Invalid webhook signature for {webhook_type}")
-                return HttpResponse(status=401)
-
-            # Step 2: Parse webhook data
+            # Step 1: Parse webhook data first (needed to check live_mode)
             try:
                 webhook_data = json.loads(request.body.decode('utf-8'))
             except json.JSONDecodeError as e:
                 self.logger.error(f"Invalid JSON in webhook body: {e}")
                 return HttpResponse(status=400)
+
+            # Step 2: Verify webhook signature (skip for test webhooks)
+            is_test_webhook = webhook_data.get('live_mode', True) == False
+
+            if not is_test_webhook:
+                # Production webhooks MUST have valid signature
+                if not self._verify_signature(request):
+                    self.logger.warning(f"Invalid webhook signature for {webhook_type}")
+                    return HttpResponse(status=401)
+            else:
+                # Test webhooks: log warning but allow
+                self.logger.info(f"Test webhook received (live_mode=false), skipping signature verification")
 
             # Step 3: Log webhook receipt
             event_type = webhook_data.get('type', 'unknown')
@@ -112,7 +119,12 @@ class MercadoPagoWebhookHandler:
         """
         signature_header = request.headers.get('X-Signature', '')
 
-        if not signature_header or not self.webhook_secret:
+        if not signature_header:
+            self.logger.warning("Webhook missing X-Signature header")
+            return False
+
+        if not self.webhook_secret:
+            self.logger.error("MERCADOPAGO_WEBHOOK_SECRET not configured")
             return False
 
         try:

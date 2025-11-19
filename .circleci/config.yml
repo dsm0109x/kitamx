@@ -72,17 +72,18 @@ jobs:
     steps:
       - checkout
 
-      # Agregar SSH key desde CircleCI SSH keys (método nativo)
-      - add_ssh_keys:
-          fingerprints:
-            - "f8:ca:f3:7e:b4:ba:0e:13:5f:72:ea:25:76:8d:d2:5f"
+      # Deploy via SSH usando sshpass con contraseña
+      - run:
+          name: Install sshpass
+          command: |
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq sshpass
 
-      # Deploy via SSH
       - run:
           name: Deploy to production server
           command: |
-            # Conectar al servidor y ejecutar deployment
-            ssh -o StrictHostKeyChecking=no kita@159.203.124.1 'bash -s' < deployment/deploy.sh
+            # Conectar al servidor usando sshpass y ejecutar deployment
+            sshpass -p "$CIRCLECI_SSH_PASSWORD" ssh -o StrictHostKeyChecking=no circleci@159.203.124.1 'bash -s' < deployment/deploy.sh
 
       # Health check post-deploy
       - run:

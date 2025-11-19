@@ -21,6 +21,7 @@ BRANCH="production"
 # Timestamp para logs
 TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "⏰ Started at: $TIMESTAMP"
+echo "👤 Running as: $(whoami)"
 echo ""
 
 # Cambiar al directorio del proyecto
@@ -30,48 +31,40 @@ cd $PROJECT_DIR
 # 1. PULL LATEST CODE
 # ============================================
 echo "📦 1. Pulling latest code from $BRANCH..."
-git fetch origin $BRANCH
-git reset --hard origin/$BRANCH
-COMMIT=$(git rev-parse --short HEAD)
+sudo -u kita git -C $PROJECT_DIR fetch origin $BRANCH
+sudo -u kita git -C $PROJECT_DIR reset --hard origin/$BRANCH
+COMMIT=$(sudo -u kita git -C $PROJECT_DIR rev-parse --short HEAD)
 echo "   ✅ Code updated to commit: $COMMIT"
 echo ""
 
 # ============================================
-# 2. ACTIVATE VIRTUAL ENV
+# 2. INSTALL/UPDATE DEPENDENCIES
 # ============================================
-echo "🐍 2. Activating virtual environment..."
-source $VENV_DIR/bin/activate
-echo "   ✅ Virtual env activated"
-echo ""
-
-# ============================================
-# 3. INSTALL/UPDATE DEPENDENCIES
-# ============================================
-echo "📦 3. Installing dependencies..."
-pip install -r requirements.txt --quiet --no-cache-dir
+echo "📦 2. Installing dependencies..."
+sudo -u kita $VENV_DIR/bin/pip install -r $PROJECT_DIR/requirements.txt --quiet --no-cache-dir
 echo "   ✅ Dependencies installed"
 echo ""
 
 # ============================================
-# 4. RUN MIGRATIONS
+# 3. RUN MIGRATIONS
 # ============================================
-echo "🗄️  4. Running database migrations..."
-python manage.py migrate --noinput
+echo "🗄️  3. Running database migrations..."
+sudo -u kita $VENV_DIR/bin/python $PROJECT_DIR/manage.py migrate --noinput
 echo "   ✅ Migrations completed"
 echo ""
 
 # ============================================
-# 5. COLLECT STATIC FILES
+# 4. COLLECT STATIC FILES
 # ============================================
-echo "📂 5. Collecting static files..."
-python manage.py collectstatic --noinput --clear
+echo "📂 4. Collecting static files..."
+sudo -u kita $VENV_DIR/bin/python $PROJECT_DIR/manage.py collectstatic --noinput --clear
 echo "   ✅ Static files collected"
 echo ""
 
 # ============================================
-# 6. RESTART SERVICES
+# 5. RESTART SERVICES
 # ============================================
-echo "🔄 6. Restarting services..."
+echo "🔄 5. Restarting services..."
 
 # Gunicorn (Django app)
 echo "   → Restarting kita-gunicorn..."
@@ -92,14 +85,14 @@ echo "   ✅ All services restarted"
 echo ""
 
 # ============================================
-# 7. VERIFY SERVICES
+# 6. VERIFY SERVICES
 # ============================================
-echo "🔍 7. Verifying services status..."
+echo "🔍 6. Verifying services status..."
 
 # Check systemd services
-GUNICORN_STATUS=$(systemctl is-active kita-gunicorn)
-CELERY_STATUS=$(systemctl is-active kita-celery)
-BEAT_STATUS=$(systemctl is-active kita-celery-beat)
+GUNICORN_STATUS=$(sudo systemctl is-active kita-gunicorn)
+CELERY_STATUS=$(sudo systemctl is-active kita-celery)
+BEAT_STATUS=$(sudo systemctl is-active kita-celery-beat)
 
 echo "   Gunicorn: $GUNICORN_STATUS"
 echo "   Celery:   $CELERY_STATUS"
@@ -113,9 +106,9 @@ fi
 echo ""
 
 # ============================================
-# 8. CLEANUP
+# 7. CLEANUP
 # ============================================
-echo "🧹 8. Cleanup..."
+echo "🧹 7. Cleanup..."
 
 # Limpiar archivos .pyc
 find . -type f -name "*.pyc" -delete

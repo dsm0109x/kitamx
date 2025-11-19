@@ -35,6 +35,8 @@ class StaticViewSitemap(Sitemap):
         """Return list of static page URL names."""
         return [
             'home',           # Landing page
+            'account_login',  # Login page
+            'account_signup', # Signup page
             'legal:terms',    # Términos de servicio
             'legal:privacy',  # Política de privacidad
             'legal:cookies',  # Política de cookies
@@ -48,6 +50,8 @@ class StaticViewSitemap(Sitemap):
         """Set priority based on page importance (0.0 - 1.0)."""
         priorities = {
             'home': 1.0,          # Highest priority
+            'account_login': 0.9,  # High priority
+            'account_signup': 0.9, # High priority
             'legal:terms': 0.6,
             'legal:privacy': 0.6,
             'legal:cookies': 0.5,
@@ -58,6 +62,8 @@ class StaticViewSitemap(Sitemap):
         """Set change frequency based on page type."""
         frequencies = {
             'home': 'daily',       # Landing changes frequently
+            'account_login': 'weekly',   # May have UI updates
+            'account_signup': 'weekly',  # May have UI updates
             'legal:terms': 'monthly',
             'legal:privacy': 'monthly',
             'legal:cookies': 'monthly',

@@ -47,7 +47,6 @@ THIRD_PARTY_APPS = [
     'allauth.socialaccount.providers.google',  # Google OAuth
     'django_eventstream',
     'storages',
-    'debug_toolbar',
     'anymail',  # Email backend with tracking
 ]
 
@@ -68,9 +67,12 @@ LOCAL_APPS = [
 
 INSTALLED_APPS: List[str] = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+# Add debug_toolbar only in DEBUG mode
+if DEBUG:
+    INSTALLED_APPS += ['debug_toolbar']
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,6 +82,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.TenantMiddleware',
 ]
+
+# Add debug_toolbar middleware only in DEBUG mode
+if DEBUG:
+    MIDDLEWARE.insert(1, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 # CSP middleware temporarily disabled
 

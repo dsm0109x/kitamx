@@ -107,7 +107,7 @@ jobs:
           name: Deploy to production server
           command: |
             # Conectar al servidor usando sshpass y ejecutar deployment
-            sshpass -p "$CIRCLECI_SSH_PASSWORD" ssh -o StrictHostKeyChecking=no circleci@159.203.124.1 'bash -s' < deployment/deploy.sh
+            sshpass -p "$CIRCLECI_SSH_PASSWORD" ssh -p 29384 -o StrictHostKeyChecking=no circleci@159.203.124.1 'bash -s' < deployment/deploy.sh
 
       # Health check post-deploy
       - run:

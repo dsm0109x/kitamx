@@ -348,7 +348,7 @@ document.getElementById('business-form')?.addEventListener('submit', function(e)
 });
 
 // Test connection function
-function testConnection(type) {
+window.testConnection = function(type) {
     const btn = event.target;
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -387,8 +387,8 @@ function testConnection(type) {
     });
 }
 
-// Deactivate CSD
-function deactivateCSD(certId, serialNumber) {
+// Deactivate CSD - Exponer globalmente
+window.deactivateCSD = function(certId, serialNumber) {
     if (confirm(`¿Desactivar certificado ${serialNumber}?\n\nEsto impedirá generar nuevas facturas con este certificado.`)) {
         fetch('{% url "config:deactivate_csd" %}', {
             method: 'POST',
@@ -410,8 +410,8 @@ function deactivateCSD(certId, serialNumber) {
     }
 }
 
-// Connect Mercado Pago
-function connectMercadoPago() {
+// Connect Mercado Pago - Exponer globalmente
+window.connectMercadoPago = function() {
     // Redirigir al mismo flujo OAuth pero sin onboarding requirement
     showToast('Redirigiendo a Mercado Pago® para autorizar...', 'info');
     setTimeout(() => {
@@ -419,13 +419,13 @@ function connectMercadoPago() {
     }, 1000);
 }
 
-// Disconnect Mercado Pago
-function disconnectMercadoPago() {
+// Disconnect Mercado Pago - Exponer globalmente
+window.disconnectMercadoPago = function() {
     if (!confirm('¿Desconectar Mercado Pago®?\n\nEsto desactivará tus links de pago activos.')) {
         return;
     }
 
-    fetch('/incorporacion/api/desconectar-mp/',  // 🇪🇸 Migrado {
+    fetch('/incorporacion/api/desconectar-mp/', {  // 🇪🇸 Migrado
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -446,7 +446,7 @@ function disconnectMercadoPago() {
     });
 }
 
-function getCsrfToken() {
+window.getCsrfToken = function() {
     const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
     if (csrfInput) return csrfInput.value;
 

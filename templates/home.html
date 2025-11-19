@@ -12,6 +12,9 @@
 
 <!-- Video Hero Styles -->
 <link rel="stylesheet" href="{% static 'css/04-pages/video-hero.css' %}?v=1.0">
+
+<!-- Safari/iOS Video Transparency Fix -->
+<link rel="stylesheet" href="{% static 'css/04-pages/video-safari-fix.css' %}?v=1.0">
 {% endblock %}
 
 {% block content %}
@@ -256,13 +259,13 @@ En 30 segundos tendrás un enlace de Mercado Pago® que cobra y timbra CFDI 4.0 
                 <!-- DERECHA: Video Demo (35%) -->
                 <div class="col-lg-4 order-lg-2 order-1">
                     <video class="demo-gif-direct"
-                           src="{% static 'images/demo/paso1.webm' %}"
                            poster="{% static 'images/demo/paso1-poster.jpg' %}"
                            autoplay
                            muted
                            loop
-                           playsinline
-                           style="background-color: #f8fafc;">
+                           playsinline>
+                        <source src="{% static 'images/demo/paso1.mp4' %}" type="video/mp4; codecs=hvc1">
+                        <source src="{% static 'images/demo/paso1.webm' %}" type="video/webm">
                         Tu navegador no soporta video HTML5.
                     </video>
                 </div>
@@ -323,13 +326,13 @@ En 30 segundos tendrás un enlace de Mercado Pago® que cobra y timbra CFDI 4.0 
                 <!-- DERECHA: Video Demo (50%) -->
                 <div class="col-lg-4 order-lg-2 order-1">
                     <video class="demo-gif-direct"
-                           src="{% static 'images/demo/paso3.webm' %}"
                            poster="{% static 'images/demo/paso3-poster.jpg' %}"
                            autoplay
                            muted
                            loop
-                           playsinline
-                           style="background-color: #f8fafc;">
+                           playsinline>
+                        <source src="{% static 'images/demo/paso3.mp4' %}" type="video/mp4; codecs=hvc1">
+                        <source src="{% static 'images/demo/paso3.webm' %}" type="video/webm">
                         Tu navegador no soporta video HTML5.
                     </video>
                 </div>
@@ -403,13 +406,13 @@ En 30 segundos tendrás un enlace de Mercado Pago® que cobra y timbra CFDI 4.0 
                 <!-- DERECHA: Video Demo (50%) -->
                 <div class="col-lg-4 order-lg-2 order-1">
                     <video class="demo-gif-direct"
-                           src="{% static 'images/demo/paso2.webm' %}"
                            poster="{% static 'images/demo/paso2-poster.jpg' %}"
                            autoplay
                            muted
                            loop
-                           playsinline
-                           style="background-color: #f8fafc;">
+                           playsinline>
+                        <source src="{% static 'images/demo/paso2.mp4' %}" type="video/mp4; codecs=hvc1">
+                        <source src="{% static 'images/demo/paso2.webm' %}" type="video/webm">
                         Tu navegador no soporta video HTML5.
                     </video>
                 </div>
@@ -1317,39 +1320,99 @@ En 30 segundos tendrás un enlace de Mercado Pago® que cobra y timbra CFDI 4.0 
 <!-- v5.5: Inline JS moved to bundle, VideoModal added, Debug mode with ?debug=1 -->
 <script src="{% static 'js/home-bundle.js' %}?v=5.5" defer></script>
 
-<!-- Lazy Load Videos (Fix for Django runserver blocking on large files) -->
+<!-- Lazy Load Videos con Safari Detection -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Detectar Safari/iOS
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    // Debug info (solo en desarrollo)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        console.log('Browser Detection:', {
+            isSafari: isSafari,
+            isIOS: isIOS,
+            userAgent: navigator.userAgent
+        });
+    }
+
     const videos = document.querySelectorAll('video.demo-gif-direct');
 
     videos.forEach((video, index) => {
-        // Solo cargar cuando el video es visible
+        // Aplicar fix específico para Safari/iOS
+        if (isSafari || isIOS) {
+            // Forzar el uso de MP4 en Safari removiendo source WebM
+            const webmSource = video.querySelector('source[type*="webm"]');
+            if (webmSource) {
+                webmSource.remove();
+            }
+
+            // Agregar clase para CSS específico
+            video.classList.add('safari-video');
+
+            // Asegurar que playsinline funcione en iOS
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+        }
+
+        // Configurar lazy loading con IntersectionObserver
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
-                if (entry.isIntersecting && !video.src) {
-                    const videoSrc = video.getAttribute('data-src') || video.getAttribute('src');
-                    if (videoSrc && !video.src) {
-                        video.src = videoSrc;
-                        video.load();
-                        // Intentar reproducir después de cargar
-                        video.play().catch(err => console.log('Video play deferred:', err));
+                if (entry.isIntersecting && !video.hasAttribute('data-loaded')) {
+                    // Marcar como cargado
+                    video.setAttribute('data-loaded', 'true');
+
+                    // Cargar el video
+                    video.load();
+
+                    // Intentar reproducir con manejo de errores mejorado
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise
+                            .then(() => {
+                                // Video reproduciendo exitosamente
+                                video.classList.add('video-playing');
+                            })
+                            .catch(error => {
+                                // Auto-play fue prevenido, intentar con user interaction
+                                console.log('Autoplay prevented:', error.message);
+                                // Agregar un botón de play si falla el autoplay
+                                if (!video.hasAttribute('controls')) {
+                                    video.setAttribute('controls', '');
+                                }
+                            });
                     }
+
                     observer.unobserve(video);
                 }
             });
-        }, { rootMargin: '50px' });
+        }, {
+            rootMargin: '50px',
+            threshold: 0.1
+        });
 
-        // Solo primer video carga inmediatamente, resto lazy
+        // Primer video carga inmediatamente, resto con lazy loading
         if (index === 0) {
-            const src = video.getAttribute('data-src') || video.getAttribute('src');
-            if (src) {
-                video.src = src;
-                video.load();
-            }
+            video.setAttribute('data-loaded', 'true');
+            video.load();
+            // Intentar autoplay del primer video
+            setTimeout(() => {
+                video.play().catch(() => {
+                    // Silent fail para el primer video
+                });
+            }, 100);
         } else {
             observer.observe(video);
         }
     });
+
+    // Fallback para navegadores sin IntersectionObserver
+    if (!('IntersectionObserver' in window)) {
+        videos.forEach(video => {
+            video.load();
+            video.play().catch(() => {});
+        });
+    }
 });
 </script>
 {% endblock %}

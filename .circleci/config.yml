@@ -127,6 +127,30 @@ jobs:
     steps:
       - checkout
 
+      # Gitleaks - Escanear secrets en código
+      - run:
+          name: Scan for leaked secrets with Gitleaks
+          command: |
+            echo "🔍 Installing Gitleaks..."
+            wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.0/gitleaks_8.18.0_linux_x64.tar.gz
+            tar -xzf gitleaks_8.18.0_linux_x64.tar.gz
+            chmod +x gitleaks
+
+            echo "🔐 Scanning repository for leaked secrets..."
+            ./gitleaks detect --source=. --no-git --verbose --exit-code=1 || {
+              echo ""
+              echo "❌ CRITICAL: Secrets or credentials found in code!"
+              echo "   Review the findings above and remove sensitive data"
+              echo "   Common issues:"
+              echo "   - API keys, tokens, passwords in code"
+              echo "   - Private keys or certificates"
+              echo "   - Database credentials"
+              echo ""
+              exit 1
+            }
+
+            echo "✅ No secrets found in repository"
+
       # Verificar que DEBUG esté en False
       - run:
           name: Check DEBUG mode is disabled
@@ -145,23 +169,124 @@ jobs:
 
             echo "✅ DEBUG mode check passed"
 
-      # Verificar SECRET_KEY
+      # Django Security Settings Validator (Robusto)
       - run:
-          name: Check SECRET_KEY configuration
+          name: Validate Django production security settings
           command: |
-            echo "🔑 Checking SECRET_KEY..."
+            echo "🔒 Validating Django security configuration..."
 
-            # Verificar que SECRET_KEY venga de variable de entorno
-            if grep -q "SECRET_KEY\s*=\s*['\"]" kita/settings.py; then
-              echo "❌ CRITICAL: SECRET_KEY is hardcoded in settings.py"
-              exit 1
-            fi
+            python3 << 'PYEOF'
+import re
+import sys
 
-            if ! grep -q "SECRET_KEY\s*=\s*env(" kita/settings.py; then
-              echo "⚠️  WARNING: SECRET_KEY may not be from environment"
-            fi
+# Leer settings.py
+with open('kita/settings.py', 'r') as f:
+    settings_content = f.read()
 
-            echo "✅ SECRET_KEY configuration OK"
+print("=" * 60)
+print("🔐 DJANGO SECURITY CONFIGURATION AUDIT")
+print("=" * 60)
+print()
+
+# Verificaciones críticas (BLOQUEANTES)
+critical_failures = []
+warnings = []
+
+# 1. SECRET_KEY
+print("1️⃣  SECRET_KEY Configuration")
+if re.search(r"SECRET_KEY\s*=\s*['\"][^{$]", settings_content):
+    critical_failures.append("SECRET_KEY is hardcoded")
+    print("   ❌ FAIL: SECRET_KEY is hardcoded in settings.py")
+elif re.search(r"SECRET_KEY\s*=\s*env\(", settings_content):
+    print("   ✅ PASS: SECRET_KEY from environment")
+else:
+    warnings.append("SECRET_KEY configuration unclear")
+    print("   ⚠️  WARN: SECRET_KEY configuration unclear")
+
+# 2. DEBUG
+print("\n2️⃣  DEBUG Mode")
+if re.search(r"DEBUG\s*=\s*True(?!\s*#)", settings_content):
+    critical_failures.append("DEBUG is hardcoded to True")
+    print("   ❌ FAIL: DEBUG=True hardcoded (security risk)")
+elif re.search(r"DEBUG\s*=\s*env\(", settings_content):
+    print("   ✅ PASS: DEBUG from environment")
+else:
+    warnings.append("DEBUG configuration unclear")
+    print("   ⚠️  WARN: DEBUG not from environment")
+
+# 3. ALLOWED_HOSTS
+print("\n3️⃣  ALLOWED_HOSTS Configuration")
+if re.search(r"ALLOWED_HOSTS\s*=\s*\[[\s]*['\"]?\*['\"]?[\s]*\]", settings_content):
+    critical_failures.append("ALLOWED_HOSTS allows all hosts")
+    print("   ❌ FAIL: ALLOWED_HOSTS=['*'] is dangerous")
+elif re.search(r"ALLOWED_HOSTS\s*=\s*env", settings_content):
+    print("   ✅ PASS: ALLOWED_HOSTS from environment")
+else:
+    print("   ✅ PASS: ALLOWED_HOSTS configured")
+
+# 4. Security Headers (cuando DEBUG=False)
+print("\n4️⃣  Security Headers (in production)")
+security_settings = {
+    'SECURE_SSL_REDIRECT': r'SECURE_SSL_REDIRECT\s*=\s*True',
+    'SESSION_COOKIE_SECURE': r'SESSION_COOKIE_SECURE\s*=\s*True',
+    'CSRF_COOKIE_SECURE': r'CSRF_COOKIE_SECURE\s*=\s*True',
+    'SECURE_HSTS_SECONDS': r'SECURE_HSTS_SECONDS\s*=\s*\d+',
+    'X_FRAME_OPTIONS': r'X_FRAME_OPTIONS\s*=',
+}
+
+for setting, pattern in security_settings.items():
+    if re.search(pattern, settings_content):
+        print(f"   ✅ {setting} configured")
+    else:
+        warnings.append(f"{setting} not found")
+        print(f"   ⚠️  WARN: {setting} not explicitly set")
+
+# 5. Database Configuration
+print("\n5️⃣  Database Security")
+if re.search(r"sqlite3", settings_content, re.IGNORECASE):
+    # OK si es condicional en DEBUG
+    if re.search(r"if\s+DEBUG.*sqlite3", settings_content, re.DOTALL):
+        print("   ✅ PASS: SQLite only in DEBUG mode")
+    else:
+        warnings.append("SQLite may be used in production")
+        print("   ⚠️  WARN: SQLite configuration found (may be production)")
+else:
+    print("   ✅ PASS: Using production database")
+
+# 6. debug_toolbar
+print("\n6️⃣  Debug Toolbar")
+if "'debug_toolbar'" in settings_content or '"debug_toolbar"' in settings_content:
+    # Verificar que esté condicional
+    if re.search(r"if\s+DEBUG:.*debug_toolbar", settings_content, re.DOTALL):
+        print("   ✅ PASS: debug_toolbar conditional on DEBUG")
+    else:
+        warnings.append("debug_toolbar always enabled")
+        print("   ⚠️  WARN: debug_toolbar may be active in production")
+else:
+    print("   ✅ PASS: debug_toolbar not installed")
+
+# Resultado final
+print("\n" + "=" * 60)
+print("📊 AUDIT RESULTS")
+print("=" * 60)
+
+if critical_failures:
+    print(f"\n❌ CRITICAL FAILURES ({len(critical_failures)}):")
+    for failure in critical_failures:
+        print(f"   • {failure}")
+    print("\n🚫 DEPLOYMENT BLOCKED - Fix critical issues above")
+    sys.exit(1)
+
+if warnings:
+    print(f"\n⚠️  WARNINGS ({len(warnings)}):")
+    for warning in warnings:
+        print(f"   • {warning}")
+    print("\n💡 Review warnings - deployment will continue")
+
+print("\n✅ SECURITY AUDIT PASSED")
+print("   All critical security checks passed")
+print("=" * 60)
+PYEOF
 
       # Verificar que no haya credenciales hardcodeadas
       - run:

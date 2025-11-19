@@ -13,10 +13,34 @@ workflows:
             branches:
               only: /.*/
 
-      # Deploy solo en production branch (después de tests)
+      # Security checks - BLOQUEANTE para production
+      - security-checks:
+          requires:
+            - test
+          filters:
+            branches:
+              only: production
+
+      # Deploy solo en production branch (después de tests Y security)
       - deploy:
           requires:
             - test
+            - security-checks
+          filters:
+            branches:
+              only: production
+
+      # Jobs NO bloqueantes (corren en paralelo después de deploy)
+      - dependency-audit:
+          requires:
+            - deploy
+          filters:
+            branches:
+              only: production
+
+      - code-quality:
+          requires:
+            - deploy
           filters:
             branches:
               only: production
@@ -92,3 +116,180 @@ jobs:
             echo "⏳ Waiting for services to restart..."
             sleep 10
             curl -f https://kita.mx/health/ && echo "✅ Health check passed" || echo "⚠️  Health check failed"
+
+  # --------------------------------------------
+  # JOB: Security Checks (BLOQUEANTE)
+  # --------------------------------------------
+  security-checks:
+    machine:
+      image: ubuntu-2204:2024.01.1
+
+    steps:
+      - checkout
+
+      # Verificar que DEBUG esté en False
+      - run:
+          name: Check DEBUG mode is disabled
+          command: |
+            echo "🔒 Checking DEBUG mode..."
+            if grep -q "DEBUG.*=.*True" kita/settings.py; then
+              echo "❌ CRITICAL: DEBUG is True in settings.py"
+              echo "   This is a SECURITY RISK in production!"
+              exit 1
+            fi
+
+            # Verificar que no haya DEBUG=True hardcodeado
+            if grep -rn "DEBUG\s*=\s*True" --include="*.py" kita/ core/ accounts/ payments/ invoicing/ 2>/dev/null; then
+              echo "⚠️  WARNING: Found DEBUG=True in code (may be OK if conditional)"
+            fi
+
+            echo "✅ DEBUG mode check passed"
+
+      # Verificar SECRET_KEY
+      - run:
+          name: Check SECRET_KEY configuration
+          command: |
+            echo "🔑 Checking SECRET_KEY..."
+
+            # Verificar que SECRET_KEY venga de variable de entorno
+            if grep -q "SECRET_KEY\s*=\s*['\"]" kita/settings.py; then
+              echo "❌ CRITICAL: SECRET_KEY is hardcoded in settings.py"
+              exit 1
+            fi
+
+            if ! grep -q "SECRET_KEY\s*=\s*env(" kita/settings.py; then
+              echo "⚠️  WARNING: SECRET_KEY may not be from environment"
+            fi
+
+            echo "✅ SECRET_KEY configuration OK"
+
+      # Verificar que no haya credenciales hardcodeadas
+      - run:
+          name: Check for hardcoded credentials
+          command: |
+            echo "🔐 Scanning for hardcoded credentials..."
+
+            # Buscar patrones sospechosos
+            FOUND=0
+
+            if grep -rn "password\s*=\s*['\"][^'\"{}$]" --include="*.py" . 2>/dev/null | grep -v "venv/" | grep -v ".git/"; then
+              echo "⚠️  WARNING: Potential hardcoded passwords found"
+              FOUND=1
+            fi
+
+            if grep -rn "api[_-]key\s*=\s*['\"][^'\"{}$]" --include="*.py" . 2>/dev/null | grep -v "venv/" | grep -v ".git/"; then
+              echo "⚠️  WARNING: Potential hardcoded API keys found"
+              FOUND=1
+            fi
+
+            if [ $FOUND -eq 0 ]; then
+              echo "✅ No obvious hardcoded credentials found"
+            else
+              echo "⚠️  Review warnings above (non-blocking)"
+            fi
+
+      # Verificar archivos sensibles no estén en git
+      - run:
+          name: Check sensitive files
+          command: |
+            echo "📁 Checking for sensitive files..."
+
+            if [ -f .env ]; then
+              echo "❌ CRITICAL: .env file found in repository!"
+              exit 1
+            fi
+
+            if find . -name "*.pem" -o -name "*.key" -o -name "credentials.json" 2>/dev/null | grep -v ".git/" | grep -v "venv/"; then
+              echo "⚠️  WARNING: Potential sensitive files in repository"
+            else
+              echo "✅ No sensitive files in repository"
+            fi
+
+  # --------------------------------------------
+  # JOB: Dependency Audit (NO BLOQUEANTE)
+  # --------------------------------------------
+  dependency-audit:
+    machine:
+      image: ubuntu-2204:2024.01.1
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install pip-audit
+          command: |
+            python3 -m pip install pip-audit --quiet
+
+      - run:
+          name: Audit dependencies for vulnerabilities
+          command: |
+            echo "🔍 Auditing dependencies for known vulnerabilities..."
+
+            # Continuar incluso si encuentra vulnerabilidades
+            python3 -m pip_audit -r requirements.txt --desc || {
+              echo "⚠️  Vulnerabilities found in dependencies"
+              echo "   This is informational - deployment already completed"
+              echo "   Review and update dependencies when possible"
+              exit 0  # No bloquear
+            }
+
+            echo "✅ No known vulnerabilities in dependencies"
+
+      - run:
+          name: Check for outdated packages
+          when: always
+          command: |
+            echo "📦 Checking for outdated packages..."
+            python3 -m pip install pip-review --quiet
+            python3 -m pip_review --raw || echo "Some packages have updates available"
+
+  # --------------------------------------------
+  # JOB: Code Quality (NO BLOQUEANTE)
+  # --------------------------------------------
+  code-quality:
+    machine:
+      image: ubuntu-2204:2024.01.1
+
+    steps:
+      - checkout
+
+      - run:
+          name: Install linting tools
+          command: |
+            python3 -m pip install flake8 bandit --quiet
+
+      - run:
+          name: Run flake8 linter
+          when: always
+          command: |
+            echo "🔍 Running flake8 linter..."
+
+            # Configuración permisiva para no ser muy estricto
+            python3 -m flake8 . \
+              --exclude=venv,migrations,.git,__pycache__,staticfiles \
+              --max-line-length=120 \
+              --ignore=E501,W503,E203 \
+              --count \
+              --statistics || {
+              echo "⚠️  Linting issues found (informational)"
+              exit 0
+            }
+
+            echo "✅ Code passes linting"
+
+      - run:
+          name: Run Bandit security scanner
+          when: always
+          command: |
+            echo "🔒 Running Bandit security scanner..."
+
+            # Escanear código buscando problemas de seguridad comunes
+            python3 -m bandit -r . \
+              -x venv,tests,migrations,.git \
+              -ll \
+              -f screen || {
+              echo "⚠️  Security issues found (informational)"
+              exit 0
+            }
+
+            echo "✅ No security issues found"

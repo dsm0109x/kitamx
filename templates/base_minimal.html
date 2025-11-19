@@ -95,9 +95,9 @@
     <!-- BRUTALIST OVERRIDES (MUST load LAST) -->
     <link rel="stylesheet" href="{% static 'css/00-tokens/brutalist-overrides.css' %}?v=3.5">
 
-    <!-- Google Analytics 4 - Consent Mode v2 (GDPR Compliant) -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7K5TD53TK2"></script>
     <script>
-        // Initialize consent defaults (denied by default)
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
 
@@ -111,12 +111,8 @@
         });
 
         gtag('js', new Date());
-        gtag('config', 'G-Y31EXM884N', {
-            'anonymize_ip': true,
-            'cookie_flags': 'SameSite=None;Secure'
-        });
+        gtag('config', 'G-7K5TD53TK2');
     </script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y31EXM884N"></script>
 </head>
 <body>
     <!-- Skip Link for Accessibility -->

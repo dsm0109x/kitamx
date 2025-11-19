@@ -305,10 +305,19 @@ body.modal-open .modal-backdrop {
 {% block extra_js %}
 {{ block.super }}
 
+<!-- Global Config Functions - MUST LOAD FIRST for onclick handlers -->
+<script src="{% static 'js/config-functions.js' %}?v=1.0"></script>
+
 <!-- Address Autocomplete for Postal Code -->
 <script src="{% static 'js/address-autocomplete.js' %}?v=1.3"></script>
 
 <script>
+// Set Django URL endpoints for config-functions.js
+window.DEACTIVATE_CSD_URL = '{% url "config:deactivate_csd" %}';
+window.TEST_MP_URL = '{% url "config:test_mp_connection" %}';
+window.TEST_WA_URL = '{% url "config:test_whatsapp" %}';
+window.TEST_EMAIL_URL = '{% url "config:test_email" %}';
+
 // Business form submission
 document.getElementById('business-form')?.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -778,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('password', password);
 
         try {
-            const response = await fetch('/negocio/csd/validar-ajax/',  // 🇪🇸 Migrado
+            const response = await fetch('/negocio/csd/validar-ajax/', {  // 🇪🇸 Migrado
                 method: 'POST',
                 headers: { 'X-CSRFToken': getCsrfToken() },
                 body: formData
@@ -836,7 +845,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             setStepActiveSettings('upload');
 
-            const response = await fetch('/negocio/csd/subir-ajax/',  // 🇪🇸 Migrado
+            const response = await fetch('/negocio/csd/subir-ajax/', {  // 🇪🇸 Migrado
                 method: 'POST',
                 headers: { 'X-CSRFToken': getCsrfToken() },
                 body: formData

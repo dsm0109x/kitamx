@@ -175,12 +175,11 @@ jobs:
           command: |
             echo "🔒 Validating Django security configuration..."
 
-            python3 << 'PYEOF'
+            python3 -c '
 import re
 import sys
 
-# Leer settings.py
-with open('kita/settings.py', 'r') as f:
+with open("kita/settings.py", "r") as f:
     settings_content = f.read()
 
 print("=" * 60)
@@ -188,13 +187,12 @@ print("🔐 DJANGO SECURITY CONFIGURATION AUDIT")
 print("=" * 60)
 print()
 
-# Verificaciones críticas (BLOQUEANTES)
 critical_failures = []
 warnings = []
 
 # 1. SECRET_KEY
 print("1️⃣  SECRET_KEY Configuration")
-if re.search(r"SECRET_KEY\s*=\s*['\"][^{$]", settings_content):
+if re.search(r"SECRET_KEY\s*=\s*[\x27\x22][^{$]", settings_content):
     critical_failures.append("SECRET_KEY is hardcoded")
     print("   ❌ FAIL: SECRET_KEY is hardcoded in settings.py")
 elif re.search(r"SECRET_KEY\s*=\s*env\(", settings_content):
@@ -216,22 +214,22 @@ else:
 
 # 3. ALLOWED_HOSTS
 print("\n3️⃣  ALLOWED_HOSTS Configuration")
-if re.search(r"ALLOWED_HOSTS\s*=\s*\[[\s]*['\"]?\*['\"]?[\s]*\]", settings_content):
+if re.search(r"ALLOWED_HOSTS\s*=\s*\[[\s]*[\x27\x22]?\*[\x27\x22]?[\s]*\]", settings_content):
     critical_failures.append("ALLOWED_HOSTS allows all hosts")
-    print("   ❌ FAIL: ALLOWED_HOSTS=['*'] is dangerous")
+    print("   ❌ FAIL: ALLOWED_HOSTS=[\x27*\x27] is dangerous")
 elif re.search(r"ALLOWED_HOSTS\s*=\s*env", settings_content):
     print("   ✅ PASS: ALLOWED_HOSTS from environment")
 else:
     print("   ✅ PASS: ALLOWED_HOSTS configured")
 
-# 4. Security Headers (cuando DEBUG=False)
+# 4. Security Headers
 print("\n4️⃣  Security Headers (in production)")
 security_settings = {
-    'SECURE_SSL_REDIRECT': r'SECURE_SSL_REDIRECT\s*=\s*True',
-    'SESSION_COOKIE_SECURE': r'SESSION_COOKIE_SECURE\s*=\s*True',
-    'CSRF_COOKIE_SECURE': r'CSRF_COOKIE_SECURE\s*=\s*True',
-    'SECURE_HSTS_SECONDS': r'SECURE_HSTS_SECONDS\s*=\s*\d+',
-    'X_FRAME_OPTIONS': r'X_FRAME_OPTIONS\s*=',
+    "SECURE_SSL_REDIRECT": r"SECURE_SSL_REDIRECT\s*=\s*True",
+    "SESSION_COOKIE_SECURE": r"SESSION_COOKIE_SECURE\s*=\s*True",
+    "CSRF_COOKIE_SECURE": r"CSRF_COOKIE_SECURE\s*=\s*True",
+    "SECURE_HSTS_SECONDS": r"SECURE_HSTS_SECONDS\s*=\s*\d+",
+    "X_FRAME_OPTIONS": r"X_FRAME_OPTIONS\s*=",
 }
 
 for setting, pattern in security_settings.items():
@@ -241,31 +239,29 @@ for setting, pattern in security_settings.items():
         warnings.append(f"{setting} not found")
         print(f"   ⚠️  WARN: {setting} not explicitly set")
 
-# 5. Database Configuration
+# 5. Database
 print("\n5️⃣  Database Security")
 if re.search(r"sqlite3", settings_content, re.IGNORECASE):
-    # OK si es condicional en DEBUG
     if re.search(r"if\s+DEBUG.*sqlite3", settings_content, re.DOTALL):
         print("   ✅ PASS: SQLite only in DEBUG mode")
     else:
         warnings.append("SQLite may be used in production")
-        print("   ⚠️  WARN: SQLite configuration found (may be production)")
+        print("   ⚠️  WARN: SQLite found (may be production)")
 else:
     print("   ✅ PASS: Using production database")
 
 # 6. debug_toolbar
 print("\n6️⃣  Debug Toolbar")
-if "'debug_toolbar'" in settings_content or '"debug_toolbar"' in settings_content:
-    # Verificar que esté condicional
+if "debug_toolbar" in settings_content:
     if re.search(r"if\s+DEBUG:.*debug_toolbar", settings_content, re.DOTALL):
-        print("   ✅ PASS: debug_toolbar conditional on DEBUG")
+        print("   ✅ PASS: debug_toolbar conditional")
     else:
         warnings.append("debug_toolbar always enabled")
         print("   ⚠️  WARN: debug_toolbar may be active in production")
 else:
     print("   ✅ PASS: debug_toolbar not installed")
 
-# Resultado final
+# Resultado
 print("\n" + "=" * 60)
 print("📊 AUDIT RESULTS")
 print("=" * 60)
@@ -274,19 +270,18 @@ if critical_failures:
     print(f"\n❌ CRITICAL FAILURES ({len(critical_failures)}):")
     for failure in critical_failures:
         print(f"   • {failure}")
-    print("\n🚫 DEPLOYMENT BLOCKED - Fix critical issues above")
+    print("\n🚫 DEPLOYMENT BLOCKED")
     sys.exit(1)
 
 if warnings:
     print(f"\n⚠️  WARNINGS ({len(warnings)}):")
     for warning in warnings:
         print(f"   • {warning}")
-    print("\n💡 Review warnings - deployment will continue")
+    print("\n💡 Review warnings - deployment continues")
 
 print("\n✅ SECURITY AUDIT PASSED")
-print("   All critical security checks passed")
 print("=" * 60)
-PYEOF
+'
 
       # Verificar que no haya credenciales hardcodeadas
       - run:

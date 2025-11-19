@@ -137,7 +137,7 @@ jobs:
             chmod +x gitleaks
 
             echo "🔐 Scanning repository for leaked secrets..."
-            ./gitleaks detect --source=. --no-git --verbose --exit-code=1 || {
+            ./gitleaks detect --source=. --no-git --verbose --exit-code=1 --gitleaks-ignore-path=.gitleaksignore || {
               echo ""
               echo "❌ CRITICAL: Secrets or credentials found in code!"
               echo "   Review the findings above and remove sensitive data"

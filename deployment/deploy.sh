@@ -110,9 +110,9 @@ echo ""
 # ============================================
 echo "🧹 7. Cleanup..."
 
-# Limpiar archivos .pyc
-find . -type f -name "*.pyc" -delete
-find . -type d -name "__pycache__" -delete
+# Limpiar archivos .pyc (ignorar errores de permisos)
+find . -type f -name "*.pyc" -delete 2>/dev/null || true
+find . -type d -name "__pycache__" -delete 2>/dev/null || true
 
 echo "   ✅ Cleanup completed"
 echo ""

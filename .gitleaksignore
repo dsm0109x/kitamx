@@ -1,20 +1,12 @@
 # Gitleaks Ignore File
-# Ignora falsos positivos - ejemplos de documentación y datos de prueba
+# Formato: usa los fingerprints exactos reportados por Gitleaks
+# Sintaxis: archivo:regla:línea
 
-# README - Contiene ejemplos de AWS keys y otros secrets para documentación
-README.md:219
-README.md:221
-README.md:257
-README.md:42
+# README.md - Ejemplos de documentación (NO son credenciales reales)
+README.md:aws-access-token:219
+README.md:aws-access-token:221
+README.md:aws-access-token:257
+README.md:sidekiq-secret:42
 
-# Tests - Contiene private keys de prueba (no reales)
-invoicing/tests.py:142
-*/tests.py
-*/test_*.py
-**/tests/**
-
-# Archivos de ejemplo y documentación
-*.example
-*.sample
-*.md
-docs/**
+# Tests - Private keys de prueba (NO son claves reales)
+invoicing/tests.py:private-key:142

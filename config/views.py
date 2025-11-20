@@ -3,8 +3,9 @@ from typing import Any, Dict
 from datetime import timedelta
 import logging
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
@@ -18,6 +19,7 @@ import json
 
 from core.models import Notification
 from payments.models import MercadoPagoIntegration
+from payments.services import MercadoPagoService
 from accounts.decorators import tenant_required
 from core.query_optimizations import QueryOptimizer
 
@@ -99,20 +101,21 @@ def test_mp_connection(request: HttpRequest) -> JsonResponse:
                 'error': 'No hay integración de MercadoPago configurada'
             })
 
-        # Test connection using existing service
-        result = mp_service.get_payment_methods()
+        # Test connection by getting public key (makes API call to /users/me)
+        public_key = mp_service.get_public_key()
 
         return JsonResponse({
             'success': True,
             'message': 'Conexión MercadoPago exitosa',
-            'data': result
+            'user_id': mp_service.integration.user_id,
+            'public_key_prefix': public_key[:20] + '...' if len(public_key) > 20 else public_key
         })
 
     except Exception as e:
-        logger.error(f"Error testing MP connection: {str(e)}")
+        logger.error(f"Error testing MP connection: {str(e)}", exc_info=True)
         return JsonResponse({
             'success': False,
-            'error': 'Error de conexión con MercadoPago'
+            'error': f'Error de conexión: {str(e)}'
         })
 
 
@@ -338,6 +341,101 @@ def webhooks_management(request: HttpRequest) -> JsonResponse:
             'subscription_webhook': '/webhook/mercadopago/'
         }
     })
+
+
+# ========================================
+# MERCADO PAGO OAUTH (Post-Onboarding)
+# ========================================
+
+@login_required
+@tenant_required(require_owner=True)
+def mercadopago_oauth(request: HttpRequest) -> HttpResponse:
+    """
+    MercadoPago OAuth flow for post-onboarding users.
+
+    Allows users who already completed onboarding to connect/reconnect
+    their MercadoPago integration from settings (/negocio/).
+
+    Handles:
+    - OAuth URL generation and redirect to MercadoPago
+    - OAuth callback processing with state validation
+    - Token exchange and integration storage
+
+    This is separate from onboarding_step2 to avoid @onboarding_required
+    decorator blocking access for users who already completed setup.
+    """
+    import secrets
+    from django.urls import reverse
+
+    tenant = request.tenant
+    user = request.user
+    mp_service = MercadoPagoService(tenant)
+
+    # Handle OAuth callback
+    if 'code' in request.GET:
+        code = request.GET.get('code')
+        state = request.GET.get('state')
+
+        logger.info(f"Settings OAuth callback - code: {code[:20]}..., state: {state}, tenant_id: {tenant.id}")
+
+        # Verify state with session-stored random token for security
+        stored_state = request.session.get('oauth_state')
+        stored_tenant_id = request.session.get('oauth_tenant_id')
+
+        if not stored_state or state != stored_state:
+            messages.error(request, 'Hubo un problema de seguridad. Por favor intenta conectar tu cuenta de nuevo.')
+            logger.warning(f"Settings OAuth state mismatch for tenant {tenant.id}: received={state}, stored={stored_state}")
+            return redirect('config:index')
+
+        if stored_tenant_id != str(tenant.id):
+            messages.error(request, 'Hubo un problema de seguridad. Por favor intenta conectar tu cuenta de nuevo.')
+            logger.warning(f"Settings OAuth tenant mismatch: session={stored_tenant_id}, current={tenant.id}")
+            return redirect('config:index')
+
+        # Clear session state after validation
+        request.session.pop('oauth_state', None)
+        request.session.pop('oauth_tenant_id', None)
+
+        try:
+            # Exchange code for token
+            redirect_uri = request.build_absolute_uri(reverse('config:mercadopago_oauth'))
+            logger.info(f"Settings token exchange - redirect_uri: {redirect_uri}")
+
+            result = mp_service.exchange_code_for_token(code, redirect_uri)
+
+            if result['success']:
+                messages.success(request, '¡Mercado Pago conectado exitosamente!')
+                return redirect('config:index')
+            else:
+                messages.error(request, 'No pudimos conectar tu cuenta de Mercado Pago. Por favor intenta de nuevo.')
+                return redirect('config:index')
+
+        except Exception as e:
+            logger.error(f"Settings OAuth callback error for tenant {tenant.id}: {str(e)}")
+            if settings.DEBUG:
+                messages.error(request, f'Error: {str(e)}')
+            else:
+                messages.error(request, 'No pudimos procesar la autorización. Por favor intenta conectar de nuevo.')
+            return redirect('config:index')
+
+    # Generate OAuth URL and redirect to MercadoPago
+    redirect_uri = request.build_absolute_uri(reverse('config:mercadopago_oauth'))
+
+    try:
+        # Generate cryptographically secure state parameter
+        state = secrets.token_urlsafe(32)
+        request.session['oauth_state'] = state
+        request.session['oauth_tenant_id'] = str(tenant.id)
+
+        oauth_url = mp_service.get_oauth_url(redirect_uri, state)
+
+        logger.info(f"Settings: Redirecting tenant {tenant.id} to MercadoPago OAuth")
+        return redirect(oauth_url)
+
+    except ValueError as e:
+        messages.error(request, 'Hay un problema de configuración. Por favor contacta al administrador.')
+        logger.error(f"Settings OAuth URL generation error: {str(e)}")
+        return redirect('config:index')
 
 
 # ========================================

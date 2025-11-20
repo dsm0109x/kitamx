@@ -291,9 +291,9 @@ body.modal-open .modal-backdrop {
                                     <p class="small text-muted mb-3">
                                         Para recibir pagos necesitas conectar tu cuenta de Mercado Pago®.
                                     </p>
-                                    <button class="btn btn-primary" onclick="connectMercadoPago()">
+                                    <a href="{% url 'config:mercadopago_oauth' %}" class="btn btn-primary">
                                         Conectar Cuenta
-                                    </button>
+                                    </a>
                                 {% endif %}
                         </div>
                 </div>
@@ -306,7 +306,7 @@ body.modal-open .modal-backdrop {
 {{ block.super }}
 
 <!-- Global Config Functions - MUST LOAD FIRST for onclick handlers -->
-<script src="{% static 'js/config-functions.js' %}?v=1.0"></script>
+<script src="{% static 'js/config-functions.js' %}?v=20251119-2245"></script>
 
 <!-- Address Autocomplete for Postal Code -->
 <script src="{% static 'js/address-autocomplete.js' %}?v=1.3"></script>
@@ -317,6 +317,14 @@ window.DEACTIVATE_CSD_URL = '{% url "config:deactivate_csd" %}';
 window.TEST_MP_URL = '{% url "config:test_mp_connection" %}';
 window.TEST_WA_URL = '{% url "config:test_whatsapp" %}';
 window.TEST_EMAIL_URL = '{% url "config:test_email" %}';
+
+// OVERRIDE: Force correct MercadoPago OAuth URL (inline to bypass cache)
+window.connectMercadoPago = function() {
+    showToast('Redirigiendo a Mercado Pago® para autorizar...', 'info');
+    setTimeout(() => {
+        window.location.href = '/negocio/mercadopago/oauth/';
+    }, 1000);
+};
 
 // Business form submission
 document.getElementById('business-form')?.addEventListener('submit', function(e) {

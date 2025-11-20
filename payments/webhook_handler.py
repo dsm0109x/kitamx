@@ -392,9 +392,29 @@ class MercadoPagoWebhookHandler:
 
             # Update payment link if payment successful
             if payment_status == 'approved' and created:
-                payment_link.status = 'paid'
-                payment_link.uses_count += 1
-                payment_link.save()
+                # CRITICAL: Validate link is still active before marking as paid
+                if payment_link.status == 'cancelled':
+                    self.logger.warning(
+                        f"Payment {payment_id} received for CANCELLED link {payment_link.id}. "
+                        f"Cancelled at: {payment_link.cancelled_at}, "
+                        f"Reason: {payment_link.cancellation_reason}. "
+                        f"Payment registered but link NOT marked as paid."
+                    )
+
+                    # Alert tenant and admin about this race condition
+                    self._alert_cancelled_link_payment(payment_link, payment, payment_data)
+
+                elif payment_link.status == 'active':
+                    # Normal flow: mark as paid
+                    payment_link.status = 'paid'
+                    payment_link.uses_count += 1
+                    payment_link.save()
+                else:
+                    # Link is expired or already paid
+                    self.logger.warning(
+                        f"Payment {payment_id} received for link {payment_link.id} "
+                        f"with status '{payment_link.status}'. Payment registered."
+                    )
 
                 # Send notifications
                 self._send_payment_notifications(payment)
@@ -671,6 +691,117 @@ class MercadoPagoWebhookHandler:
             self.logger.info(f"Payment {payment.id} requires invoice generation")
         except Exception as e:
             self.logger.error(f"Failed to trigger invoice generation: {e}")
+
+    def _alert_cancelled_link_payment(
+        self,
+        payment_link: PaymentLink,
+        payment: Payment,
+        payment_data: Dict[str, Any]
+    ) -> None:
+        """Alert tenant and admin when payment is received for cancelled link.
+
+        This handles the race condition where a user completes payment
+        while someone cancels the link.
+
+        Args:
+            payment_link: Cancelled PaymentLink that received payment
+            payment: Payment record that was created
+            payment_data: Payment data from MercadoPago
+        """
+        try:
+            from django.core.mail import send_mail
+            from core.notifications import notification_service
+
+            # Extract payment details
+            payer_email = payment_data.get('payer', {}).get('email', '')
+            payer_name = f"{payment_data.get('payer', {}).get('first_name', '')} " \
+                        f"{payment_data.get('payer', {}).get('last_name', '')}".strip()
+            amount = payment_data.get('transaction_amount', 0)
+            mp_payment_id = payment_data.get('id', '')
+
+            # 1. Alert TENANT via email
+            tenant = payment_link.tenant
+            tenant_owners = tenant.tenantuser_set.filter(is_owner=True)
+
+            for tenant_user in tenant_owners:
+                try:
+                    context = {
+                        'payment_link_title': payment_link.title,
+                        'payment_link_id': str(payment_link.id),
+                        'amount': f"${amount:,.2f} MXN",
+                        'payer_name': payer_name or 'Cliente',
+                        'payer_email': payer_email,
+                        'mp_payment_id': mp_payment_id,
+                        'cancelled_at': payment_link.cancelled_at,
+                        'cancellation_reason': payment_link.get_cancellation_reason_display() if payment_link.cancellation_reason else 'No especificada',
+                        'cancelled_by': payment_link.cancelled_by.get_full_name() if payment_link.cancelled_by else 'Desconocido'
+                    }
+
+                    notification_service.send_notification(
+                        tenant=tenant,
+                        notification_type='payment_on_cancelled_link',
+                        recipient_email=tenant_user.email,
+                        recipient_name=tenant_user.first_name,
+                        context=context
+                    )
+
+                    self.logger.info(f"Sent cancelled link payment alert to tenant owner: {tenant_user.email}")
+
+                except Exception as e:
+                    self.logger.error(f"Failed to send tenant alert: {e}")
+
+            # 2. Alert ADMIN (Diego) via direct email
+            admin_email = getattr(settings, 'ADMIN_ALERT_EMAIL', 'dsm0109@gmail.com')
+
+            try:
+                subject = f"⚠️ ALERTA: Pago recibido en link cancelado - {tenant.name}"
+                message = f"""
+ALERTA DE RACE CONDITION EN PAGOS
+==================================
+
+Tenant: {tenant.name} (ID: {tenant.id})
+Link: {payment_link.title} (ID: {payment_link.id})
+Monto: ${amount:,.2f} MXN
+
+DETALLES DEL PAGO:
+- Pago ID (MP): {mp_payment_id}
+- Pagador: {payer_name} ({payer_email})
+- Estado del pago: {payment.status}
+
+DETALLES DE LA CANCELACIÓN:
+- Cancelado el: {payment_link.cancelled_at}
+- Cancelado por: {payment_link.cancelled_by.get_full_name() if payment_link.cancelled_by else 'Desconocido'}
+- Razón: {payment_link.get_cancellation_reason_display() if payment_link.cancellation_reason else 'No especificada'}
+
+ACCIÓN TOMADA:
+✅ Pago registrado en la base de datos (ID: {payment.id})
+❌ Link NO marcado como pagado (permanece cancelado)
+📧 Tenant notificado
+
+ACCIONES SUGERIDAS:
+1. Contactar al tenant para confirmar si deben procesar o refund
+2. Verificar si el cliente requiere factura
+3. Procesar refund desde panel de MercadoPago si es necesario
+
+Dashboard: {settings.APP_BASE_URL}/admin/payments/payment/{payment.id}/
+MercadoPago: https://www.mercadopago.com.mx/activities/{mp_payment_id}
+                """
+
+                send_mail(
+                    subject=subject,
+                    message=message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[admin_email],
+                    fail_silently=False
+                )
+
+                self.logger.info(f"Sent cancelled link payment alert to admin: {admin_email}")
+
+            except Exception as e:
+                self.logger.error(f"Failed to send admin alert: {e}", exc_info=True)
+
+        except Exception as e:
+            self.logger.error(f"Error in _alert_cancelled_link_payment: {e}", exc_info=True)
 
     def _process_subscription_payment_direct(self, payment_data: Dict[str, Any]) -> Dict[str, Any]:
         """Process subscription payment directly.

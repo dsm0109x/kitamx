@@ -359,6 +359,7 @@ class NotificationService:
             'invoice_ready': 'Tu factura CFDI ha sido generada - {tenant_name}',
             'subscription_due': 'Renovación de suscripción - Kita',
             'subscription_failed': 'Problema con tu suscripción - Kita',
+            'payment_on_cancelled_link': '⚠️ Atención: Pago recibido en link cancelado - {tenant_name}',
         }
 
         template = subjects.get(notification_type, 'Notificación - {tenant_name}')
@@ -542,6 +543,71 @@ Detalles:
 - Expiró el: {expired_at}
 
 Si todavía necesitas realizar este pago, por favor contacta con nosotros y con gusto te generaremos un nuevo link.
+
+Saludos,
+{tenant_name}"""
+            },
+            'payment_on_cancelled_link': {
+                'whatsapp': """⚠️ ALERTA: Pago recibido en link cancelado
+
+Hola {recipient_name},
+
+Hemos recibido un pago de {amount} para un link que fue cancelado previamente.
+
+📋 Link: {payment_link_title}
+💰 Monto: {amount}
+👤 Pagador: {payer_name} ({payer_email})
+
+DETALLES DE LA CANCELACIÓN:
+🗓️ Cancelado: {cancelled_at}
+👤 Por: {cancelled_by}
+📝 Razón: {cancellation_reason}
+
+⚠️ IMPORTANTE:
+El pago fue registrado pero el link NO fue marcado como pagado porque ya estaba cancelado.
+
+ACCIÓN REQUERIDA:
+1. Revisar si el pago debe ser procesado o reembolsado
+2. Contactar al cliente si es necesario
+3. Generar factura si aplica
+
+ID del Pago (MercadoPago): {mp_payment_id}
+
+Por favor revisa tu panel de Kita para más detalles.
+
+{tenant_name}""",
+                'email': """Hola {recipient_name},
+
+Hemos detectado una situación importante que requiere tu atención.
+
+⚠️ PAGO RECIBIDO EN LINK CANCELADO
+
+Se recibió un pago para un link que había sido cancelado previamente. Esto puede ocurrir cuando un cliente completa el pago mientras el link está siendo cancelado.
+
+DETALLES DEL PAGO:
+- Link: {payment_link_title}
+- ID del Link: {payment_link_id}
+- Monto: {amount}
+- Pagador: {payer_name}
+- Email del pagador: {payer_email}
+- ID del Pago (MercadoPago): {mp_payment_id}
+
+DETALLES DE LA CANCELACIÓN:
+- Cancelado el: {cancelled_at}
+- Cancelado por: {cancelled_by}
+- Razón: {cancellation_reason}
+
+ACCIÓN TOMADA POR EL SISTEMA:
+✅ El pago fue registrado en la base de datos
+❌ El link NO fue marcado como pagado (permanece cancelado)
+
+ACCIÓN REQUERIDA DE TU PARTE:
+1. Revisar la situación con el cliente
+2. Decidir si procesar el pago o hacer un reembolso
+3. Si procedes con el pago, generar la factura manualmente si es necesario
+4. Actualizar el estado del link si corresponde
+
+Puedes revisar los detalles completos en tu panel de administración de Kita o contactarnos si necesitas ayuda.
 
 Saludos,
 {tenant_name}"""

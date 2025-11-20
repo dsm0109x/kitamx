@@ -43,8 +43,9 @@ class KitaBillingService:
                         "number": tenant.rfc
                     },
                     "address": {
-                        "street_name": tenant.address[:100] if tenant.address else "",
-                        "zip_code": tenant.postal_code or ""
+                        "street_name": f"{tenant.calle} {tenant.numero_exterior}".strip(),
+                        "street_number": tenant.numero_exterior or "",
+                        "zip_code": tenant.codigo_postal or ""
                     }
                 },
                 "payment_methods": {
@@ -56,9 +57,9 @@ class KitaBillingService:
                     "installments": 1  # Single payment only (PUE)
                 },
                 "back_urls": {
-                    "success": f"{settings.APP_BASE_URL}/incorporacion/suscripcion/exito/",  # 🇪🇸
-                    "failure": f"{settings.APP_BASE_URL}/incorporacion/suscripcion/error/",  # 🇪🇸
-                    "pending": f"{settings.APP_BASE_URL}/incorporacion/suscripcion/pendiente/"  # 🇪🇸
+                    "success": f"{settings.APP_BASE_URL}/suscripcion/pago/exito/",  # 🇪🇸 Migrado a billing
+                    "failure": f"{settings.APP_BASE_URL}/suscripcion/pago/error/",  # 🇪🇸 Migrado a billing
+                    "pending": f"{settings.APP_BASE_URL}/suscripcion/pago/pendiente/"  # 🇪🇸 Migrado a billing
                 },
                 "auto_return": "approved",
                 "external_reference": f"kita_subscription_{tenant.id}",

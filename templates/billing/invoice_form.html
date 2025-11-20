@@ -1,0 +1,170 @@
+{% extends 'dashboard/base.html' %}
+{% load humanize static %}
+
+{% block title %}Facturar Suscripción - {{ tenant.name }}{% endblock %}
+
+{% block dashboard_content %}
+<!-- Page Header -->
+<div class="settings-page-header" style="margin-bottom: 2rem;">
+    <h1>Facturar Suscripción</h1>
+    <p style="color: #6b7280; font-size: 0.875rem;">
+        Genera tu factura CFDI 4.0 para el pago de suscripción a Kita
+    </p>
+</div>
+
+<!-- Payment Details Card -->
+<div style="background: white; border: 1px solid #e5e7eb; padding: 1.5rem; margin-bottom: 2rem;">
+    <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; color: #111827;">
+        Detalles del Pago
+    </h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div>
+            <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase;">Periodo</div>
+            <div style="font-weight: 600;">{{ payment.billing_period_start|date:"F Y" }}</div>
+        </div>
+        <div>
+            <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase;">Monto</div>
+            <div style="font-weight: 600;">${{ payment.amount|floatformat:2 }} {{ payment.currency }}</div>
+        </div>
+        <div>
+            <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase;">Fecha de Pago</div>
+            <div style="font-weight: 600;">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
+        </div>
+        <div>
+            <div style="font-size: 0.75rem; color: #9ca3af; text-transform: uppercase;">Método</div>
+            <div style="font-weight: 600;">{{ payment.get_payment_method_display }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Invoice Form -->
+<form method="POST" id="invoice-form">
+    {% csrf_token %}
+
+    <div style="background: white; border: 1px solid #e5e7eb; padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1rem; font-weight: 600; margin-bottom: 1rem; text-transform: uppercase; color: #111827;">
+            Datos Fiscales del Receptor
+        </h3>
+
+        <div class="alert" style="background: #f0fdfa; border-left: 3px solid #0d9488; padding: 1rem; margin-bottom: 1.5rem;">
+            <strong style="font-size: 0.875rem;">ℹ️ Datos autocompletados</strong>
+            <p style="font-size: 0.8125rem; color: #6b7280; margin: 0.25rem 0 0 0;">
+                Los datos se han pre-llenado con la información de tu cuenta. Verifica que sean correctos.
+            </p>
+        </div>
+
+        <!-- RFC (readonly) -->
+        <div class="mb-3">
+            <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                RFC <span style="color: #ef4444;">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   name="rfc"
+                   value="{{ rfc }}"
+                   readonly
+                   style="background: #f9fafb; border: 1px solid #e5e7eb;">
+            <small class="form-text text-muted">Este campo no se puede modificar</small>
+        </div>
+
+        <!-- Razón Social (readonly) -->
+        <div class="mb-3">
+            <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                Razón Social <span style="color: #ef4444;">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   name="business_name"
+                   value="{{ business_name }}"
+                   readonly
+                   style="background: #f9fafb; border: 1px solid #e5e7eb;">
+            <small class="form-text text-muted">Este campo no se puede modificar</small>
+        </div>
+
+        <!-- Régimen Fiscal -->
+        <div class="mb-3">
+            <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                Régimen Fiscal <span style="color: #ef4444;">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   name="fiscal_regime"
+                   value="{{ fiscal_regime }}"
+                   readonly
+                   style="background: #f9fafb; border: 1px solid #e5e7eb;">
+        </div>
+
+        <!-- Uso de CFDI -->
+        <div class="mb-3">
+            <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                Uso de CFDI <span style="color: #ef4444;">*</span>
+            </label>
+            <select class="form-select" name="uso_cfdi" required style="border: 1px solid #e5e7eb;">
+                <option value="">Selecciona el uso...</option>
+                <option value="G03">G03 - Gastos en general</option>
+                <option value="D10">D10 - Pagos por servicios educativos</option>
+                <option value="P01">P01 - Por definir</option>
+                <option value="CP01" selected>CP01 - Pagos</option>
+            </select>
+            <small class="form-text text-muted">Uso que le darás a esta factura en tu contabilidad</small>
+        </div>
+
+        <!-- Código Postal -->
+        <div class="mb-3">
+            <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                Código Postal <span style="color: #ef4444;">*</span>
+            </label>
+            <input type="text"
+                   class="form-control"
+                   name="codigo_postal"
+                   value="{{ codigo_postal }}"
+                   required
+                   pattern="[0-9]{5}"
+                   maxlength="5"
+                   style="border: 1px solid #e5e7eb;">
+        </div>
+
+        <!-- Forma de Pago -->
+        <div class="mb-3">
+            <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                Forma de Pago
+            </label>
+            <select class="form-select" name="forma_pago" required style="border: 1px solid #e5e7eb;">
+                <option value="03" selected>03 - Transferencia electrónica de fondos</option>
+                <option value="04">04 - Tarjeta de crédito</option>
+                <option value="28">28 - Tarjeta de débito</option>
+                <option value="99">99 - Por definir</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <a href="{% url 'billing:index' %}"
+           class="btn btn-outline-secondary"
+           style="padding: 0.75rem 1.5rem;">
+            Cancelar
+        </a>
+        <button type="submit"
+                class="btn btn-primary"
+                style="background: #0d9488; border: none; padding: 0.75rem 1.5rem;">
+            📄 Generar Factura CFDI
+        </button>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+document.getElementById('invoice-form')?.addEventListener('submit', function(e) {
+    const btn = this.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+    btn.disabled = true;
+
+    // Form will submit normally
+});
+</script>
+{% endblock %}

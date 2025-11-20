@@ -125,7 +125,7 @@
 
             {% elif subscription.is_trial and not subscription.is_trial_expired %}
                 <p style="font-size: 0.875rem; color: #6b7280; margin: 0;">
-                    Tu suscripción se activará automáticamente al terminar el trial
+                    Al terminar el trial, deberás activar tu suscripción para continuar usando Kita
                 </p>
 
             {% elif subscription.is_active %}
@@ -146,18 +146,56 @@
         </div>
     </div>
 
-    <!-- Historial Resumido -->
+    <!-- Historial de Pagos -->
     {% if payments %}
     <div class="membership-history">
-        <div class="membership-history-title">HISTORIAL</div>
-        <div class="membership-history-summary">
-            <strong>{{ payments|length }}</strong> pago{{ payments|length|pluralize }} ·
-            <strong>${{ payments_total|floatformat:2|default:"0.00" }}</strong> total ·
-            Última: {{ payments.0.created_at|date:"d/m/Y" }}
+        <div class="membership-history-title">HISTORIAL DE PAGOS</div>
+
+        {% for payment in payments %}
+        <div class="payment-item" style="border-bottom: 1px solid #e5e7eb; padding: 1rem 0; display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+                <div style="font-size: 0.875rem; font-weight: 600; color: #111827; margin-bottom: 0.25rem;">
+                    {{ payment.billing_period_start|date:"F Y" }}
+                    {% if payment.status == 'completed' %}
+                        <span style="color: #10b981; margin-left: 0.5rem;">✓ Pagado</span>
+                    {% elif payment.status == 'pending' %}
+                        <span style="color: #f59e0b; margin-left: 0.5rem;">⏳ Pendiente</span>
+                    {% elif payment.status == 'failed' %}
+                        <span style="color: #ef4444; margin-left: 0.5rem;">✗ Fallido</span>
+                    {% endif %}
+                </div>
+                <div style="font-size: 0.75rem; color: #6b7280;">
+                    ${{ payment.amount|floatformat:2 }} {{ payment.currency }} ·
+                    {{ payment.created_at|date:"d/m/Y" }} ·
+                    {% if payment.invoice_generated %}
+                        <span style="color: #10b981;">📄 Facturado</span>
+                    {% else %}
+                        <span style="color: #9ca3af;">Sin factura</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                {% if payment.can_invoice %}
+                <a href="{% url 'billing:invoice_payment' payment.id %}"
+                   class="btn btn-sm"
+                   style="background: #0d9488; color: white; padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 4px; text-decoration: none;">
+                    📄 Facturar
+                </a>
+                {% elif payment.invoice_generated %}
+                <button class="btn btn-sm btn-outline-secondary"
+                        onclick="viewInvoice('{{ payment.id }}')"
+                        style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 4px;">
+                    Ver Factura
+                </button>
+                {% endif %}
+                <button class="btn btn-sm btn-outline-secondary"
+                        onclick="showPaymentDetail('{{ payment.id }}')"
+                        style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 4px;">
+                    Detalles
+                </button>
+            </div>
         </div>
-        <a href="#" onclick="showAllPayments(); return false;" class="membership-history-link">
-            Ver detalle →
-        </a>
+        {% endfor %}
     </div>
     {% endif %}
 </div>

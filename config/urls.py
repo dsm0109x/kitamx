@@ -29,6 +29,8 @@ urlpatterns = [
     path('integraciones/', views.integrations, name='integrations'),
     # 🇪🇸 update-mp-integration → actualizar-mp-integracion
     path('actualizar-mp-integracion/', views.update_mp_integration, name='update_mp_integration'),
+    # MercadoPago OAuth (post-onboarding)
+    path('mercadopago/oauth/', views.mercadopago_oauth, name='mercadopago_oauth'),
     # 🇪🇸 test-mp-connection → probar-conexion-mp
     path('probar-conexion-mp/', views.test_mp_connection, name='test_mp_connection'),
     # 🇪🇸 update-whatsapp → actualizar-whatsapp

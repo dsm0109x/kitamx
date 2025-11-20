@@ -354,6 +354,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True  # ✅ Redirect directo a Google (sin pantalla
 # Email Configuration - Anymail with Postmark
 EMAIL_BACKEND = 'anymail.backends.postmark.EmailBackend'
 DEFAULT_FROM_EMAIL = env('EMAIL_FROM')
+ADMIN_ALERT_EMAIL = env('ADMIN_ALERT_EMAIL', default='dsm0109@gmail.com')
 
 # Anymail Configuration
 ANYMAIL = {
@@ -479,6 +480,14 @@ FISCALAPI_URL = env('FISCALAPI_URL', default='https://test.fiscalapi.com')
 FISCALAPI_API_KEY = env('FISCALAPI_API_KEY', default='')
 FISCALAPI_TENANT_KEY = env('FISCALAPI_TENANT_KEY', default='')
 FISCALAPI_TIMEOUT = env.int('FISCALAPI_TIMEOUT', default=30)
+
+# Kita as Issuer (for subscription invoicing)
+KITA_FISCALAPI_PERSON_ID = env('KITA_FISCALAPI_PERSON_ID', default='a57e0293-ecab-4e24-b81c-904bbfd91f6b')
+KITA_RFC = env('KITA_RFC', default='XOJI740919U48')
+KITA_RAZON_SOCIAL = env('KITA_RAZON_SOCIAL', default='XOJI740919U48')  # Temporal
+KITA_REGIMEN_FISCAL = env('KITA_REGIMEN_FISCAL', default='612')  # Personas Físicas
+KITA_CODIGO_POSTAL = env('KITA_CODIGO_POSTAL', default='14240')
+KITA_EMAIL = env('KITA_EMAIL', default='facturacion@kita.mx')
 
 # Cloudflare Turnstile (Anti-bot protection)
 TURNSTILE_SITE_KEY = env('TURNSTILE_SITE_KEY')

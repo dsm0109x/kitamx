@@ -27,7 +27,7 @@ window.getCsrfToken = function() {
 window.connectMercadoPago = function() {
     showToast('Redirigiendo a Mercado Pago® para autorizar...', 'info');
     setTimeout(() => {
-        window.location.href = '/incorporacion/paso2/';
+        window.location.href = '/negocio/mercadopago/oauth/';
     }, 1000);
 }
 

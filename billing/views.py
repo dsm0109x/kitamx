@@ -29,6 +29,8 @@ from payments.billing import KitaBillingService
 from invoicing.models import Invoice
 
 from .models import Subscription, BillingPayment
+from django.shortcuts import redirect
+from django.contrib import messages
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +122,24 @@ def subscription_index(request: HttpRequest) -> HttpResponse:
         .select_related('subscription', 'tenant')
         .order_by('-created_at')[:10]
     )
+
+    # Determine which payments can be invoiced
+    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    for payment in payments:
+        # Can invoice if:
+        # 1. Payment is completed
+        # 2. Payment is from current month
+        # 3. Invoice not yet generated
+        # 4. Tenant has valid fiscal data
+        payment.can_invoice = (
+            payment.status == 'completed' and
+            payment.created_at >= current_month_start and
+            not payment.invoice_generated and
+            tenant.rfc and
+            tenant.business_name and
+            tenant.codigo_postal
+        )
 
     # Calculate cached usage stats
     usage_stats = UsageStatsCalculator.calculate(tenant)
@@ -375,7 +395,7 @@ def payment_detail(request: HttpRequest, payment_id: str) -> HttpResponse:
     tenant = request.tenant_user.tenant
 
     payment = get_object_or_404(
-        BillingPayment.objects.with_subscription(),
+        BillingPayment.objects.select_related('subscription', 'tenant'),
         id=payment_id,
         tenant=tenant
     )
@@ -387,7 +407,7 @@ def payment_detail(request: HttpRequest, payment_id: str) -> HttpResponse:
             action='view_payment_details',
             entity_type='BillingPayment',
             entity_id=str(payment_id),
-            details={'amount': float(payment.amount)}
+            notes=f'Viewed payment details for ${payment.amount}'
         )
 
     context = {
@@ -520,3 +540,179 @@ def subscription_stats(request: HttpRequest) -> JsonResponse:
             'success': False,
             'error': 'Error al obtener estadísticas'
         }, status=500)
+
+# ========================================
+# SUBSCRIPTION PAYMENT CALLBACKS
+# ========================================
+
+@login_required
+@tenant_required(require_owner=True, require_active=False)
+def subscription_payment_success(request: HttpRequest) -> HttpResponse:
+    """
+    Subscription payment success callback.
+    
+    Handles successful subscription payments from MercadoPago.
+    Works for both onboarding and post-onboarding subscription activations.
+    
+    No @onboarding_required decorator to allow post-onboarding access.
+    """
+    payment_id = request.GET.get('payment_id')
+    tenant = request.tenant_user.tenant
+
+    if payment_id:
+        try:
+            # Process payment via webhook handler
+            from payments.webhook_handler import webhook_handler
+            
+            webhook_data = {
+                "data": {"id": payment_id}, 
+                "type": "payment",
+                "action": "payment.updated"
+            }
+            
+            result = webhook_handler._process_subscription_payment(payment_id, webhook_data)
+            
+            if result.get('success'):
+                messages.success(request, '¡Suscripción activada exitosamente!')
+                logger.info(f"Subscription payment processed successfully for tenant {tenant.id}")
+            else:
+                messages.info(request, 'Pago recibido. La activación puede tomar unos minutos.')
+                logger.warning(f"Subscription payment processing issue: {result.get('error')}")
+                
+        except Exception as e:
+            logger.error(f"Error processing subscription success callback: {str(e)}", exc_info=True)
+            messages.info(request, 'Pago recibido. La activación puede tomar unos minutos.')
+    
+    return redirect('billing:index')
+
+
+@login_required
+@tenant_required(require_owner=True, require_active=False)
+def subscription_payment_failure(request: HttpRequest) -> HttpResponse:
+    """
+    Subscription payment failure callback.
+    
+    Handles failed subscription payments from MercadoPago.
+    """
+    tenant = request.tenant_user.tenant
+    
+    messages.error(request, 'El pago no pudo ser procesado. Por favor intenta de nuevo.')
+    logger.warning(f"Subscription payment failed for tenant {tenant.id}")
+    
+    return redirect('billing:index')
+
+
+@login_required
+@tenant_required(require_owner=True, require_active=False)
+def subscription_payment_pending(request: HttpRequest) -> HttpResponse:
+    """
+    Subscription payment pending callback.
+    
+    Handles pending subscription payments (e.g., OXXO, bank transfer).
+    """
+    tenant = request.tenant_user.tenant
+    
+    messages.info(request, 'Tu pago está siendo procesado. Te notificaremos cuando se confirme.')
+    logger.info(f"Subscription payment pending for tenant {tenant.id}")
+    
+    return redirect('billing:index')
+
+
+# ========================================
+# SUBSCRIPTION INVOICE GENERATION
+# ========================================
+
+@login_required
+@tenant_required(require_owner=True, require_active=False)
+def invoice_subscription_payment(request: HttpRequest, payment_id: str) -> HttpResponse:
+    """
+    Invoice subscription payment form.
+
+    Shows form to collect fiscal data and generate CFDI invoice
+    for a subscription payment made to Kita.
+
+    Emisor: Kita (configured in settings)
+    Receptor: Tenant (form data)
+    """
+    tenant = request.tenant_user.tenant
+    
+    # Get payment
+    payment = get_object_or_404(
+        BillingPayment,
+        id=payment_id,
+        tenant=tenant
+    )
+    
+    # Validate payment can be invoiced
+    current_month_start = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    can_invoice = (
+        payment.status == 'completed' and
+        payment.created_at >= current_month_start and
+        not payment.invoice_generated
+    )
+    
+    if not can_invoice:
+        messages.error(request, 'Este pago no puede ser facturado en este momento.')
+        return redirect('billing:index')
+    
+    # Handle form submission (POST)
+    if request.method == 'POST':
+        try:
+            # Extract form data
+            fiscal_data = {
+                'rfc': payment.tenant.rfc,  # From tenant (readonly)
+                'business_name': payment.tenant.business_name,  # From tenant (readonly)
+                'email': payment.tenant.email,
+                'codigo_postal': request.POST.get('codigo_postal'),
+                'fiscal_regime': payment.tenant.fiscal_regime,
+                'uso_cfdi': request.POST.get('uso_cfdi'),
+                'forma_pago': request.POST.get('forma_pago'),
+            }
+
+            # Validate required fields
+            if not all([fiscal_data['uso_cfdi'], fiscal_data['forma_pago'], fiscal_data['codigo_postal']]):
+                messages.error(request, 'Por favor completa todos los campos requeridos.')
+                return redirect('billing:invoice_payment', payment_id=payment.id)
+
+            # Generate invoice
+            from billing.invoice_service import subscription_invoice_service
+
+            result = subscription_invoice_service.generate_invoice(payment, fiscal_data)
+
+            if result['success']:
+                messages.success(
+                    request,
+                    f'¡Factura generada exitosamente! UUID: {result["uuid"]}'
+                )
+                logger.info(f"Subscription invoice generated for payment {payment.id}")
+                return redirect('billing:index')
+            else:
+                messages.error(request, f'Error: {result.get("message", "Error generando factura")}')
+                logger.error(f"Failed to generate invoice: {result.get('error')}")
+                return redirect('billing:invoice_payment', payment_id=payment.id)
+
+        except Exception as e:
+            logger.error(f"Error processing invoice form: {e}", exc_info=True)
+            messages.error(request, f'Error inesperado: {str(e)}')
+            return redirect('billing:invoice_payment', payment_id=payment.id)
+    
+    # Show form (GET)
+    context = {
+        'tenant': tenant,
+        'payment': payment,
+        'page_title': 'Facturar Suscripción',
+        # Autocompleted data
+        'rfc': tenant.rfc,
+        'business_name': tenant.business_name,
+        'codigo_postal': tenant.codigo_postal,
+        'colonia': tenant.colonia,
+        'municipio': tenant.municipio,
+        'estado': tenant.estado,
+        'calle': tenant.calle,
+        'numero_exterior': tenant.numero_exterior,
+        'numero_interior': tenant.numero_interior,
+        'fiscal_regime': tenant.fiscal_regime,
+    }
+    
+    return render(request, 'billing/invoice_form.html', context)

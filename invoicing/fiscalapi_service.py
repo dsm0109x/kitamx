@@ -83,9 +83,19 @@ class FiscalAPIService:
                 return response.json()
             else:
                 error_data = response.json() if response.headers.get('content-type', '').startswith('application/json') else {}
-                raise FiscalAPIServiceException(
-                    f"FiscalAPI error {response.status_code}: {error_data.get('message', response.text)}"
-                )
+                # Log full error details for debugging
+                logger.error(f"FiscalAPI error response: {response.status_code}")
+                logger.error(f"FiscalAPI error data: {error_data}")
+                logger.error(f"FiscalAPI error text: {response.text[:500]}")
+
+                error_message = error_data.get('message', response.text)
+                error_details = error_data.get('details', '')
+
+                full_error = f"FiscalAPI error {response.status_code}: {error_message}"
+                if error_details:
+                    full_error += f" | Details: {error_details}"
+
+                raise FiscalAPIServiceException(full_error)
 
         except requests.exceptions.Timeout:
             raise FiscalAPIServiceException("FiscalAPI timeout - intenta de nuevo")

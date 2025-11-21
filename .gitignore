@@ -132,6 +132,10 @@ deploy-*.sh
 
 # Documentation that might contain sensitive info
 # =============================================================================
+# Ignore all .md files in root except README.md
+/*.md
+!README.md
+
 # Uncomment if needed
 # docs/deployment-notes.md
 # docs/credentials.md

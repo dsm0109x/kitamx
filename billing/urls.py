@@ -25,6 +25,10 @@ urlpatterns = [
     path('reintentar-pago/<uuid:payment_id>/', views.retry_payment, name='retry_payment'),
     # 🇪🇸 invoice-payment → facturar-pago
     path('facturar/<uuid:payment_id>/', views.invoice_subscription_payment, name='invoice_payment'),
+    # 🇪🇸 download invoice XML → descargar-factura-xml
+    path('factura/<uuid:payment_id>/xml/', views.download_subscription_invoice_xml, name='download_invoice_xml'),
+    # 🇪🇸 download invoice PDF → descargar-factura-pdf
+    path('factura/<uuid:payment_id>/pdf/', views.download_subscription_invoice_pdf, name='download_invoice_pdf'),
 
     # Subscription payment callbacks (MercadoPago back URLs)
     # 🇪🇸 payment/success → pago/exito

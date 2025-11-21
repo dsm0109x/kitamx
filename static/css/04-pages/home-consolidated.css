@@ -173,7 +173,8 @@ section {
 /* Dividers sobre fondo BLANCO - más visibles */
 .section-timeline::before,
 .section-comparison::before,
-.section-cta::before {
+.section-cta::before,
+.section-security::before {
     content: '';
     position: absolute;
     top: 0;
@@ -189,7 +190,8 @@ section {
 
 /* Dividers sobre fondo NAVY-50 - más sutiles */
 .section-pricing::before,
-.section-faq::before {
+.section-faq::before,
+.section-dashboard-control::before {
     content: '';
     position: absolute;
     top: 0;

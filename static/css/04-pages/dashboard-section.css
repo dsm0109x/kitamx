@@ -1,0 +1,222 @@
+/**
+ * Dashboard & Control Section - Landing Page
+ * Sección destacada para mostrar dashboard y registro manual
+ * Design: Clean, brutalist, cohesive con el resto de la landing
+ */
+
+/* ========================================
+   SECTION CONTAINER
+   ======================================== */
+
+.section-dashboard-control {
+    padding: 4rem 0 !important;
+    background: #f0f4f8 !important; /* Navy-50 - Azul marino claro (mismo que hero) */
+    position: relative;
+    overflow: hidden;
+}
+
+/* ========================================
+   DEMO CONTAINER
+   ======================================== */
+
+.dashboard-demo-container {
+    position: relative;
+    padding: 0;
+}
+
+.dashboard-demo-container img {
+    border: none;
+    box-shadow: none;
+    transition: transform 0.3s ease;
+}
+
+.dashboard-demo-container img:hover {
+    transform: scale(1.02);
+}
+
+/* ========================================
+   FEATURE CARDS GRID
+   ======================================== */
+
+.feature-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+}
+
+.feature-card-dashboard {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    background: transparent;
+    border: none;
+    padding: 0.5rem 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.feature-card-dashboard:hover {
+    transform: translateX(4px);
+}
+
+/* ========================================
+   FEATURE ICON
+   ======================================== */
+
+.feature-icon-dashboard {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    color: #14532d; /* Forest green (same as hero) */
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: transform 0.2s ease;
+}
+
+.feature-card-dashboard:hover .feature-icon-dashboard {
+    transform: scale(1.1);
+}
+
+/* ========================================
+   FEATURE CONTENT
+   ======================================== */
+
+.feature-content-dashboard {
+    flex: 1;
+}
+
+.feature-title-dashboard {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: #000000; /* Black text on light background */
+    margin-bottom: 0.25rem;
+    line-height: 1.3;
+}
+
+.feature-description-dashboard {
+    font-size: 0.875rem;
+    color: #4b5563; /* Gray text on light background */
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+/* Tablet */
+@media (min-width: 768px) {
+    .feature-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .section-dashboard-control {
+        padding: 6rem 0;
+    }
+
+    .feature-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Mobile optimizations */
+@media (max-width: 767px) {
+    .section-dashboard-control {
+        padding: 3rem 0 !important;
+    }
+
+    .feature-card-dashboard {
+        padding: 0.375rem 0;
+        gap: 0.5rem;
+    }
+
+    .feature-icon-dashboard {
+        width: 32px;
+        height: 32px;
+        font-size: 1.25rem;
+    }
+
+    .feature-title-dashboard {
+        font-size: 1rem;
+    }
+
+    .feature-description-dashboard {
+        font-size: 0.8125rem;
+    }
+
+    /* GIF muestra arriba en mobile gracias a order-1/order-2 */
+    .dashboard-demo-container {
+        padding: 0;
+        margin-bottom: 1rem;
+    }
+}
+
+/* ========================================
+   DARK MODE SUPPORT (opcional)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    .section-dashboard-control {
+        background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    }
+
+    .feature-card-dashboard {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .feature-title-dashboard {
+        color: #f9fafb;
+    }
+
+    .feature-description-dashboard {
+        color: #d1d5db;
+    }
+
+    .dashboard-demo-container img {
+        border-color: #374151;
+    }
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feature-card-dashboard {
+    animation: fadeInUp 0.5s ease-out;
+    animation-fill-mode: both;
+}
+
+.feature-card-dashboard:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.feature-card-dashboard:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.feature-card-dashboard:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.feature-card-dashboard:nth-child(4) {
+    animation-delay: 0.4s;
+}

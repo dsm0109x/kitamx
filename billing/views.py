@@ -716,3 +716,47 @@ def invoice_subscription_payment(request: HttpRequest, payment_id: str) -> HttpR
     }
     
     return render(request, 'billing/invoice_form.html', context)
+
+
+@login_required
+@tenant_required()
+def download_subscription_invoice_xml(request: HttpRequest, payment_id: str) -> HttpResponse:
+    """Download XML for subscription invoice."""
+    tenant = request.tenant
+    payment = get_object_or_404(BillingPayment, id=payment_id, tenant=tenant)
+    
+    if not payment.invoice_generated or not payment.invoice_data:
+        return HttpResponse('Factura no generada', status=404)
+    
+    from invoicing.models import Invoice
+    try:
+        invoice = Invoice.objects.get(tenant=tenant, uuid=payment.invoice_data['uuid'])
+        if invoice.xml_file:
+            response = HttpResponse(invoice.xml_file.read(), content_type='application/xml')
+            response['Content-Disposition'] = f'attachment; filename="factura_{invoice.serie_folio}.xml"'
+            return response
+        return HttpResponse('XML no encontrado', status=404)
+    except Invoice.DoesNotExist:
+        return HttpResponse('Factura no encontrada', status=404)
+
+
+@login_required
+@tenant_required()
+def download_subscription_invoice_pdf(request: HttpRequest, payment_id: str) -> HttpResponse:
+    """Download PDF for subscription invoice."""
+    tenant = request.tenant
+    payment = get_object_or_404(BillingPayment, id=payment_id, tenant=tenant)
+    
+    if not payment.invoice_generated or not payment.invoice_data:
+        return HttpResponse('Factura no generada', status=404)
+    
+    from invoicing.models import Invoice
+    try:
+        invoice = Invoice.objects.get(tenant=tenant, uuid=payment.invoice_data['uuid'])
+        if invoice.pdf_file:
+            response = HttpResponse(invoice.pdf_file.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="factura_{invoice.serie_folio}.pdf"'
+            return response
+        return HttpResponse('PDF no encontrado', status=404)
+    except Invoice.DoesNotExist:
+        return HttpResponse('Factura no encontrada', status=404)

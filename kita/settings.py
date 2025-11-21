@@ -474,20 +474,25 @@ WA_BUSINESS_ID = env('WA_BUSINESS_ID', default='')
 
 # ========================================
 # PAC CONFIGURATION (Proveedor Autorizado de Certificación)
-# FiscalAPI - Proveedor único de Kita
+# facturapi.io - Proveedor de Kita (migrado de FiscalAPI)
 # ========================================
-FISCALAPI_URL = env('FISCALAPI_URL', default='https://test.fiscalapi.com')
-FISCALAPI_API_KEY = env('FISCALAPI_API_KEY', default='')
-FISCALAPI_TENANT_KEY = env('FISCALAPI_TENANT_KEY', default='')
-FISCALAPI_TIMEOUT = env.int('FISCALAPI_TIMEOUT', default=30)
+FACTURAPI_URL = env('FACTURAPI_URL', default='https://www.facturapi.io/v2')
+FACTURAPI_API_KEY = env('FACTURAPI_API_KEY', default='')  # Live Key de Kita
+FACTURAPI_USER_KEY = env('FACTURAPI_USER_KEY', default='')  # User Key para gestionar orgs
+FACTURAPI_TIMEOUT = env.int('FACTURAPI_TIMEOUT', default=30)
 
-# Kita as Issuer (for subscription invoicing)
-KITA_FISCALAPI_PERSON_ID = env('KITA_FISCALAPI_PERSON_ID', default='a57e0293-ecab-4e24-b81c-904bbfd91f6b')
-KITA_RFC = env('KITA_RFC', default='XOJI740919U48')
-KITA_RAZON_SOCIAL = env('KITA_RAZON_SOCIAL', default='XOJI740919U48')  # Temporal
-KITA_REGIMEN_FISCAL = env('KITA_REGIMEN_FISCAL', default='612')  # Personas Físicas
+# FiscalAPI (DEPRECATED - Comentado para rollback)
+# FISCALAPI_URL = env('FISCALAPI_URL', default='https://test.fiscalapi.com')
+# FISCALAPI_API_KEY = env('FISCALAPI_API_KEY', default='')
+# FISCALAPI_TENANT_KEY = env('FISCALAPI_TENANT_KEY', default='')
+# FISCALAPI_TIMEOUT = env.int('FISCALAPI_TIMEOUT', default=30)
+
+# Kita as Issuer (for subscription invoicing and all invoices)
+KITA_RFC = env('KITA_RFC', default='SAHM661127B26')
+KITA_RAZON_SOCIAL = env('KITA_RAZON_SOCIAL', default='MARCO ANTONIO SANCHEZ HERNANDEZ')
+KITA_REGIMEN_FISCAL = env('KITA_REGIMEN_FISCAL', default='612')
 KITA_CODIGO_POSTAL = env('KITA_CODIGO_POSTAL', default='14240')
-KITA_EMAIL = env('KITA_EMAIL', default='facturacion@kita.mx')
+KITA_EMAIL = env('KITA_EMAIL', default='dsm0109@ciencias.unam.mx')
 
 # Cloudflare Turnstile (Anti-bot protection)
 TURNSTILE_SITE_KEY = env('TURNSTILE_SITE_KEY')

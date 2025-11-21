@@ -1,6 +1,6 @@
 """
-PAC Service - FiscalAPI as sole provider
-Simplified version - no legacy SmartWeb support
+PAC Service - facturapi.io as provider
+Migrated from FiscalAPI to facturapi.io
 """
 import logging
 
@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 def get_pac_service():
     """
-    Get FiscalAPI service instance.
+    Get facturapi.io service instance.
 
     Returns:
-        FiscalAPIService: Singleton instance
+        FacturapiService: Singleton instance
     """
-    from .fiscalapi_service import fiscalapi_service
-    return fiscalapi_service
+    from .facturapi_service import facturapi_service
+    return facturapi_service
 
 
-# Global instance - FiscalAPI singleton
+# Global instance - facturapi.io singleton
 pac_service = get_pac_service()

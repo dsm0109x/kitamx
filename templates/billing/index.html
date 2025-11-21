@@ -182,11 +182,20 @@
                     📄 Facturar
                 </a>
                 {% elif payment.invoice_generated %}
-                <button class="btn btn-sm btn-outline-secondary"
-                        onclick="viewInvoice('{{ payment.id }}')"
-                        style="padding: 0.375rem 0.75rem; font-size: 0.75rem; border-radius: 4px;">
-                    Ver Factura
-                </button>
+                <div class="d-flex flex-column gap-1">
+                    <span class="badge bg-success">✅ Facturado</span>
+                    <div class="btn-group btn-group-sm">
+                        <a href="{% url 'billing:download_invoice_xml' payment.id %}"
+                           class="btn btn-outline-secondary"
+                           title="Descargar XML">XML</a>
+                        <a href="{% url 'billing:download_invoice_pdf' payment.id %}"
+                           class="btn btn-outline-secondary"
+                           title="Descargar PDF">PDF</a>
+                    </div>
+                    {% if payment.invoice_data.uuid %}
+                    <small class="text-muted">{{ payment.invoice_data.uuid|slice:":13" }}...</small>
+                    {% endif %}
+                </div>
                 {% endif %}
                 <button class="btn btn-sm btn-outline-secondary"
                         onclick="showPaymentDetail('{{ payment.id }}')"

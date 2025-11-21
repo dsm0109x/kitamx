@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparación de Compresión GIF - paso4.gif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #000;
+        }
+
+        .intro {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #14532d;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-item {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comparison-item.recommended {
+            border: 3px solid #14532d;
+            position: relative;
+        }
+
+        .comparison-item.recommended::before {
+            content: '⭐ RECOMENDADO';
+            position: absolute;
+            top: -12px;
+            right: 1rem;
+            background: #14532d;
+            color: #fff;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .item-header {
+            margin-bottom: 1rem;
+        }
+
+        .item-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #000;
+        }
+
+        .item-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #000;
+        }
+
+        .stat-value.good {
+            color: #14532d;
+        }
+
+        .stat-value.excellent {
+            color: #15803d;
+        }
+
+        .item-image {
+            border: 2px solid #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .item-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .item-method {
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-top: 0.75rem;
+            font-family: 'Courier New', monospace;
+            background: #f1f5f9;
+            padding: 0.5rem;
+            border-radius: 4px;
+        }
+
+        .recommendation {
+            background: #ecfdf5;
+            border: 1px solid #14532d;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .recommendation h2 {
+            color: #14532d;
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .recommendation ul {
+            margin-left: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .recommendation strong {
+            color: #14532d;
+        }
+
+        .table-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 700;
+            color: #000;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .best {
+            background: #ecfdf5 !important;
+        }
+
+        .best td {
+            font-weight: 600;
+            color: #14532d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Comparación de Compresión GIF - paso4.gif</h1>
+
+        <div class="intro">
+            <p><strong>Original:</strong> 9.24 MB | <strong>Objetivo:</strong> Reducir tamaño manteniendo transparencia y calidad</p>
+            <p style="margin-top: 0.5rem;"><strong>Herramienta:</strong> gifsicle (optimizador GIF con soporte de transparencia)</p>
+        </div>
+
+        <div class="recommendation">
+            <h2>💡 Recomendación</h2>
+            <p><strong>Mejor opción: lossy=80 + 256 colores</strong></p>
+            <ul>
+                <li><strong>Reducción: 61.8%</strong> (9.24 MB → 3.53 MB)</li>
+                <li>✅ Mantiene transparencia al 100%</li>
+                <li>✅ Calidad visual excelente (casi imperceptible vs original)</li>
+                <li>✅ Todos los colores importantes preservados</li>
+                <li>✅ Animación fluida</li>
+            </ul>
+        </div>
+
+        <div class="table-container">
+            <h2 style="margin-bottom: 1rem;">📊 Tabla Comparativa</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Archivo</th>
+                        <th>Tamaño</th>
+                        <th>Reducción</th>
+                        <th>Método</th>
+                        <th>Transparencia</th>
+                        <th>Calidad Visual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>paso4.gif</strong></td>
+                        <td>9.24 MB</td>
+                        <td>-</td>
+                        <td>Original</td>
+                        <td>✅ Sí</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>paso4-O3.gif</td>
+                        <td>9.10 MB</td>
+                        <td>1.5%</td>
+                        <td>-O3 (sin pérdida)</td>
+                        <td>✅ Sí</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>paso4-lossy30.gif</td>
+                        <td>4.48 MB</td>
+                        <td>51.5%</td>
+                        <td>-O3 --lossy=30</td>
+                        <td>✅ Sí</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>paso4-lossy50.gif</td>
+                        <td>4.04 MB</td>
+                        <td>56.3%</td>
+                        <td>-O3 --lossy=50</td>
+                        <td>✅ Sí</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr class="best">
+                        <td><strong>paso4-lossy80-256c.gif</strong> ⭐</td>
+                        <td><strong>3.53 MB</strong></td>
+                        <td><strong>61.8%</strong></td>
+                        <td><strong>-O3 --lossy=80 --colors=256</strong></td>
+                        <td>✅ Sí</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                    </tr>
+                    <tr>
+                        <td>paso4-lossy100-128c.gif</td>
+                        <td>3.16 MB</td>
+                        <td>65.8%</td>
+                        <td>-O3 --lossy=100 --colors=128</td>
+                        <td>✅ Sí</td>
+                        <td>⭐⭐⭐⭐</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 style="margin-bottom: 1rem;">🔍 Comparación Visual</h2>
+        <p style="margin-bottom: 1.5rem; color: #6b7280;">Abre cada imagen en una nueva pestaña para comparar en detalle</p>
+
+        <div class="comparison-grid">
+            <div class="comparison-item">
+                <div class="item-header">
+                    <h3 class="item-title">Original</h3>
+                    <div class="item-stats">
+                        <div class="stat">
+                            <span class="stat-label">Tamaño</span>
+                            <span class="stat-value">9.24 MB</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Reducción</span>
+                            <span class="stat-value">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-image">
+                    <img src="paso4.gif" alt="Original">
+                </div>
+                <div class="item-method">Original sin optimizar</div>
+            </div>
+
+            <div class="comparison-item">
+                <div class="item-header">
+                    <h3 class="item-title">Lossy 30</h3>
+                    <div class="item-stats">
+                        <div class="stat">
+                            <span class="stat-label">Tamaño</span>
+                            <span class="stat-value good">4.48 MB</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Reducción</span>
+                            <span class="stat-value good">51.5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-image">
+                    <img src="paso4-lossy30.gif" alt="Lossy 30">
+                </div>
+                <div class="item-method">gifsicle -O3 --lossy=30</div>
+            </div>
+
+            <div class="comparison-item">
+                <div class="item-header">
+                    <h3 class="item-title">Lossy 50</h3>
+                    <div class="item-stats">
+                        <div class="stat">
+                            <span class="stat-label">Tamaño</span>
+                            <span class="stat-value good">4.04 MB</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Reducción</span>
+                            <span class="stat-value good">56.3%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-image">
+                    <img src="paso4-lossy50.gif" alt="Lossy 50">
+                </div>
+                <div class="item-method">gifsicle -O3 --lossy=50</div>
+            </div>
+
+            <div class="comparison-item recommended">
+                <div class="item-header">
+                    <h3 class="item-title">Lossy 80 + 256 colores</h3>
+                    <div class="item-stats">
+                        <div class="stat">
+                            <span class="stat-label">Tamaño</span>
+                            <span class="stat-value excellent">3.53 MB</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Reducción</span>
+                            <span class="stat-value excellent">61.8%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-image">
+                    <img src="paso4-lossy80-256c.gif" alt="Lossy 80 + 256 colores">
+                </div>
+                <div class="item-method">gifsicle -O3 --lossy=80 --colors=256</div>
+            </div>
+
+            <div class="comparison-item">
+                <div class="item-header">
+                    <h3 class="item-title">Lossy 100 + 128 colores</h3>
+                    <div class="item-stats">
+                        <div class="stat">
+                            <span class="stat-label">Tamaño</span>
+                            <span class="stat-value excellent">3.16 MB</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Reducción</span>
+                            <span class="stat-value excellent">65.8%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-image">
+                    <img src="paso4-lossy100-128c.gif" alt="Lossy 100 + 128 colores">
+                </div>
+                <div class="item-method">gifsicle -O3 --lossy=100 --colors=128</div>
+            </div>
+
+            <div class="comparison-item">
+                <div class="item-header">
+                    <h3 class="item-title">O3 (sin pérdida)</h3>
+                    <div class="item-stats">
+                        <div class="stat">
+                            <span class="stat-label">Tamaño</span>
+                            <span class="stat-value">9.10 MB</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Reducción</span>
+                            <span class="stat-value">1.5%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-image">
+                    <img src="paso4-O3.gif" alt="O3 sin pérdida">
+                </div>
+                <div class="item-method">gifsicle -O3 (lossless)</div>
+            </div>
+        </div>
+
+        <div class="intro">
+            <h2 style="margin-bottom: 0.75rem; font-size: 1.25rem;">📝 Notas</h2>
+            <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                <li><strong>Transparencia:</strong> Todas las versiones mantienen la transparencia perfectamente</li>
+                <li><strong>Calidad visual:</strong> De lossy=30 a lossy=80 es casi imperceptible la diferencia</li>
+                <li><strong>lossy=100 + 128 colores:</strong> Máxima compresión, puede haber ligero banding en gradientes</li>
+                <li><strong>Mejor balance:</strong> lossy=80 + 256 colores (61.8% reducción, calidad excelente)</li>
+            </ul>
+        </div>
+
+        <div class="intro" style="border-left-color: #dc2626;">
+            <h2 style="margin-bottom: 0.75rem; font-size: 1.25rem; color: #dc2626;">⚠️ Importante</h2>
+            <p><strong>Revisa visualmente cada versión</strong> antes de decidir. Haz zoom en las imágenes para ver detalles.</p>
+            <p style="margin-top: 0.5rem;">Compara especialmente:</p>
+            <ul style="margin-left: 1.5rem; margin-top: 0.5rem; line-height: 1.8;">
+                <li>Texto pequeño o detalles finos</li>
+                <li>Gradientes y transiciones de color</li>
+                <li>Bordes y líneas</li>
+                <li>Fluidez de la animación</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

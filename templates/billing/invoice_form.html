@@ -53,7 +53,7 @@
             </p>
         </div>
 
-        <!-- RFC (readonly) -->
+        <!-- RFC (editable) -->
         <div class="mb-3">
             <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
                 RFC <span style="color: #ef4444;">*</span>
@@ -62,12 +62,14 @@
                    class="form-control"
                    name="rfc"
                    value="{{ rfc }}"
-                   readonly
-                   style="background: #f9fafb; border: 1px solid #e5e7eb;">
-            <small class="form-text text-muted">Este campo no se puede modificar</small>
+                   required
+                   pattern="[A-ZÑ&]{3,4}[0-9]{6}[A-Z0-9]{3}"
+                   maxlength="13"
+                   style="border: 1px solid #e5e7eb;">
+            <small class="form-text text-muted">RFC de quien recibirá la factura (modificable)</small>
         </div>
 
-        <!-- Razón Social (readonly) -->
+        <!-- Razón Social (editable) -->
         <div class="mb-3">
             <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
                 Razón Social <span style="color: #ef4444;">*</span>
@@ -76,22 +78,36 @@
                    class="form-control"
                    name="business_name"
                    value="{{ business_name }}"
-                   readonly
-                   style="background: #f9fafb; border: 1px solid #e5e7eb;">
-            <small class="form-text text-muted">Este campo no se puede modificar</small>
+                   required
+                   maxlength="255"
+                   style="border: 1px solid #e5e7eb;">
+            <small class="form-text text-muted">Nombre o razón social del receptor (modificable)</small>
         </div>
 
-        <!-- Régimen Fiscal -->
+        <!-- Régimen Fiscal (editable con select) -->
         <div class="mb-3">
             <label class="form-label" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
                 Régimen Fiscal <span style="color: #ef4444;">*</span>
             </label>
-            <input type="text"
-                   class="form-control"
-                   name="fiscal_regime"
-                   value="{{ fiscal_regime }}"
-                   readonly
-                   style="background: #f9fafb; border: 1px solid #e5e7eb;">
+            <select class="form-select" name="fiscal_regime" required style="border: 1px solid #e5e7eb;">
+                <option value="">Selecciona régimen...</option>
+                <option value="601" {% if fiscal_regime == '601' %}selected{% endif %}>601 - General de Ley Personas Morales</option>
+                <option value="603" {% if fiscal_regime == '603' %}selected{% endif %}>603 - Personas Morales con Fines no Lucrativos</option>
+                <option value="605" {% if fiscal_regime == '605' %}selected{% endif %}>605 - Sueldos y Salarios</option>
+                <option value="606" {% if fiscal_regime == '606' %}selected{% endif %}>606 - Arrendamiento</option>
+                <option value="607" {% if fiscal_regime == '607' %}selected{% endif %}>607 - Enajenación o Adquisición de Bienes</option>
+                <option value="608" {% if fiscal_regime == '608' %}selected{% endif %}>608 - Demás ingresos</option>
+                <option value="610" {% if fiscal_regime == '610' %}selected{% endif %}>610 - Residentes en el Extranjero</option>
+                <option value="611" {% if fiscal_regime == '611' %}selected{% endif %}>611 - Ingresos por Dividendos</option>
+                <option value="612" {% if fiscal_regime == '612' %}selected{% endif %}>612 - Personas Físicas con Actividades Empresariales</option>
+                <option value="614" {% if fiscal_regime == '614' %}selected{% endif %}>614 - Ingresos por intereses</option>
+                <option value="615" {% if fiscal_regime == '615' %}selected{% endif %}>615 - Ingresos por premios</option>
+                <option value="616" {% if fiscal_regime == '616' %}selected{% endif %}>616 - Sin obligaciones fiscales</option>
+                <option value="621" {% if fiscal_regime == '621' %}selected{% endif %}>621 - Incorporación Fiscal</option>
+                <option value="622" {% if fiscal_regime == '622' %}selected{% endif %}>622 - Actividades Agrícolas, Ganaderas</option>
+                <option value="625" {% if fiscal_regime == '625' %}selected{% endif %}>625 - Plataformas Tecnológicas</option>
+                <option value="626" {% if fiscal_regime == '626' %}selected{% endif %}>626 - Simplificado de Confianza (RESICO)</option>
+            </select>
         </div>
 
         <!-- Uso de CFDI -->

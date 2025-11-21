@@ -12,6 +12,12 @@
 
 <!-- Video Hero Styles -->
 <link rel="stylesheet" href="{% static 'css/04-pages/video-hero.css' %}?v=1.0">
+
+<!-- Dashboard Section Styles -->
+<link rel="stylesheet" href="{% static 'css/04-pages/dashboard-section.css' %}?v=1.0">
+
+<!-- Security Section Styles -->
+<link rel="stylesheet" href="{% static 'css/04-pages/security-section.css' %}?v=1.0">
 {% endblock %}
 
 {% block content %}
@@ -400,6 +406,236 @@ En 30 segundos tendrás un enlace de Mercado Pago® que cobra y timbra CFDI 4.0 
             <p class="text-center text-muted small mt-2 mb-0">
                  Factura válida ante el SAT (Compatible con CFDI 4.0).
             </p>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard & Control Section -->
+<section class="section-dashboard-control" aria-labelledby="dashboard-heading">
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-3">
+            <h2 id="dashboard-heading" class="section-heading display-5 mb-2 text-black">
+                Más Que Enlaces de Pago
+            </h2>
+            <p class="lead text-muted mb-0">
+                No solo cobras y facturas. También <strong class="text-dark">controlas, registras y analizas</strong> cada peso que entra y sale de tu negocio.
+            </p>
+        </div>
+
+        <div class="row g-3 align-items-center">
+            <!-- Left: GIF Demo (40%) -->
+            <div class="col-lg-5 order-lg-1 order-2">
+                <div class="dashboard-demo-container">
+                    <img src="{% static 'images/demo/paso4.gif' %}"
+                         alt="Dashboard en tiempo real con métricas, gráficas y registro manual de gastos e ingresos"
+                         class="img-fluid"
+                         loading="lazy">
+                </div>
+            </div>
+
+            <!-- Right: Feature Cards (60%) -->
+            <div class="col-lg-7 order-lg-2 order-1">
+                <div class="feature-cards-grid">
+
+                    <!-- Feature 1: Dashboard -->
+                    <div class="feature-card-dashboard">
+                        <div class="feature-icon-dashboard">
+                            <span class="iconoir-dashboard" aria-hidden="true"></span>
+                        </div>
+                        <div class="feature-content-dashboard">
+                            <h3 class="feature-title-dashboard">Dashboard en Tiempo Real</h3>
+                            <p class="feature-description-dashboard">
+                                Métricas actualizadas al instante. Ve ingresos, gastos, facturas pendientes y flujo de caja sin abrir Excel.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2: Registro Manual -->
+                    <div class="feature-card-dashboard">
+                        <div class="feature-icon-dashboard">
+                            <span class="iconoir-edit-pencil" aria-hidden="true"></span>
+                        </div>
+                        <div class="feature-content-dashboard">
+                            <h3 class="feature-title-dashboard">Registro Manual Completo</h3>
+                            <p class="feature-description-dashboard">
+                                Captura gastos e ingresos que no vienen de enlaces: efectivo, transferencias, gastos fijos. Todo en un solo lugar.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3: Análisis -->
+                    <div class="feature-card-dashboard">
+                        <div class="feature-icon-dashboard">
+                            <span class="iconoir-chart-line" aria-hidden="true"></span>
+                        </div>
+                        <div class="feature-content-dashboard">
+                            <h3 class="feature-title-dashboard">Análisis y Reportes</h3>
+                            <p class="feature-description-dashboard">
+                                Gráficas automáticas de tendencias. Identifica patrones, exporta reportes para tu contador.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4: Sincronización -->
+                    <div class="feature-card-dashboard">
+                        <div class="feature-icon-dashboard">
+                            <span class="iconoir-refresh-double" aria-hidden="true"></span>
+                        </div>
+                        <div class="feature-content-dashboard">
+                            <h3 class="feature-title-dashboard">Sincronización Automática</h3>
+                            <p class="feature-description-dashboard">
+                                Enlaces de pago, facturas y registros manuales sincronizados. Dashboard siempre actualizado.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Bottom -->
+        <div class="text-center mt-3">
+            <a href="{% url 'account_signup' %}?ref=dashboard"
+               class="btn btn-accent btn-xl"
+               data-tracking="cta-dashboard-section"
+               aria-label="Comenzar a controlar tu negocio con prueba gratuita">
+                <span class="iconoir-rocket me-2" aria-hidden="true"></span>
+                <span class="btn-text">Empieza a Controlar Tu Negocio · 30 Días Gratis</span>
+            </a>
+            <p class="text-muted small mt-2 mb-0">
+                <span class="iconoir-check me-1" aria-hidden="true"></span>
+                Dashboard incluido en tu suscripción de ${{ subscription_price|floatformat:0 }} MXN/mes
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Security & Protection Section -->
+<section class="section-security" aria-labelledby="security-heading">
+    <div class="container">
+        <!-- Header -->
+        <div class="text-center mb-3">
+            <h2 id="security-heading" class="section-heading display-5 mb-2 text-black">
+                Tu Información, Segura y Protegida
+            </h2>
+            <p class="lead text-muted mb-0">
+                Protegemos tus datos con <strong>tecnología de nivel bancario</strong>. Tu CSD, contraseñas y datos fiscales siempre cifrados.
+            </p>
+        </div>
+
+        <div class="row g-3 align-items-center">
+            <!-- Left: Feature List (60%) -->
+            <div class="col-lg-7 order-lg-1 order-2">
+                <div class="security-features-list">
+
+                    <!-- Feature 1 -->
+                    <div class="security-feature-item">
+                        <div class="security-icon">
+                            <span class="iconoir-shield-check" aria-hidden="true"></span>
+                        </div>
+                        <div class="security-content">
+                            <h3 class="security-title">Cifrado AES-256</h3>
+                            <p class="security-description">
+                                Tu CSD y contraseñas se cifran con el mismo estándar que usan los bancos. Nunca guardamos nada en texto plano.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="security-feature-item">
+                        <div class="security-icon">
+                            <span class="iconoir-lock" aria-hidden="true"></span>
+                        </div>
+                        <div class="security-content">
+                            <h3 class="security-title">SSL/TLS en Todas las Conexiones</h3>
+                            <p class="security-description">
+                                Toda comunicación está encriptada. Tu información viaja segura desde tu navegador hasta nuestros servidores.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="security-feature-item">
+                        <div class="security-icon">
+                            <span class="iconoir-server" aria-hidden="true"></span>
+                        </div>
+                        <div class="security-content">
+                            <h3 class="security-title">Infraestructura Segura</h3>
+                            <p class="security-description">
+                                Servidores en la nube con backups automáticos diarios. Tus datos están respaldados y protegidos 24/7.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 4 -->
+                    <div class="security-feature-item">
+                        <div class="security-icon">
+                            <span class="iconoir-eye-off" aria-hidden="true"></span>
+                        </div>
+                        <div class="security-content">
+                            <h3 class="security-title">Nunca Tocamos Tu Dinero</h3>
+                            <p class="security-description">
+                                Los pagos van directo a tu cuenta de Mercado Pago®. Kita solo genera enlaces, nunca custodia fondos.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 5 -->
+                    <div class="security-feature-item">
+                        <div class="security-icon">
+                            <span class="iconoir-user-shield" aria-hidden="true"></span>
+                        </div>
+                        <div class="security-content">
+                            <h3 class="security-title">Cumplimiento Legal</h3>
+                            <p class="security-description">
+                                Cumplimos con la Ley Federal de Protección de Datos Personales. Tu privacidad es prioritaria.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right: GIF Demo (40%) -->
+            <div class="col-lg-5 order-lg-2 order-1">
+                <div class="security-demo-container">
+                    <img src="{% static 'images/demo/paso5.gif' %}"
+                         alt="Medidas de seguridad implementadas: cifrado, SSL, backups y protección de datos"
+                         class="img-fluid"
+                         loading="lazy">
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Badges -->
+        <div class="security-badges text-center mt-2">
+            <div class="row justify-content-center g-3">
+                <div class="col-md-3 col-6">
+                    <div class="security-badge">
+                        <span class="iconoir-shield-check security-badge-icon" aria-hidden="true"></span>
+                        <p class="security-badge-text">Cifrado<br><strong>AES-256</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="security-badge">
+                        <span class="iconoir-lock security-badge-icon" aria-hidden="true"></span>
+                        <p class="security-badge-text">Conexión<br><strong>SSL/TLS</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="security-badge">
+                        <span class="iconoir-database-backup security-badge-icon" aria-hidden="true"></span>
+                        <p class="security-badge-text">Backups<br><strong>Diarios</strong></p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="security-badge">
+                        <span class="iconoir-verified-badge security-badge-icon" aria-hidden="true"></span>
+                        <p class="security-badge-text">Cumplimiento<br><strong>Legal MX</strong></p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

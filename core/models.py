@@ -146,6 +146,14 @@ class Tenant(BaseModel):
     csd_valid_from = models.DateTimeField(null=True, blank=True)
     csd_valid_to = models.DateTimeField(null=True, blank=True)
 
+    # PAC Integration Data (facturapi.io organization IDs, Live Keys, etc)
+    pac_integration_data = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text='Integration data for PAC providers (organization IDs, Live Keys, timestamps)',
+        verbose_name='PAC Integration Data'
+    )
+
     objects = TenantManager()
 
     class Meta:

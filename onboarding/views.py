@@ -430,9 +430,28 @@ def onboarding_step3(request: HttpRequest) -> HttpResponse:
     tenant = request.tenant
     tenant_user = request.tenant_user
 
-    # Allow access if user is on step 3 or higher
+    # Check if CSD already exists
+    from invoicing.models import CSDCertificate
+    existing_csd = CSDCertificate.objects.filter(
+        tenant=tenant,
+        is_active=True,
+        is_validated=True
+    ).first()
 
-    # BUG FIX #24: Generate and store upload_session in session for validation
+    if existing_csd:
+        # Ya tiene CSD - mostrar estado
+        context = {
+            'step': 3,
+            'total_steps': 4,
+            'step_title': 'Certificado Digital (CSD)',
+            'step_description': 'Certificado configurado correctamente',
+            'tenant': tenant,
+            'csd': existing_csd,
+            'has_csd': True,
+        }
+        return render(request, 'onboarding/step3.html', context)
+
+    # No tiene CSD - mostrar form de upload
     upload_session = str(uuid.uuid4())
     request.session['csd_upload_session'] = upload_session
     request.session['csd_upload_session_created'] = timezone.now().isoformat()
@@ -444,6 +463,7 @@ def onboarding_step3(request: HttpRequest) -> HttpResponse:
         'step_description': 'Sube tu certificado de sello digital para facturar',
         'tenant': tenant,
         'upload_session': upload_session,
+        'has_csd': False,
     }
 
     return render(request, 'onboarding/step3.html', context)
@@ -601,15 +621,43 @@ def start_trial(request: HttpRequest) -> JsonResponse:
                     'warnings': []
                 }
 
+                # Upload CSD to facturapi.io if exists and not uploaded
+                if has_csd:
+                    from invoicing.models import CSDCertificate
+                    csd = CSDCertificate.objects.filter(
+                        tenant=tenant,
+                        is_active=True,
+                        is_validated=True
+                    ).first()
+
+                    if csd and not csd.pac_uploaded:
+                        logger.info(f"Uploading CSD to facturapi.io for tenant {tenant.name}")
+                        try:
+                            from invoicing.pac_factory import pac_service
+                            connection_test = pac_service.test_connection()
+                            if not connection_test['success']:
+                                raise Exception(f"PAC connection failed: {connection_test.get('error')}")
+
+                            pac_result = pac_service.upload_certificate(csd)
+                            if not pac_result['success']:
+                                raise Exception(f"PAC upload failed: {pac_result.get('message')}")
+
+                            logger.info(f"✅ CSD uploaded successfully to facturapi.io")
+                            response_data['csd_uploaded'] = True
+                        except Exception as pac_error:
+                            logger.error(f"PAC upload failed during trial: {pac_error}")
+                            response_data['warnings'].append(f'Certificado CSD no pudo subirse: {str(pac_error)}')
+                            response_data['csd_uploaded'] = False
+
                 # BUG FIX #24: Add warning if trial activated without MP or CSD
                 if not has_mp and not has_csd:
-                    response_data['warnings'].append('No conectaste Mercado Pago ni subiste tu CSD. Completa estos pasos desde Configuración para poder cobrar y facturar.')
+                    response_data['warnings'].append('No conectaste Mercado Pago ni subiste tu CSD.')
                 elif not has_mp:
-                    response_data['warnings'].append('No conectaste Mercado Pago. Conéctalo desde Configuración para poder crear links de cobro.')
+                    response_data['warnings'].append('No conectaste Mercado Pago.')
                 elif not has_csd:
-                    response_data['warnings'].append('No subiste tu CSD. Súbelo desde Configuración para poder emitir facturas.')
+                    response_data['warnings'].append('No subiste tu CSD.')
 
-                # Mark user onboarding as completed ONLY after response is prepared
+                # Mark user onboarding as completed
                 request.user.onboarding_completed = True
                 request.user.save()
 

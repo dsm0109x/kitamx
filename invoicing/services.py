@@ -133,7 +133,8 @@ class CSDEncryptionService:
 class CSDValidationService:
     """Service for validating CSD certificates"""
 
-    def validate_certificate_files(self, cert_content, key_content, password, tenant_rfc=None):
+    def validate_certificate_files(self, cert_content, key_content, password,
+                                   tenant_rfc=None, tenant_business_name=None):
         """
         Validate CSD certificate and private key files.
 
@@ -149,6 +150,10 @@ class CSDValidationService:
 
             # Extract certificate information using centralized handler
             cert_info = CertificateHandler.extract_certificate_info(certificate)
+
+            # Validate business_name if provided
+            if tenant_business_name and cert_info.get('subject_name'):
+                self._validate_business_name(tenant_business_name, cert_info['subject_name'])
 
             # Validate RFC if tenant_rfc provided
             if tenant_rfc and cert_info.get('rfc'):
@@ -238,6 +243,36 @@ class CSDValidationService:
         except Exception as e:
             logger.error(f"Error validating CSD: {str(e)}")
             raise ValueError(f"Error validando certificado: {str(e)}")
+
+    def _validate_business_name(self, tenant_business_name: str, cert_subject_name: str):
+        """Validate that tenant business name matches certificate subject name."""
+        import re
+        import unicodedata
+        from difflib import SequenceMatcher
+
+        # Extract CN from subject
+        match = re.search(r'CN=([^,]+)', cert_subject_name)
+        subject_cn = match.group(1).strip() if match else cert_subject_name
+
+        logger.info(f"Validating business name: Certificate='{subject_cn}' vs Tenant='{tenant_business_name}'")
+
+        # Normalize
+        def normalize(name):
+            name = unicodedata.normalize('NFKD', name).encode('ASCII', 'ignore').decode('ASCII')
+            name = name.lower()
+            name = re.sub(r'\b(s\.?a\.?|de\s+c\.?v\.?|s\.?c\.?)\b', '', name)
+            name = re.sub(r'[^\w\s]', '', name)
+            return ' '.join(name.split()).strip()
+
+        similarity = SequenceMatcher(None, normalize(subject_cn), normalize(tenant_business_name)).ratio()
+
+        if similarity < 0.85:
+            raise ValueError(
+                f"La razón social del certificado ({subject_cn}) no coincide "
+                f"con la registrada ({tenant_business_name})."
+            )
+
+        logger.info(f"✅ Business name validation passed ({similarity:.0%})")
 
 
 class FileUploadService:
@@ -358,3 +393,4 @@ class FileUploadService:
             file_type=file_type,
             status__in=['uploaded', 'processing', 'processed']
         ).order_by('-created_at')
+

@@ -104,10 +104,12 @@ def validate_csd_local(request: HttpRequest) -> JsonResponse:
             except UnicodeDecodeError:
                 key_content = key_binary
 
-            # Validate with CSD service (includes RFC validation)
+            # Validate with CSD service (includes RFC and business_name validation)
             validation_service = CSDValidationService()
             validation_result = validation_service.validate_certificate_files(
-                cert_content, key_content, password, tenant_rfc=tenant.rfc
+                cert_content, key_content, password,
+                tenant_rfc=tenant.rfc,
+                tenant_business_name=tenant.business_name  # Validar nombre también
             )
 
             return JsonResponse({
@@ -176,6 +178,21 @@ def save_csd_complete(request: HttpRequest) -> JsonResponse:
         # Use tenant_user injected by @tenant_required decorator
         tenant_user = request.tenant_user
         tenant = request.tenant
+
+        # FIX: Check if CSD already exists (prevent re-upload)
+        existing_csd = CSDCertificate.objects.filter(
+            tenant=tenant,
+            is_active=True,
+            is_validated=True
+        ).first()
+
+        if existing_csd:
+            logger.warning(f"Tenant {tenant.name} attempted re-upload with active CSD")
+            return ErrorResponseBuilder.build_error(
+                message='Ya tienes un certificado CSD activo. Si necesitas actualizarlo, contacta soporte@kita.mx',
+                code='csd_already_exists',
+                status=409
+            )
 
         # BUG FIX #24: Validate upload_session against session-stored value
         upload_session = request.POST.get('upload_session')
@@ -297,36 +314,9 @@ def save_csd_complete(request: HttpRequest) -> JsonResponse:
         tenant.csd_valid_to = validation_result['valid_to']
         tenant.save()
 
-        # Upload certificate to PAC provider
-        try:
-            from .pac_factory import pac_service
-            logger.info(f"Testing PAC connection for tenant {tenant.name}")
-
-            # Test PAC connection
-            connection_test = pac_service.test_connection()
-            if not connection_test['success']:
-                raise Exception(f"PAC connection failed: {connection_test.get('error', 'Unknown error')}")
-
-            logger.info(f"PAC connection valid, uploading CSD for tenant {tenant.name}")
-            pac_result = pac_service.upload_certificate(csd_certificate)
-
-            if not pac_result['success']:
-                # PAC upload failed - mark in database but continue
-                logger.warning(f"PAC upload failed for {tenant.name}: {pac_result.get('message', 'Error desconocido')}")
-
-                return JsonResponse({
-                    'success': False,
-                    'error': f"Certificado guardado localmente pero falló subida a PAC: {pac_result.get('message', 'Error de conexión')}"
-                }, status=400)
-
-            logger.info(f"PAC upload successful for {tenant.name}")
-
-        except Exception as e:
-            logger.error(f"PAC upload exception for {tenant.name}: {str(e)}")
-            return JsonResponse({
-                'success': False,
-                'error': f"Certificado guardado localmente pero falló conexión con PAC: {str(e)}"
-            }, status=400)
+        # FIX: DO NOT upload to PAC yet (deferred to Step 4)
+        # Upload will happen in onboarding Step 4 (trial activation)
+        logger.info(f"CSD saved locally for tenant {tenant.name}, upload deferred to Step 4")
 
         # Mark uploads as processed
         cert_upload.status = 'processed'
@@ -334,13 +324,19 @@ def save_csd_complete(request: HttpRequest) -> JsonResponse:
         key_upload.status = 'processed'
         key_upload.save()
 
-        logger.info(f"CSD certificate saved and uploaded to FiscalAPI for tenant {tenant.name}")
+        logger.info(f"CSD certificate saved locally for tenant {tenant.name}")
+
+        # Update onboarding step
+        user = request.user
+        if hasattr(user, 'onboarding_step') and user.onboarding_step == 3:
+            user.onboarding_step = 4
+            user.save(update_fields=['onboarding_step'])
 
         return JsonResponse({
             'success': True,
             'serial_number': validation_result['serial_number'],
-            'pac_uploaded': csd_certificate.pac_uploaded,
-            'message': 'Certificado guardado y subido a FiscalAPI exitosamente'
+            'pac_uploaded': False,  # Se subirá en Step 4
+            'message': 'Certificado guardado correctamente. Se subirá al activar el trial.'
         })
 
     except Exception as e:
@@ -1138,3 +1134,57 @@ def export_invoices(request: HttpRequest) -> HttpResponse:
         response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
         return response
+
+@login_required
+@tenant_required(require_owner=True)
+@csrf_protect
+@require_http_methods(["POST"])
+def delete_csd(request: HttpRequest) -> JsonResponse:
+    """Delete CSD certificate completely from all locations (DB + Storage + facturapi.io)."""
+    try:
+        tenant = request.tenant
+        csd = CSDCertificate.objects.filter(tenant=tenant, is_active=True).first()
+        
+        if not csd:
+            return JsonResponse({'success': False, 'error': 'No se encontró certificado activo'}, status=404)
+        
+        serial = csd.serial_number
+        deletion_summary = {'serial_number': serial, 'deleted_from': []}
+        
+        logger.info(f"Starting complete CSD deletion for tenant {tenant.name}: {serial}")
+        
+        # 1. Delete from facturapi.io if uploaded
+        if csd.pac_uploaded and csd.pac_response:
+            org_id = csd.pac_response.get('organization_id')
+            if org_id:
+                try:
+                    from .pac_factory import pac_service
+                    pac_result = pac_service.delete_certificate(org_id)
+                    if pac_result['success']:
+                        deletion_summary['deleted_from'].append('facturapi.io')
+                except Exception as e:
+                    logger.error(f"Error deleting from facturapi: {e}")
+        
+        # 2. Delete files from storage
+        if csd.certificate_file:
+            csd.certificate_file.delete(save=False)
+            deletion_summary['deleted_from'].append('storage_cer')
+        if csd.private_key_file:
+            csd.private_key_file.delete(save=False)
+            deletion_summary['deleted_from'].append('storage_key')
+        
+        # 3. Delete from DB
+        csd.delete()
+        deletion_summary['deleted_from'].append('database')
+        
+        logger.info(f"✅ Complete CSD deletion for {tenant.name}")
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Certificado eliminado completamente',
+            'details': deletion_summary
+        })
+    
+    except Exception as e:
+        logger.error(f"Error deleting CSD: {str(e)}")
+        return ErrorResponseBuilder.build_error(message='Error eliminando certificado', code='deletion_error', status=500)

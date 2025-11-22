@@ -17,6 +17,7 @@ urlpatterns = [
     path('csd/validar-local/', views.validate_csd_local, name='validate_csd_local'),
     # 🇪🇸 csd/save-complete → csd/guardar-completo
     path('csd/guardar-completo/', views.save_csd_complete, name='save_csd_complete'),
+    path('csd/eliminar/', views.delete_csd, name='delete_csd'),
 
     # Facturación section (CFDI management)
     path('', views.facturacion_index, name='index'),

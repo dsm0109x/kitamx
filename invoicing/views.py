@@ -179,7 +179,7 @@ def save_csd_complete(request: HttpRequest) -> JsonResponse:
         tenant_user = request.tenant_user
         tenant = request.tenant
 
-        # FIX: Check if CSD already exists (prevent re-upload)
+        # Check if CSD already exists
         existing_csd = CSDCertificate.objects.filter(
             tenant=tenant,
             is_active=True,
@@ -187,12 +187,24 @@ def save_csd_complete(request: HttpRequest) -> JsonResponse:
         ).first()
 
         if existing_csd:
-            logger.warning(f"Tenant {tenant.name} attempted re-upload with active CSD")
-            return ErrorResponseBuilder.build_error(
-                message='Ya tienes un certificado CSD activo. Si necesitas actualizarlo, contacta soporte@kita.mx',
-                code='csd_already_exists',
-                status=409
-            )
+            # Allow replacement ONLY if not uploaded to PAC yet
+            if existing_csd.pac_uploaded:
+                # Already in production - require support contact
+                logger.warning(f"Tenant {tenant.name} attempted to replace CSD already in PAC")
+                return ErrorResponseBuilder.build_error(
+                    message='Tu CSD ya está activo en facturapi.io. Para cambiarlo, contacta soporte@kita.mx',
+                    code='csd_in_production',
+                    status=409
+                )
+            else:
+                # CSD only local - allow replacement
+                logger.info(f"Replacing local CSD for tenant {tenant.name} (pac_uploaded=False)")
+
+                # Deactivate previous CSD (keep as backup)
+                existing_csd.is_active = False
+                existing_csd.save(update_fields=['is_active'])
+
+                logger.info(f"Previous CSD {existing_csd.serial_number} deactivated, proceeding with new upload")
 
         # BUG FIX #24: Validate upload_session against session-stored value
         upload_session = request.POST.get('upload_session')

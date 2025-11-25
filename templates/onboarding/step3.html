@@ -196,7 +196,7 @@
 
                         {% if has_csd %}
                         <!-- ✅ CSD YA EXISTE - Mostrar información -->
-                        <div class="alert alert-success border-success mb-4">
+                        <div class="alert alert-success border-success mb-4" id="existingCsdInfo">
                             <h6 class="fw-bold mb-3">
                                 <span class="iconoir-check-circle me-2"></span>
                                 ✅ Certificado CSD Configurado
@@ -222,35 +222,34 @@
                                 <strong class="text-muted d-block mb-1">Estado:</strong>
                                 {% if csd.pac_uploaded %}
                                     <span class="badge bg-success">✓ Subido a facturapi.io</span>
+                                    <small class="text-muted d-block mt-2">
+                                        ⚠️ Para cambiar este certificado, contacta a soporte@kita.mx
+                                    </small>
                                 {% else %}
                                     <span class="badge bg-warning">⏳ Pendiente de subir a PAC</span>
                                     <small class="text-muted d-block mt-1">Se subirá al activar tu trial en el siguiente paso</small>
+
+                                    <!-- ✅ NUEVO: Botón para reemplazar (solo si no está en PAC) -->
+                                    <button type="button" class="btn btn-outline-warning btn-sm mt-3" onclick="showReplaceModal()">
+                                        <span class="iconoir-refresh-double me-2"></span>
+                                        Reemplazar Certificado
+                                    </button>
                                 {% endif %}
                             </div>
                         </div>
 
                         <!-- Botón para continuar -->
-                        <div class="d-grid gap-2 mb-5">
+                        <div class="d-grid gap-2 mb-5" id="continueSection">
                             <a href="{% url 'onboarding:step4' %}" class="btn btn-primary btn-lg">
                                 <span class="iconoir-arrow-right me-2"></span>
                                 Continuar al Siguiente Paso
                             </a>
                         </div>
 
-                        <div class="alert alert-warning border-warning">
-                            <h6 class="fw-bold mb-2">
-                                <span class="iconoir-warning-triangle me-2"></span>
-                                ¿Necesitas cambiar tu CSD?
-                            </h6>
-                            <p class="mb-2">Si necesitas subir un certificado diferente, contacta a soporte.</p>
-                            <p class="mb-0">
-                                <small class="text-muted">
-                                    Email: <a href="mailto:soporte@kita.mx">soporte@kita.mx</a>
-                                </small>
-                            </p>
-                        </div>
-
-                        {% else %}
+                        <!-- ✅ NUEVO: Formulario de upload (oculto inicialmente) -->
+                        <div id="uploadFormSection" style="display: none;">
+                        {% endif %}
+                        {# El formulario de upload se muestra cuando: has_csd=False OR modo reemplazo activado #}
                         <!-- ❌ NO HAY CSD - Mostrar formulario de upload -->
 
                         <!-- Info Card: ¿Qué es el CSD? -->
@@ -457,8 +456,10 @@
                             </button>
                         </div>
 
+                        {% if has_csd %}
+                        </div>
+                        {# End of uploadFormSection #}
                         {% endif %}
-                        {# End of has_csd conditional #}
 
                         <!-- Footer -->
                         <div class="mt-5 pt-4 border-top">
@@ -520,6 +521,47 @@
     </div>
 </div>
 
+<!-- Replace CSD Modal -->
+<div class="modal fade" id="replaceModal" tabindex="-1" aria-labelledby="replaceModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-redesign">
+            <!-- Icon Header -->
+            <div class="modal-icon-header">
+                <div class="modal-icon modal-icon-warning">
+                    <span class="iconoir-refresh-double"></span>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="modal-body text-center px-4 pb-2">
+                <h5 class="modal-title-redesign" id="replaceModalTitle">
+                    ¿Reemplazar Certificado CSD?
+                </h5>
+
+                <p class="modal-description mb-3">
+                    Esto desactivará el certificado actual ({{ csd.serial_number|default:"anterior" }}) y te permitirá subir uno nuevo.
+                </p>
+
+                <p class="text-muted mb-0">
+                    <small>💾 El certificado anterior se mantendrá como backup inactivo</small>
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary btn-modal-secondary" data-bs-dismiss="modal">
+                    <span class="iconoir-cancel me-2"></span>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-warning btn-modal-primary" onclick="enableReplaceMode()">
+                    <span class="iconoir-refresh-double me-2"></span>
+                    Sí, Reemplazar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Smart Loading System -->
 <div class="loading-topbar" id="loadingTopbar">
     <div class="loading-topbar-progress"></div>
@@ -561,6 +603,51 @@ function generateUUID() {
 }
 
 {# BUG FIX #25: getCsrfToken() moved to onboarding-common.js (loaded from base_onboarding.html) #}
+
+// ✅ NUEVO: Reemplazar CSD
+function showReplaceModal() {
+    const modal = new bootstrap.Modal(document.getElementById('replaceModal'));
+    modal.show();
+
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'csd_replace_modal_shown', {
+            'event_category': 'onboarding',
+            'event_label': 'step3_csd_replace'
+        });
+    }
+}
+
+function enableReplaceMode() {
+    // Ocultar info del CSD existente
+    const existingInfo = document.getElementById('existingCsdInfo');
+    const continueSection = document.getElementById('continueSection');
+    const uploadSection = document.getElementById('uploadFormSection');
+
+    if (existingInfo) existingInfo.style.display = 'none';
+    if (continueSection) continueSection.style.display = 'none';
+    if (uploadSection) uploadSection.style.display = 'block';
+
+    // Cerrar modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('replaceModal'));
+    if (modal) modal.hide();
+
+    // Toast informativo
+    showToast('Ahora puedes subir un nuevo certificado. El anterior se guardará como backup.', 'info');
+
+    // Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'csd_replace_mode_enabled', {
+            'event_category': 'onboarding',
+            'event_label': 'step3_csd_replace'
+        });
+    }
+
+    // Scroll al formulario
+    setTimeout(() => {
+        uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 500);
+}
 
 function showSkipModal() {
     // ✅ Check si ya skipeó antes (localStorage memory)

@@ -274,6 +274,13 @@ CELERY_BEAT_SCHEDULE = {
         'options': {'queue': 'default'}
     },
 
+    # facturapi.io monitoring - CRITICAL
+    'monitor-facturapi-health': {
+        'task': 'invoicing.tasks.monitor_facturapi_health',
+        'schedule': 300.0,  # Every 5 minutes
+        'options': {'queue': 'high'},  # High priority for critical monitoring
+    },
+
     # Healthcheck heartbeat - verifica que Celery Beat está vivo
     'healthcheck-heartbeat': {
         'task': 'core.healthcheck_heartbeat',
@@ -474,18 +481,22 @@ WA_BUSINESS_ID = env('WA_BUSINESS_ID', default='')
 
 # ========================================
 # PAC CONFIGURATION (Proveedor Autorizado de Certificación)
-# facturapi.io - Proveedor de Kita (migrado de FiscalAPI)
+# facturapi.io - Proveedor oficial de Kita
 # ========================================
 FACTURAPI_URL = env('FACTURAPI_URL', default='https://www.facturapi.io/v2')
 FACTURAPI_API_KEY = env('FACTURAPI_API_KEY', default='')  # Live Key de Kita
 FACTURAPI_USER_KEY = env('FACTURAPI_USER_KEY', default='')  # User Key para gestionar orgs
 FACTURAPI_TIMEOUT = env.int('FACTURAPI_TIMEOUT', default=30)
 
-# FiscalAPI (DEPRECATED - Comentado para rollback)
-# FISCALAPI_URL = env('FISCALAPI_URL', default='https://test.fiscalapi.com')
-# FISCALAPI_API_KEY = env('FISCALAPI_API_KEY', default='')
-# FISCALAPI_TENANT_KEY = env('FISCALAPI_TENANT_KEY', default='')
-# FISCALAPI_TIMEOUT = env.int('FISCALAPI_TIMEOUT', default=30)
+# ========================================
+# MONITORING & ALERTING
+# ========================================
+# healthchecks.io - External monitoring service
+# Expects periodic pings every 5 minutes
+HEALTHCHECKS_IO_URL = env('HEALTHCHECKS_IO_URL', default='https://hc-ping.com/9808e559-304f-4fe1-8428-17f9c49b3979')
+
+# Admin notifications
+ADMIN_EMAIL = env('ADMIN_EMAIL', default='dsm0109@ciencias.unam.mx')
 
 # Kita as Issuer (for subscription invoicing and all invoices)
 KITA_RFC = env('KITA_RFC', default='SAHM661127B26')

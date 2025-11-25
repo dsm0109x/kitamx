@@ -20,6 +20,9 @@ urlpatterns = [
     # Recipient Lookup API (for invoice autofill)
     path('api/recipients/lookup/', api_views.api_lookup_recipient, name='api_lookup_recipient'),
 
+    # facturapi.io Health Check
+    path('api/facturapi/health/', api_views.api_facturapi_health, name='api_facturapi_health'),
+
     # Static
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
 ]

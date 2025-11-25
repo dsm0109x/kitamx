@@ -28,6 +28,9 @@ urlpatterns = [
     # 🇪🇸 check-email → verificar-email
     path('verificar-email/', ajax_views.check_email_availability, name='check_email'),
 
+    # Email verification resend
+    path('reenviar-email-verificacion/', views.resend_verification_email, name='resend_verification'),
+
     # NOTE: Business info and CSD moved to /negocio/ (config app)
     # - /negocio/empresa/ (business information)
     # - /negocio/csd/ (CSD management)

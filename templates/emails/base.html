@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light dark">
-    <meta name="supported-color-schemes" content="light dark">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
     <title>{% block email_title %}Kita{% endblock %}</title>
     <style>
         /* ========================================
@@ -474,98 +474,9 @@
         }
 
         /* ========================================
-           DARK MODE SUPPORT
+           LIGHT MODE ONLY - No dark mode support
+           Emails siempre en modo claro para consistencia
            ======================================== */
-        @media (prefers-color-scheme: dark) {
-            .email-wrapper {
-                background-color: #1f2937 !important;
-            }
-
-            .email-container {
-                background-color: #111827 !important;
-                border: 1px solid #374151 !important;  /* ✅ Borde sutil en dark */
-            }
-
-            .email-content {
-                background-color: #111827 !important;
-            }
-
-            .email-content h1,
-            .email-content h2 {
-                color: #f9fafb !important;
-            }
-
-            .email-content p {
-                color: #d1d5db !important;
-            }
-
-            .email-footer {
-                background-color: #1f2937 !important;
-                border-top-color: #374151 !important;
-            }
-
-            .email-footer p {
-                color: #9ca3af !important;
-            }
-
-            /* Success Box - Verde oscuro */
-            .success-box {
-                background-color: rgba(21, 128, 61, 0.15) !important;  /* ✅ Verde transparente */
-                border: 1px solid rgba(21, 128, 61, 0.3) !important;  /* ✅ Borde verde */
-            }
-
-            .success-box p {
-                color: #86efac !important;  /* ✅ Verde claro */
-            }
-
-            /* Info Box - Amarillo oscuro */
-            .info-box {
-                background-color: rgba(245, 158, 11, 0.15) !important;  /* ✅ Amarillo transparente */
-                border: 1px solid rgba(245, 158, 11, 0.3) !important;  /* ✅ Borde amarillo */
-            }
-
-            .info-box p {
-                color: #fde68a !important;  /* ✅ Amarillo claro */
-            }
-
-            /* Security Box - Gris oscuro */
-            .security-box {
-                background-color: #1f2937 !important;  /* ✅ Gris oscuro */
-                border: 1px solid #4b5563 !important;  /* ✅ Borde gris */
-            }
-
-            .security-box p {
-                color: #d1d5db !important;  /* ✅ Texto gris claro */
-            }
-
-            .security-box strong {
-                color: #f9fafb !important;  /* ✅ Blanco para strong */
-            }
-
-            /* Error Box - Rojo oscuro */
-            .error-box {
-                background-color: rgba(220, 38, 38, 0.15) !important;  /* ✅ Rojo transparente */
-                border: 1px solid rgba(220, 38, 38, 0.3) !important;  /* ✅ Borde rojo */
-            }
-
-            .error-box p {
-                color: #fca5a5 !important;  /* ✅ Rojo claro */
-            }
-
-            /* Link Fallback - Oscuro */
-            .link-fallback {
-                background-color: #1f2937 !important;
-                border-color: #374151 !important;
-            }
-
-            .link-fallback p {
-                color: #9ca3af !important;
-            }
-
-            .link-fallback a {
-                color: #86efac !important;  /* ✅ Verde claro */
-            }
-        }
     </style>
 </head>
 <body>
@@ -577,11 +488,15 @@
                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 0; padding: 0;">
                     <tr>
                         <td align="center" style="padding: 0;">
-                            <!-- Logo inline con texto -->
+                            <!-- Logo imagen + texto -->
                             <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                                 <tr>
-                                    <td align="center" valign="middle" colspan="2">
-                                        <h1 class="email-logo" style="margin: 0; display: inline-block;">Kita</h1>
+                                    <td align="center" valign="middle">
+                                        <img src="https://kita.mx/static/images/kita-logo.png"
+                                             alt="Kita"
+                                             class="email-logo-img"
+                                             style="width: 40px; height: 40px; display: inline-block; vertical-align: middle; margin-right: 8px;">
+                                        <h1 class="email-logo" style="margin: 0; display: inline-block; vertical-align: middle;">Kita</h1>
                                     </td>
                                 </tr>
                             </table>

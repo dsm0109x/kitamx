@@ -33,8 +33,9 @@ def onboarding_required(view_func):
     """
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
-        # Check si usuario está autenticado y completó onboarding
+        # Check si usuario está autenticado
         if request.user.is_authenticated:
+            # Check si completó onboarding
             if getattr(request.user, 'onboarding_completed', False):
                 messages.info(
                     request,
@@ -42,6 +43,9 @@ def onboarding_required(view_func):
                     'Puedes editar tus datos desde Configuración en el dashboard.'
                 )
                 return redirect('dashboard:index')
+
+        # Email verification is now handled by login adapter
+        # If user reached here, email is verified (or they bypassed somehow)
 
         # Si no completó, permitir acceso normal
         return view_func(request, *args, **kwargs)

@@ -86,16 +86,16 @@ class MercadoPagoWebhookHandler:
                 f"Event: {event_type}.{event_action}, ID: {data_id}"
             )
 
-            # Step 4: Check idempotency
-            if self._is_duplicate(webhook_data):
-                self.logger.info(f"Duplicate webhook ignored: {data_id}")
+            # Step 4: Claim webhook for processing (atomic check-and-set)
+            # This prevents race conditions where two requests process same webhook
+            if not self._try_claim_webhook(webhook_data):
+                self.logger.info(f"Duplicate webhook ignored (already claimed): {data_id}")
                 return HttpResponse(status=200)
 
             # Step 5: Route to appropriate handler
             result = self._route_webhook(webhook_data, webhook_type)
 
-            # Step 6: Mark as processed
-            self._mark_processed(webhook_data)
+            # Webhook already marked as processed by _try_claim_webhook
 
             if result.get('success', False):
                 return HttpResponse(status=200)
@@ -151,45 +151,66 @@ class MercadoPagoWebhookHandler:
             self.logger.error(f"Signature verification error: {e}")
             return False
 
-    def _is_duplicate(self, webhook_data: Dict[str, Any]) -> bool:
-        """Check if webhook has already been processed.
+    def _try_claim_webhook(self, webhook_data: Dict[str, Any]) -> bool:
+        """Atomically claim webhook for processing (check-and-set).
 
-        Uses cache-based idempotency to prevent duplicate processing.
+        Uses Redis SETNX (set if not exists) to prevent race conditions.
+        If two webhooks arrive simultaneously, only one can claim it.
 
         Args:
             webhook_data: Parsed webhook data
 
         Returns:
-            True if webhook is duplicate
+            True if webhook was claimed successfully (can process)
+            False if webhook was already claimed (duplicate)
         """
         event_type = webhook_data.get('type', '')
         data_id = webhook_data.get('data', {}).get('id', '')
 
         if not data_id:
-            return False
+            # No ID to check, allow processing but log warning
+            self.logger.warning("Webhook missing data.id, cannot check idempotency")
+            return True
 
         from core.cache import KitaRedisCache
         cache_key = KitaRedisCache.generate_global_key('webhook', 'processed', f"{event_type}:{data_id}")
 
-        # Check if already processed
-        if cache.get(cache_key):
-            return True
+        try:
+            # SETNX: Set key only if it does NOT exist
+            # This is atomic operation in Redis
+            claimed = cache.add(cache_key, True, timeout=86400)  # 24 hours
 
-        return False
+            if claimed:
+                # Successfully claimed (first request)
+                self.logger.debug(f"Webhook claimed for processing: {cache_key}")
+                return True
+            else:
+                # Key already exists (duplicate request)
+                self.logger.info(f"Webhook already claimed (duplicate): {cache_key}")
+                return False
 
-    def _mark_processed(self, webhook_data: Dict[str, Any]) -> None:
-        """Mark webhook as processed in cache.
+        except Exception as e:
+            # Cache failure - fallback to database check
+            self.logger.error(f"Cache claim failed, using database fallback: {e}")
+            return not self._is_duplicate_database(data_id)
+
+    def _is_duplicate_database(self, payment_id: str) -> bool:
+        """Fallback idempotency check using database.
+
+        Used when Redis is unavailable.
 
         Args:
-            webhook_data: Parsed webhook data
-        """
-        event_type = webhook_data.get('type', '')
-        data_id = webhook_data.get('data', {}).get('id', '')
+            payment_id: MercadoPago payment ID
 
-        if data_id:
-            from core.cache import KitaRedisCache
-            cache_key = KitaRedisCache.generate_global_key('webhook', 'processed', f"{event_type}:{data_id}")
-            cache.set(cache_key, True, timeout=86400)  # 24 hours
+        Returns:
+            True if payment already exists
+        """
+        try:
+            return Payment.objects.filter(mp_payment_id=payment_id).exists()
+        except Exception as e:
+            self.logger.error(f"Database duplicate check failed: {e}")
+            # If both Redis and DB fail, allow processing (better than losing payment)
+            return False
 
     def _route_webhook(
         self,
@@ -416,12 +437,20 @@ class MercadoPagoWebhookHandler:
                         f"with status '{payment_link.status}'. Payment registered."
                     )
 
-                # Send notifications
-                self._send_payment_notifications(payment)
+            # Schedule notifications after transaction commits
+            # This ensures payment is saved even if email fails
+            if payment_status == 'approved' and created:
+                payment_id_for_notification = payment.id
+                transaction.on_commit(
+                    lambda: self._send_payment_notifications_safe(payment_id_for_notification)
+                )
 
-            # Trigger invoice generation if needed
+            # Trigger invoice generation if needed (after commit)
             if payment_status == 'approved' and payment_link.requires_invoice:
-                self._trigger_invoice_generation(payment)
+                payment_id_for_invoice = payment.id
+                transaction.on_commit(
+                    lambda: self._trigger_invoice_generation_safe(payment_id_for_invoice)
+                )
 
             self.logger.info(
                 f"User payment {payment_id} processed - "
@@ -680,6 +709,22 @@ class MercadoPagoWebhookHandler:
         except Exception as e:
             self.logger.error(f"Failed to send payment notification: {e}")
 
+    def _send_payment_notifications_safe(self, payment_id: str) -> None:
+        """Send payment notifications (safe for transaction.on_commit).
+
+        Fetches payment from database to ensure we're using committed data.
+
+        Args:
+            payment_id: Payment UUID
+        """
+        try:
+            payment = Payment.objects.select_related('tenant', 'payment_link').get(id=payment_id)
+            self._send_payment_notifications(payment)
+        except Payment.DoesNotExist:
+            self.logger.error(f"Payment {payment_id} not found for notifications")
+        except Exception as e:
+            self.logger.error(f"Failed to send payment notification: {e}")
+
     def _trigger_invoice_generation(self, payment: Payment) -> None:
         """Trigger invoice generation for payment.
 
@@ -689,6 +734,20 @@ class MercadoPagoWebhookHandler:
         try:
             # TODO: Trigger CFDI generation task
             self.logger.info(f"Payment {payment.id} requires invoice generation")
+        except Exception as e:
+            self.logger.error(f"Failed to trigger invoice generation: {e}")
+
+    def _trigger_invoice_generation_safe(self, payment_id: str) -> None:
+        """Trigger invoice generation (safe for transaction.on_commit).
+
+        Args:
+            payment_id: Payment UUID
+        """
+        try:
+            payment = Payment.objects.select_related('tenant', 'payment_link').get(id=payment_id)
+            self._trigger_invoice_generation(payment)
+        except Payment.DoesNotExist:
+            self.logger.error(f"Payment {payment_id} not found for invoice generation")
         except Exception as e:
             self.logger.error(f"Failed to trigger invoice generation: {e}")
 

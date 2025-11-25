@@ -1,7 +1,7 @@
 """Kita - Mexican Payment Links and CFDI 4.0 Invoicing Platform.
 
 A Django-based SaaS platform for creating payment links via MercadoPago
-and generating CFDI 4.0 compliant invoices through FiscalAPI.
+and generating CFDI 4.0 compliant invoices through facturapi.io.
 """
 from __future__ import annotations
 from typing import Tuple

@@ -15,90 +15,53 @@
 </h1>
 
 <!-- Lead Text -->
-<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
-    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+<p class="lead" style="font-size: 16px; color: #374151; text-align: center; margin: 0 0 24px 0; line-height: 1.6;">
+    ¡Listo! Tu factura CFDI 4.0 ha sido timbrada exitosamente. Adjuntamos los archivos XML y PDF.
 </p>
 
-<!-- Main Message -->
-<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
-    Tu factura electrónica CFDI 4.0 ha sido timbrada exitosamente por el SAT.
-    Adjuntamos los archivos XML y PDF a este correo.
-</p>
+<!-- Detalles de la Factura -->
+<div style="background-color: #F0FDF4; border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #15803d;">
+    <h2 style="font-size: 18px; font-weight: 600; color: #166534; margin: 0 0 16px 0;">
+        Datos de tu factura
+    </h2>
 
-<!-- Success Box - Detalles de la Factura -->
-<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
-        🧾 Detalles de la Factura
-    </h3>
-    <ul style="margin: 0; padding-left: 20px; color: #166534;">
-        <li style="margin-bottom: 8px;">
-            <strong>UUID:</strong> {{ invoice_uuid }}
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Serie-Folio:</strong> {{ invoice_serie }}-{{ invoice_folio }}
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Fecha de timbrado:</strong> {{ stamped_at|friendly_datetime }}
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Monto:</strong> ${{ amount|currency_mx }} MXN
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Receptor:</strong> {{ customer_rfc }} - {{ customer_name }}
-        </li>
-    </ul>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px; width: 35%;">Folio fiscal (UUID):</td>
+            <td style="padding: 8px 0; color: #14532d; font-size: 12px; font-family: monospace;">{{ invoice_uuid }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px;">Serie-Folio:</td>
+            <td style="padding: 8px 0; color: #14532d; font-weight: 600; font-size: 15px;">{{ invoice_serie }}-{{ invoice_folio }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px;">Timbrado:</td>
+            <td style="padding: 8px 0; color: #14532d; font-size: 15px;">{{ stamped_at|friendly_datetime }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px;">Monto total:</td>
+            <td style="padding: 8px 0; color: #14532d; font-weight: 700; font-size: 20px;">${{ amount|currency_mx }} MXN</td>
+        </tr>
+    </table>
 </div>
 
-<!-- CTA Button - Descargar -->
 {% if download_url %}
+<!-- CTA Button - Descargar -->
 <div style="text-align: center; margin: 32px 0;">
     <a href="{{ download_url }}" class="btn-primary" style="background-color: #15803d; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(21, 128, 61, 0.15);">
-        📥 Descargar XML y PDF
+        Descargar Archivos →
     </a>
 </div>
 {% endif %}
 
-<!-- Info Box - Archivos Adjuntos -->
-<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
-        📎 Archivos Adjuntos
-    </h3>
-    <ul style="margin: 0; padding-left: 20px; color: #78350F;">
-        <li style="margin-bottom: 8px;">
-            <strong>{{ invoice_uuid }}.xml</strong> - Factura en formato XML (SAT)
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>{{ invoice_uuid }}.pdf</strong> - Representación impresa de la factura
-        </li>
-    </ul>
-    <p style="margin: 12px 0 0 0; font-size: 14px; color: #92400E;">
-        💡 <strong>Importante:</strong> Conserva ambos archivos para tu contabilidad. El XML es el documento oficial ante el SAT.
-    </p>
-</div>
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0; line-height: 1.6;">
+    📎 <strong>Archivos adjuntos:</strong> {{ invoice_uuid }}.xml y {{ invoice_uuid }}.pdf<br>
+    💡 Conserva ambos archivos por al menos 5 años (requisito SAT)
+</p>
 
-<!-- Info Box - Uso Contable -->
-<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #374151; margin: 0 0 12px 0;">
-        📚 ¿Cómo uso mi factura?
-    </h3>
-    <ul style="margin: 0; padding-left: 20px; color: #6B7280; font-size: 14px;">
-        <li style="margin-bottom: 8px;">El archivo <strong>XML</strong> debe enviarse a tu contador</li>
-        <li style="margin-bottom: 8px;">El archivo <strong>PDF</strong> es para tu archivo físico</li>
-        <li style="margin-bottom: 8px;">Conserva ambos por al menos 5 años (requisito SAT)</li>
-        <li>Puedes descargar tus facturas en cualquier momento desde tu panel</li>
-    </ul>
-</div>
-
-<!-- Emisor Info -->
-<div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #E5E7EB;">
-    <p style="font-size: 13px; color: #9CA3AF; text-align: center; margin: 0 0 8px 0;">
-        <strong>Emisor:</strong>
-    </p>
-    <p style="font-size: 14px; color: #6B7280; text-align: center; margin: 0;">
-        {{ tenant.name }}<br>
-        RFC: {{ tenant.rfc }}
-    </p>
-</div>
+<p style="font-size: 13px; color: #9CA3AF; text-align: center; margin: 24px 0; padding: 16px; background-color: #F9FAFB; border-radius: 8px;">
+    <strong>Emisor:</strong> {{ tenant.name }} (RFC: {{ tenant.rfc }})
+</p>
 
 <!-- Help -->
 <p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
@@ -109,5 +72,5 @@
 
 {% block email_footer_note %}
 Factura CFDI 4.0 emitida por {{ tenant.name }} a través de Kita.
-Timbrado por FiscalAPI (PAC autorizado por el SAT).
+Timbrado por facturapi.io (PAC autorizado por el SAT).
 {% endblock %}

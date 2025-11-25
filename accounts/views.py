@@ -8,7 +8,7 @@ from __future__ import annotations
 import json
 import logging
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import update_session_auth_hash
 from django.http import JsonResponse, HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
@@ -431,6 +431,13 @@ def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
         # Get the user
         user = emailconfirmation.email_address.user
 
+        # Clean up pending verification session if exists
+        if 'pending_verification_user_id' in request.session:
+            request.session.pop('pending_verification_user_id', None)
+            request.session.pop('pending_verification_email', None)
+            request.session.pop('pending_verification_timestamp', None)
+            logger.info(f"Cleaned pending verification session for {user.email}")
+
         # If user is not authenticated, log them in automatically
         if not request.user.is_authenticated:
             # Perform login (allauth helper)
@@ -468,6 +475,165 @@ def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
         return redirect('account_login')
 
 
+def email_verification_sent(request: HttpRequest) -> HttpResponse:
+    """
+    PUBLIC email verification page with session-based security.
+
+    Shows personalized info ONLY if user has pending_verification session
+    (created during blocked login attempt).
+
+    Security features:
+    - Public page (no auth required)
+    - Personalized email shown only with valid session
+    - No email enumeration possible
+    - Session expires in 1 hour
+
+    Returns:
+        Rendered verification sent page
+    """
+    from allauth.account.models import EmailAddress
+    from dateutil import parser
+    from datetime import timedelta
+
+    # Check if user has pending verification session (from blocked login)
+    pending_user_id = request.session.get('pending_verification_user_id')
+    pending_email = request.session.get('pending_verification_email')
+    pending_timestamp = request.session.get('pending_verification_timestamp')
+
+    has_pending_session = False
+    session_expired = False
+    show_email = False
+    email_to_show = None
+
+    if pending_user_id and pending_email and pending_timestamp:
+        # Validate session not expired (1 hour)
+        try:
+            timestamp = parser.parse(pending_timestamp)
+            if timezone.now() - timestamp < timedelta(hours=1):
+                has_pending_session = True
+                show_email = True
+                email_to_show = pending_email
+                logger.info(f"Showing verification page for pending session: {pending_email}")
+            else:
+                # Session expired
+                session_expired = True
+                logger.info(f"Pending verification session expired for: {pending_email}")
+                # Clean up session
+                request.session.pop('pending_verification_user_id', None)
+                request.session.pop('pending_verification_email', None)
+                request.session.pop('pending_verification_timestamp', None)
+        except Exception as e:
+            logger.error(f"Error parsing pending verification timestamp: {e}")
+
+    context = {
+        'has_pending_session': has_pending_session,
+        'session_expired': session_expired,
+        'show_email': show_email,
+        'email': email_to_show,
+        'logo_path': 'images/kita-logo-negro.png',
+    }
+
+    return render(request, 'account/verification_sent.html', context)
+
+
+@require_http_methods(["POST"])
+@ratelimit(key='ip', rate='3/h', method='POST')
+def resend_verification_email(request: HttpRequest) -> JsonResponse:
+    """
+    Resend email verification - SECURE with session validation.
+
+    Security:
+    - Requires pending_verification session (from blocked login)
+    - Session expires in 1 hour
+    - Rate limited: 3 per hour per IP
+    - Validates user exists in DB
+
+    This prevents:
+    - Email enumeration attacks (no email in request)
+    - Spam (session required + rate limit)
+    - Unauthorized access (session from failed login only)
+
+    Returns:
+        JSON response with success status
+    """
+    from allauth.account.models import EmailAddress, EmailConfirmation
+    from dateutil import parser
+    from datetime import timedelta
+
+    # SECURITY: Validate pending verification session
+    pending_user_id = request.session.get('pending_verification_user_id')
+    pending_timestamp = request.session.get('pending_verification_timestamp')
+
+    if not pending_user_id or not pending_timestamp:
+        logger.warning(f"Resend attempt without pending session from IP: {request.META.get('REMOTE_ADDR')}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Sesión no válida. Intenta hacer login de nuevo.'
+        }, status=403)
+
+    # Validate session not expired (1 hour)
+    try:
+        timestamp = parser.parse(pending_timestamp)
+        if timezone.now() - timestamp >= timedelta(hours=1):
+            # Session expired
+            logger.info(f"Resend attempt with expired session for user: {pending_user_id}")
+            # Clean up
+            request.session.pop('pending_verification_user_id', None)
+            request.session.pop('pending_verification_email', None)
+            request.session.pop('pending_verification_timestamp', None)
+
+            return JsonResponse({
+                'success': False,
+                'error': 'Sesión expirada. Intenta hacer login de nuevo.'
+            }, status=403)
+    except Exception as e:
+        logger.error(f"Error validating session timestamp: {e}")
+        return JsonResponse({'success': False, 'error': 'Sesión inválida'}, status=403)
+
+    # Get user from session
+    try:
+        from accounts.models import User
+        user = User.objects.get(id=pending_user_id)
+    except User.DoesNotExist:
+        logger.error(f"User not found for pending verification: {pending_user_id}")
+        return JsonResponse({'success': False, 'error': 'Usuario no encontrado'}, status=404)
+
+    # Get EmailAddress
+    email_address = EmailAddress.objects.filter(
+        user=user,
+        email__iexact=user.email
+    ).first()
+
+    if not email_address:
+        return JsonResponse({'success': False, 'error': 'Email no encontrado'}, status=404)
+
+    if email_address.verified:
+        # Already verified - clean session
+        request.session.pop('pending_verification_user_id', None)
+        request.session.pop('pending_verification_email', None)
+        request.session.pop('pending_verification_timestamp', None)
+        return JsonResponse({'success': False, 'error': 'Email ya verificado'}, status=400)
+
+    try:
+        # Create new confirmation and send
+        confirmation = EmailConfirmation.create(email_address)
+        confirmation.send(request)
+
+        logger.info(f"Email verification resent to {user.email} via session")
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Email de verificación enviado nuevamente'
+        })
+
+    except Exception as e:
+        logger.error(f"Failed to resend verification email: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Error al enviar email'
+        }, status=500)
+
+
 # Export views for URL configuration
 __all__ = [
     'account_index',
@@ -477,4 +643,6 @@ __all__ = [
     'revoke_session',
     'password_reset_done_redirect',  # Custom password reset flow
     'email_confirm_redirect',  # Custom email confirmation flow
+    'email_verification_sent',  # Custom email verification page
+    'resend_verification_email',  # Resend verification endpoint
 ]

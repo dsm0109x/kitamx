@@ -679,7 +679,7 @@ def save_csd_settings(request: HttpRequest) -> JsonResponse:
     - File upload to DigitalOcean Spaces
     - AES-256-GCM encryption
     - Database persistence
-    - FiscalAPI integration (2 files + password)
+    - facturapi.io integration (2 files + password)
     - RFC validation
     """
     import uuid
@@ -791,7 +791,7 @@ def save_csd_settings(request: HttpRequest) -> JsonResponse:
         tenant.csd_valid_to = validation_result['valid_to']
         tenant.save()
 
-        # Upload to FiscalAPI
+        # Upload to facturapi.io
         try:
             from invoicing.pac_factory import pac_service
             logger.info(f"Settings: Testing PAC connection for tenant {tenant.name}")
@@ -827,13 +827,13 @@ def save_csd_settings(request: HttpRequest) -> JsonResponse:
         key_upload.status = 'processed'
         key_upload.save()
 
-        logger.info(f"Settings: CSD certificate saved and uploaded to FiscalAPI for tenant {tenant.name}")
+        logger.info(f"Settings: CSD certificate saved and uploaded to facturapi.io for tenant {tenant.name}")
 
         return JsonResponse({
             'success': True,
             'serial_number': validation_result['serial_number'],
             'pac_uploaded': csd_certificate.pac_uploaded,
-            'message': 'Certificado guardado y subido a FiscalAPI exitosamente',
+            'message': 'Certificado guardado y subido a facturapi.io exitosamente',
             'created': created
         })
 

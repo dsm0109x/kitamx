@@ -15,77 +15,52 @@
 </h1>
 
 <!-- Lead Text -->
-<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
-    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+<p class="lead" style="font-size: 16px; color: #374151; text-align: center; margin: 0 0 24px 0; line-height: 1.6;">
+    ¡Gracias {% if recipient_name %}{{ recipient_name }}{% else %}{{ payer_name|default:"" }}{% endif %}! Tu pago ha sido confirmado exitosamente. {% if requires_invoice %}Ya puedes generar tu factura.{% endif %}
 </p>
 
-<!-- Main Message -->
-<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
-    ¡Gracias por tu pago! Hemos recibido y confirmado tu transacción exitosamente.
-    {% if requires_invoice %}
-    Ahora puedes generar tu factura CFDI 4.0.
-    {% else %}
-    Tu comprobante ha sido procesado.
-    {% endif %}
-</p>
+<!-- Detalles del Pago -->
+<div style="background-color: #F0FDF4; border-radius: 12px; padding: 24px; margin: 24px 0; border-left: 4px solid #15803d;">
+    <h2 style="font-size: 18px; font-weight: 600; color: #166534; margin: 0 0 16px 0;">
+        Confirmación de pago
+    </h2>
 
-<!-- Success Box - Confirmación -->
-<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
-        💰 Detalles de tu Pago
-    </h3>
-    <ul style="margin: 0; padding-left: 20px; color: #166534;">
-        <li style="margin-bottom: 8px;">
-            <strong>Monto pagado:</strong> ${{ amount|currency_mx }} MXN
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Concepto:</strong> {{ title }}
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Fecha:</strong> {{ paid_at|friendly_datetime }}
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>ID de pago:</strong> {{ payment_id }}
-        </li>
-    </ul>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px; width: 40%;">Monto pagado:</td>
+            <td style="padding: 8px 0; color: #14532d; font-weight: 700; font-size: 20px;">${{ amount|currency_mx }} MXN</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px;">Concepto:</td>
+            <td style="padding: 8px 0; color: #14532d; font-weight: 600; font-size: 15px;">{{ title }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px;">Fecha:</td>
+            <td style="padding: 8px 0; color: #14532d; font-size: 15px;">{{ paid_at|friendly_datetime }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #166534; font-size: 14px;">Referencia:</td>
+            <td style="padding: 8px 0; color: #14532d; font-size: 13px; font-family: monospace;">{{ payment_id }}</td>
+        </tr>
+    </table>
 </div>
 
 {% if requires_invoice %}
 <!-- CTA Button - Generar Factura -->
 <div style="text-align: center; margin: 32px 0;">
     <a href="{{ billing_form_url }}" class="btn-primary" style="background-color: #15803d; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(21, 128, 61, 0.15);">
-        📄 Generar mi Factura CFDI 4.0
+        Generar mi Factura →
     </a>
 </div>
 
-<!-- Info Box - Factura -->
-<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
-        📋 Para Generar tu Factura
-    </h3>
-    <ol style="margin: 0; padding-left: 20px; color: #78350F;">
-        <li style="margin-bottom: 8px;">Haz clic en el botón "Generar mi Factura"</li>
-        <li style="margin-bottom: 8px;">Ingresa tu RFC y razón social</li>
-        <li style="margin-bottom: 8px;">Selecciona el uso de CFDI</li>
-        <li>Recibirás tu XML y PDF por email en unos minutos</li>
-    </ol>
-</div>
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 16px 0;">
+    Solo necesitas tu RFC y razón social. Recibirás tu XML y PDF en minutos.
+</p>
 {% else %}
-<!-- Info Box - Sin factura -->
-<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <p style="margin: 0; font-size: 14px; color: #78350F;">
-        💡 <strong>Nota:</strong> Este pago no incluye factura. Si la necesitas, contacta a {{ tenant.name }}.
-    </p>
-</div>
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0;">
+    Si necesitas factura, contacta a {{ tenant.name }}.
+</p>
 {% endif %}
-
-<!-- Security Note -->
-<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <p style="margin: 0; font-size: 14px; color: #6B7280;">
-        🔒 Este pago fue procesado de forma segura a través de MercadoPago.
-        Tu información financiera está protegida con los más altos estándares de seguridad.
-    </p>
-</div>
 
 {% if billing_form_url %}
 <!-- Fallback Link -->

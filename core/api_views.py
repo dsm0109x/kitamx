@@ -184,15 +184,15 @@ def api_reverse_geocode(request):
 @ratelimit(key='ip', rate='60/m', method='POST')
 def api_lookup_recipient(request):
     """
-    Lookup recipient by RFC and Email in FiscalAPI.
-    
+    Lookup recipient by RFC and Email in facturapi.io.
+
     If RFC exists AND email matches, return recipient data for autofill.
     If RFC exists but email doesn't match, return empty (privacy/security).
     If RFC doesn't exist, return empty (will be created on invoice).
-    
+
     Request body:
         {"rfc": "XAXX010101000", "email": "customer@example.com"}
-    
+
     Response:
         {
             "found": true,
@@ -208,40 +208,42 @@ def api_lookup_recipient(request):
         data = json.loads(request.body)
         rfc = data.get('rfc', '').strip().upper()
         email = data.get('email', '').strip().lower()
-        
+
         if not rfc or not email:
             return JsonResponse({'found': False})
-        
-        # Use FiscalAPI to lookup recipient
-        from invoicing.fiscalapi_service import fiscalapi_service
-        
+
+        # Use facturapi.io to lookup recipient (customer)
+        from invoicing.facturapi_service import facturapi_service
+
         try:
-            # Search in FiscalAPI
-            response = fiscalapi_service._make_request(
+            # Search in facturapi.io customers
+            # GET /v2/customers?q=tax_id:{rfc}
+            response = facturapi_service._make_request(
                 'GET',
-                '/api/v4/people',
-                params={'tin': rfc, 'limit': 1}
+                '/customers',
+                params={'q': f'tax_id:{rfc}', 'limit': 1}
             )
-            
-            items = response.get('data', {}).get('items', [])
-            
-            if items and len(items) > 0:
-                person = items[0]
-                person_email = person.get('email', '').strip().lower()
-                
+
+            # facturapi.io response structure: {data: [...], total_results: N}
+            customers = response.get('data', [])
+
+            if customers and len(customers) > 0:
+                customer = customers[0]
+                customer_email = customer.get('email', '').strip().lower()
+
                 # Verify email match (security check)
-                if person_email == email:
+                if customer_email == email:
                     # Email matches - return data for autofill
                     logger.info(f"Recipient found and email matches for RFC {rfc}")
-                    
+
                     return JsonResponse({
                         'found': True,
                         'match': True,
                         'data': {
-                            'business_name': person.get('legalName', ''),
-                            'postal_code': person.get('zipCode', ''),
-                            'fiscal_regime': person.get('satTaxRegimeId', ''),
-                            'cfdi_use': person.get('satCfdiUseId', 'G03'),
+                            'business_name': customer.get('legal_name', ''),
+                            'postal_code': customer.get('address', {}).get('zip', ''),
+                            'fiscal_regime': customer.get('tax_system', ''),
+                            'cfdi_use': 'G03',  # Default, facturapi.io doesn't store this
                         }
                     })
                 else:
@@ -256,11 +258,50 @@ def api_lookup_recipient(request):
                 # RFC not found - will be created on invoice
                 logger.info(f"Recipient not found for RFC {rfc}")
                 return JsonResponse({'found': False})
-                
+
         except Exception as e:
-            logger.error(f"Error looking up recipient: {str(e)}")
+            logger.error(f"Error looking up recipient in facturapi.io: {str(e)}")
             return JsonResponse({'found': False, 'error': str(e)})
-            
+
     except Exception as e:
         logger.error(f"Error in api_lookup_recipient: {str(e)}")
         return JsonResponse({'found': False, 'error': 'Error interno'}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET"])
+@ratelimit(key='ip', rate='120/m', method='GET')
+def api_facturapi_health(request):
+    """
+    Check facturapi.io API health status.
+
+    Returns real-time or cached (5 min) health check data.
+    Useful for dashboard status indicators and pre-flight checks.
+
+    Rate limit: 120 requests per minute per IP
+
+    Response:
+        {
+            "ok": true,
+            "response_time_ms": 245.32,
+            "timestamp": "2025-11-24T12:00:00",
+            "cached": false
+        }
+    """
+    try:
+        from invoicing.facturapi_service import facturapi_service
+
+        health = facturapi_service.health_check()
+
+        # Return appropriate status code
+        status_code = 200 if health.get('ok') else 503
+
+        return JsonResponse(health, status=status_code)
+
+    except Exception as e:
+        logger.error(f"Error checking facturapi.io health: {str(e)}")
+        return JsonResponse({
+            'ok': False,
+            'error': 'Error interno',
+            'timestamp': None
+        }, status=500)

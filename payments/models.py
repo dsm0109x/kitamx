@@ -238,7 +238,12 @@ class Payment(TenantModel, ExternalReferenceMixin):
     payment_link = models.ForeignKey(PaymentLink, on_delete=models.CASCADE, related_name='payments')
 
     # Mercado Pago data (external_id from mixin replaces mp_payment_id)
-    mp_payment_id = models.CharField(max_length=255, unique=True, help_text='Legacy field - use external_id')
+    mp_payment_id = models.CharField(
+        max_length=255,
+        unique=True,
+        db_index=True,
+        help_text='MercadoPago payment ID - indexed for webhook lookups'
+    )
     mp_preference_id = models.CharField(max_length=255)
     mp_collection_id = models.CharField(max_length=255, blank=True)
 

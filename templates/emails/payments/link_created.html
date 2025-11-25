@@ -15,68 +15,54 @@
 </h1>
 
 <!-- Lead Text -->
-<p class="lead" style="font-size: 16px; color: #6B7280; text-align: center; margin: 0 0 32px 0;">
-    Hola {% if recipient_name %}{{ recipient_name }}{% else %}Cliente{% endif %},
+<p class="lead" style="font-size: 16px; color: #374151; text-align: center; margin: 0 0 24px 0; line-height: 1.6;">
+    Hola {% if recipient_name %}{{ recipient_name }}{% else %}{{ payer_name|default:"ahí" }}{% endif %}, <strong>{{ tenant.name }}</strong> te envió un link para que puedas pagar de forma fácil y segura.
 </p>
 
-<!-- Main Message -->
-<p style="font-size: 16px; color: #374151; line-height: 1.6; margin: 0 0 24px 0;">
-    {{ tenant.name }} te ha enviado un link de pago seguro. Puedes realizar el pago de forma rápida y segura a través de MercadoPago.
-</p>
+<!-- Detalles del Pago -->
+<div style="background-color: #F9FAFB; border-radius: 12px; padding: 24px; margin: 24px 0;">
+    <h2 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 16px 0;">
+        Detalles de tu pago
+    </h2>
+
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 8px 0; color: #6B7280; font-size: 14px; width: 40%;">Concepto:</td>
+            <td style="padding: 8px 0; color: #111827; font-weight: 600; font-size: 15px;">{{ title }}</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px 0; color: #6B7280; font-size: 14px;">Monto:</td>
+            <td style="padding: 8px 0; color: #111827; font-weight: 700; font-size: 20px;">${{ amount|currency_mx }} MXN</td>
+        </tr>
+        {% if description %}
+        <tr>
+            <td style="padding: 8px 0; color: #6B7280; font-size: 14px;">Descripción:</td>
+            <td style="padding: 8px 0; color: #111827; font-size: 15px;">{{ description }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td style="padding: 8px 0; color: #6B7280; font-size: 14px;">Válido hasta:</td>
+            <td style="padding: 8px 0; color: #DC2626; font-weight: 600; font-size: 15px;">{{ expires_at|friendly_datetime }}</td>
+        </tr>
+    </table>
+</div>
 
 <!-- CTA Button -->
 <div style="text-align: center; margin: 32px 0;">
     <a href="{{ link_url }}" class="btn-primary" style="background-color: #15803d; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 9999px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(21, 128, 61, 0.15);">
-        Ver Link de Pago →
+        Pagar Ahora →
     </a>
 </div>
 
-<!-- Success Box - Detalles -->
-<div class="success-box" style="background-color: #f0fdf4; border: 2px solid #bbf7d0; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #14532d; margin: 0 0 12px 0;">
-        📋 Detalles del Pago
-    </h3>
-    <ul style="margin: 0; padding-left: 20px; color: #166534;">
-        <li style="margin-bottom: 8px;">
-            <strong>Concepto:</strong> {{ title }}
-        </li>
-        <li style="margin-bottom: 8px;">
-            <strong>Monto:</strong> ${{ amount|currency_mx }} MXN
-        </li>
-        {% if description %}
-        <li style="margin-bottom: 8px;">
-            <strong>Descripción:</strong> {{ description }}
-        </li>
-        {% endif %}
-        <li style="margin-bottom: 8px;">
-            <strong>Válido hasta:</strong> {{ expires_at|friendly_datetime }}
-        </li>
-    </ul>
-</div>
+<p style="font-size: 15px; color: #6B7280; text-align: center; margin: 16px 0;">
+    Puedes pagar con tarjeta, débito o transferencia. Es rápido y seguro.
+</p>
 
-<!-- Info Box - Qué esperar -->
-<div class="info-box" style="background-color: #FEF3C7; border: 2px solid #FDE68A; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #92400E; margin: 0 0 12px 0;">
-        ⏱️ ¿Qué sigue?
-    </h3>
-    <ol style="margin: 0; padding-left: 20px; color: #78350F;">
-        <li style="margin-bottom: 8px;">Haz clic en el botón "Ver Link de Pago"</li>
-        <li style="margin-bottom: 8px;">Revisa los detalles de tu compra</li>
-        <li style="margin-bottom: 8px;">Realiza el pago con tarjeta, débito o transferencia</li>
-        <li style="margin-bottom: 8px;">Recibirás confirmación inmediata por email</li>
-        {% if requires_invoice %}
-        <li>Podrás generar tu factura CFDI 4.0 después de pagar</li>
-        {% endif %}
-    </ol>
-</div>
-
-<!-- Security Box -->
-<div class="security-box" style="background-color: #F3F4F6; border: 2px solid #E5E7EB; border-radius: 12px; padding: 20px; margin: 24px 0;">
-    <p style="margin: 0; font-size: 14px; color: #6B7280;">
-        🔒 <strong>Pago 100% seguro:</strong> Procesado por MercadoPago, líder en pagos en línea en México.
-        Tus datos están protegidos con cifrado de grado bancario.
-    </p>
-</div>
+{% if requires_invoice %}
+<p style="font-size: 14px; color: #6B7280; text-align: center; margin: 24px 0 0 0;">
+    💼 Después de pagar podrás generar tu factura CFDI 4.0
+</p>
+{% endif %}
 
 <!-- Fallback Link -->
 <div class="link-fallback" style="margin-top: 32px; padding-top: 24px; border-top: 1px solid #E5E7EB; text-align: center;">

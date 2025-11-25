@@ -182,7 +182,7 @@ class InvoiceGenerationService:
         Args:
             payment: Payment object
             fiscal_data: Fiscal information
-            pac_result: PAC provider response (FiscalAPI)
+            pac_result: PAC provider response (facturapi.io)
 
         Returns:
             Created Invoice object

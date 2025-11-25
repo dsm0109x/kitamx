@@ -95,19 +95,76 @@ class NoMessagesAccountAdapter(DefaultAccountAdapter):
 
     def login(self, request: HttpRequest, user: User) -> None:
         """
-        Override login to prevent automatic 'successfully logged in' message.
+        Override login to prevent automatic 'successfully logged in' message
+        AND enforce email verification requirement.
 
         IMPORTANT: Must specify backend when multiple backends are configured.
 
         Args:
             request: HTTP request object
             user: User instance to login
+
+        Raises:
+            ImmediateHttpResponse: If email not verified (ACCOUNT_EMAIL_VERIFICATION='mandatory')
         """
         from django.contrib.auth import login as auth_login
+        from allauth.account.models import EmailAddress
+        from allauth.exceptions import ImmediateHttpResponse
+        from django.shortcuts import redirect
+        from django.contrib import messages
+        from django.conf import settings
 
-        # Specify backend explicitly (required when multiple backends configured)
+        # Check if email verification is mandatory
+        email_verification = getattr(settings, 'ACCOUNT_EMAIL_VERIFICATION', None)
+
+        if email_verification == 'mandatory':
+            # Check if user's email is verified in allauth
+            email_address = EmailAddress.objects.filter(
+                user=user,
+                email__iexact=user.email
+            ).first()
+
+            if not email_address or not email_address.verified:
+                # Email NOT verified - block login
+                logger.warning(f"Login blocked for unverified email: {user.email}")
+
+                # SECURITY: Create temporary session (NOT full login)
+                # This allows /verificar-email/ to show user's email and resend button
+                # WITHOUT exposing email enumeration vulnerability
+                request.session['pending_verification_user_id'] = str(user.id)
+                request.session['pending_verification_email'] = user.email
+                request.session['pending_verification_timestamp'] = timezone.now().isoformat()
+
+                # Auto-send email if no EmailConfirmation exists
+                from allauth.account.models import EmailConfirmation
+                confirmation = EmailConfirmation.objects.filter(
+                    email_address=email_address
+                ).order_by('-created').first()
+
+                if not confirmation:
+                    # No confirmation exists - create and send
+                    logger.info(f"Auto-sending verification to {user.email} (login blocked)")
+                    try:
+                        confirmation = EmailConfirmation.create(email_address)
+                        confirmation.send(request)
+                        logger.info(f"✅ Verification email sent to {user.email}")
+                    except Exception as e:
+                        logger.error(f"Failed to send verification email: {e}")
+
+                # Redirect to public verification page
+                messages.error(
+                    request,
+                    "Debes verificar tu email antes de iniciar sesión. Te enviamos un email de verificación."
+                )
+                raise ImmediateHttpResponse(
+                    redirect('account_email_verification_sent')
+                )
+
+        # Email is verified, proceed with login
         backend = 'allauth.account.auth_backends.AuthenticationBackend'
         auth_login(request, user, backend=backend)
+
+        logger.info(f"User logged in successfully: {user.email}")
 
     def confirm_email(self, request: HttpRequest, email_address: EmailAddress) -> None:
         """

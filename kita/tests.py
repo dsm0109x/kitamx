@@ -236,10 +236,10 @@ class EnvironmentVariablesTestCase(TestCase):
         # MercadoPago
         self.assertIsNotNone(settings.MERCADOPAGO_APP_ID or '')
 
-        # FiscalAPI PAC
-        self.assertIsNotNone(settings.FISCALAPI_URL)
-        self.assertIsNotNone(settings.FISCALAPI_API_KEY or '')
-        self.assertIsNotNone(settings.FISCALAPI_TENANT_KEY or '')
+        # facturapi.io PAC
+        self.assertIsNotNone(settings.FACTURAPI_URL)
+        self.assertIsNotNone(settings.FACTURAPI_API_KEY or '')
+        self.assertIsNotNone(settings.FACTURAPI_USER_KEY or '')
 
         # Email
         self.assertIsNotNone(settings.EMAIL_HOST_USER or '')

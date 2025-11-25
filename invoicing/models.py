@@ -61,6 +61,14 @@ class CSDCertificateManager(Manager):
     def valid(self) -> QuerySet[CSDCertificate]:
         return self.get_queryset().valid()
 
+    def expiring_soon(self, days: int = 30) -> QuerySet[CSDCertificate]:
+        """Get certificates expiring within specified days."""
+        return self.get_queryset().expiring_soon(days=days)
+
+    def with_pac_status(self) -> QuerySet[CSDCertificate]:
+        """Get certificates with PAC upload status."""
+        return self.get_queryset().with_pac_status()
+
 
 class CSDCertificate(TenantModel):
     """Store encrypted CSD certificates for tenants"""
@@ -106,7 +114,7 @@ class CSDCertificate(TenantModel):
     last_used = models.DateTimeField(null=True, blank=True)
     usage_count = models.IntegerField(default=0)
 
-    # PAC integration tracking (FiscalAPI)
+    # PAC integration tracking (facturapi.io)
     pac_uploaded = models.BooleanField(default=False)
     pac_uploaded_at = models.DateTimeField(null=True, blank=True)
     pac_response = models.JSONField(default=dict, blank=True)

@@ -148,10 +148,10 @@ def validate_csd_local(request: HttpRequest) -> JsonResponse:
 @rate_limit_with_response(key='user', rate='5/h', method='POST')
 def save_csd_complete(request: HttpRequest) -> JsonResponse:
     """
-    Complete CSD certificate upload and integration with FiscalAPI PAC.
+    Complete CSD certificate upload and integration with facturapi.io PAC.
 
     Handles the full CSD integration workflow including secure file upload,
-    encryption for storage, database persistence, and PAC (FiscalAPI) upload
+    encryption for storage, database persistence, and PAC (facturapi.io) upload
     for CFDI stamping capabilities. Critical for invoice generation compliance.
 
     Args:
@@ -165,7 +165,7 @@ def save_csd_complete(request: HttpRequest) -> JsonResponse:
         JsonResponse: Integration result with:
                      - success: Boolean operation status
                      - serial_number: Certificate serial number
-                     - pac_uploaded: FiscalAPI upload status
+                     - pac_uploaded: facturapi.io upload status
                      - message: Success/error message
                      - error: Detailed error if operation fails
 
@@ -793,7 +793,7 @@ def cancel_invoice(request: HttpRequest) -> JsonResponse:
     """
     Cancel CFDI invoice through PAC with SAT compliance validation.
 
-    Submits invoice cancellation request to PAC (FiscalAPI) following
+    Submits invoice cancellation request to PAC (facturapi.io) following
     Mexican tax authority requirements. Includes business rule validation
     for cancellation eligibility and comprehensive audit logging.
 

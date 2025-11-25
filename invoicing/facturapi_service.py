@@ -895,6 +895,71 @@ class FacturapiService:
             logger.error(f"Error generating Live Key for org {organization_id}: {e}", exc_info=True)
             return None
 
+    def health_check(self) -> Dict[str, Any]:
+        """
+        Check facturapi.io API health status.
+
+        Uses the /health endpoint to verify API availability.
+        Useful for:
+        - Pre-flight checks before critical operations
+        - Dashboard status indicators
+        - Retry logic decisions
+        - User-facing error messages
+
+        Returns:
+            Dict with:
+                - ok: Boolean (True if API is healthy)
+                - response_time_ms: Response time in milliseconds
+                - timestamp: Check timestamp
+                - cached: Boolean (if result is from cache)
+        """
+        import time
+
+        # Check cache first (5 min TTL)
+        cache_key = 'facturapi_health_check'
+        cached_result = cache.get(cache_key)
+
+        if cached_result:
+            cached_result['cached'] = True
+            return cached_result
+
+        try:
+            start_time = time.time()
+
+            # GET /v2/check endpoint
+            # Use Live Key (FACTURAPI_API_KEY) - unique per organization
+            response = self._make_request(
+                'GET',
+                '/check',
+                use_user_key=False  # Use Live Key (api_key)
+            )
+
+            response_time = (time.time() - start_time) * 1000  # Convert to ms
+
+            # facturapi.io /v2/check returns: {"ok": true}
+            result = {
+                'ok': response.get('ok', False),
+                'response_time_ms': round(response_time, 2),
+                'timestamp': timezone.now().isoformat(),
+                'cached': False
+            }
+
+            # Cache for 5 minutes
+            cache.set(cache_key, result, 300)
+
+            logger.info(f"facturapi.io health check: {result['ok']} ({result['response_time_ms']}ms)")
+
+            return result
+
+        except Exception as e:
+            logger.error(f"facturapi.io health check failed: {str(e)}")
+            return {
+                'ok': False,
+                'error': str(e),
+                'timestamp': timezone.now().isoformat(),
+                'cached': False
+            }
+
 
 # Singleton instance (same pattern as fiscalapi_service)
 facturapi_service = FacturapiService()

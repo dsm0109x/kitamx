@@ -367,3 +367,246 @@ def check_certificate_expiration() -> str:
             logger.error(f"Error sending CSD expiration notice: {e}")
 
     return f"Checked {expiring_soon.count()} expiring certificates"
+
+
+@shared_task
+def monitor_facturapi_health() -> str:
+    """
+    Monitor facturapi.io API health status.
+
+    Runs periodically via Celery Beat to:
+    - Check facturapi.io API availability
+    - Cache health status for frontend
+    - Send alerts when service is down
+    - Ping healthchecks.io for external monitoring
+
+    Returns:
+        Status message with health check result
+    """
+    import requests
+    from django.conf import settings
+    from django.core.cache import cache
+    from core.models import Tenant
+
+    try:
+        # 1. Check facturapi.io health
+        from invoicing.pac_factory import pac_service
+
+        logger.info("Starting facturapi.io health check...")
+        health = pac_service.health_check()
+
+        is_healthy = health.get('ok', False)
+        response_time = health.get('response_time_ms', 0)
+        timestamp = health.get('timestamp')
+
+        # 2. Log result
+        if is_healthy:
+            logger.info(f"✅ facturapi.io is HEALTHY ({response_time}ms)")
+        else:
+            error = health.get('error', 'Unknown error')
+            logger.error(f"❌ facturapi.io is DOWN: {error}")
+
+        # 3. Check if status changed (for alerting)
+        cache_key_status = 'facturapi_last_known_status'
+        previous_status = cache.get(cache_key_status)
+
+        if previous_status is not None and previous_status != is_healthy:
+            # Status changed!
+            if not is_healthy:
+                # Service just went DOWN
+                logger.critical(f"🚨 facturapi.io DOWNTIME DETECTED at {timestamp}")
+
+                # Send alert to Kita admins
+                _send_admin_alert_service_down(health)
+
+                # Store downtime start
+                cache.set('facturapi_downtime_start', timezone.now().isoformat(), 86400)
+
+            else:
+                # Service just came back UP
+                downtime_start = cache.get('facturapi_downtime_start')
+                if downtime_start:
+                    logger.info(f"✅ facturapi.io RECOVERED. Downtime started at {downtime_start}")
+
+                    # Send recovery notification
+                    _send_admin_alert_service_recovered(downtime_start, timestamp)
+
+                    # Clear downtime cache
+                    cache.delete('facturapi_downtime_start')
+
+        # 4. Update cached status
+        cache.set(cache_key_status, is_healthy, 600)  # 10 min TTL
+
+        # 5. Store health history (last 24 hours)
+        _store_health_history(is_healthy, response_time)
+
+        # 6. Ping healthchecks.io (external monitoring)
+        _ping_healthchecks_io(is_healthy, health)
+
+        return f"Health check completed: {'HEALTHY' if is_healthy else 'DOWN'} ({response_time}ms)"
+
+    except Exception as e:
+        logger.error(f"Error in monitor_facturapi_health task: {e}", exc_info=True)
+
+        # Ping healthchecks.io with failure
+        _ping_healthchecks_io(False, {'error': str(e)})
+
+        return f"Health check failed: {str(e)}"
+
+
+def _send_admin_alert_service_down(health: dict) -> None:
+    """Send alert email to Kita admins when facturapi.io goes down."""
+    from django.core.mail import EmailMessage
+    from django.conf import settings
+
+    error = health.get('error', 'Unknown error')
+    timestamp = health.get('timestamp', 'Unknown')
+
+    subject = '🚨 CRITICAL: facturapi.io Service Down'
+
+    body = f"""
+ALERTA CRÍTICA: Servicio de Facturación Caído
+
+El servicio de facturapi.io no está respondiendo correctamente.
+
+DETALLES:
+- Timestamp: {timestamp}
+- Error: {error}
+- URL: {settings.FACTURAPI_URL}
+
+IMPACTO:
+- No se pueden generar facturas nuevas
+- Upload de CSD bloqueado
+- Formularios de facturación deshabilitados automáticamente
+
+ACCIONES AUTOMÁTICAS:
+- Health check frontend bloqueará submit de forms
+- Celery retry automático en tasks de facturación
+- Monitoreo continuo cada 5 minutos
+
+MONITOREO EXTERNO:
+- healthchecks.io: {settings.HEALTHCHECKS_IO_URL}
+
+---
+Este es un mensaje automático de Kita Monitoring System
+    """
+
+    try:
+        email = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[settings.ADMIN_EMAIL],
+        )
+        email.send(fail_silently=False)
+        logger.info("Admin alert sent: facturapi.io service down")
+    except Exception as e:
+        logger.error(f"Failed to send admin alert: {e}")
+
+
+def _send_admin_alert_service_recovered(downtime_start: str, recovered_at: str) -> None:
+    """Send recovery notification to Kita admins."""
+    from django.core.mail import EmailMessage
+    from django.conf import settings
+    from dateutil import parser
+
+    try:
+        start = parser.parse(downtime_start)
+        end = parser.parse(recovered_at)
+        duration = end - start
+        duration_mins = int(duration.total_seconds() / 60)
+
+        subject = '✅ RESOLVED: facturapi.io Service Recovered'
+
+        body = f"""
+SERVICIO RECUPERADO
+
+El servicio de facturapi.io ha vuelto a estar operativo.
+
+RESUMEN:
+- Downtime inicio: {downtime_start}
+- Recuperación: {recovered_at}
+- Duración total: {duration_mins} minutos
+
+ACCIONES AUTOMÁTICAS:
+- Health check frontend habilitará forms automáticamente
+- Celery procesará facturas pendientes
+- Monitoreo continuo activo
+
+---
+Este es un mensaje automático de Kita Monitoring System
+        """
+
+        email = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[settings.ADMIN_EMAIL],
+        )
+        email.send(fail_silently=False)
+        logger.info(f"Admin alert sent: facturapi.io service recovered (downtime: {duration_mins}m)")
+    except Exception as e:
+        logger.error(f"Failed to send recovery alert: {e}")
+
+
+def _store_health_history(is_healthy: bool, response_time: float) -> None:
+    """Store health check result in cache for dashboard metrics."""
+    from django.core.cache import cache
+    import json
+
+    cache_key = 'facturapi_health_history'
+    history = cache.get(cache_key, [])
+
+    # Add new check
+    history.append({
+        'timestamp': timezone.now().isoformat(),
+        'healthy': is_healthy,
+        'response_time_ms': response_time
+    })
+
+    # Keep only last 288 checks (24 hours at 5 min intervals)
+    history = history[-288:]
+
+    # Store back
+    cache.set(cache_key, history, 86400)  # 24 hours
+
+
+def _ping_healthchecks_io(is_healthy: bool, health_data: dict) -> None:
+    """
+    Ping healthchecks.io for external monitoring.
+
+    healthchecks.io expects periodic pings. If no ping received within
+    expected interval, it sends alerts.
+
+    Args:
+        is_healthy: Whether facturapi.io is healthy
+        health_data: Health check response data
+    """
+    import requests
+    from django.conf import settings
+
+    if not hasattr(settings, 'HEALTHCHECKS_IO_URL') or not settings.HEALTHCHECKS_IO_URL:
+        logger.debug("HEALTHCHECKS_IO_URL not configured, skipping ping")
+        return
+
+    ping_url = settings.HEALTHCHECKS_IO_URL
+
+    try:
+        if is_healthy:
+            # Success ping
+            response = requests.get(f"{ping_url}", timeout=10)
+            logger.info(f"healthchecks.io ping sent: SUCCESS ({response.status_code})")
+        else:
+            # Failure ping (append /fail to URL)
+            error_message = health_data.get('error', 'Service unavailable')
+            response = requests.post(
+                f"{ping_url}/fail",
+                data=error_message,
+                timeout=10
+            )
+            logger.warning(f"healthchecks.io ping sent: FAIL ({response.status_code})")
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Failed to ping healthchecks.io: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error pinging healthchecks.io: {e}")

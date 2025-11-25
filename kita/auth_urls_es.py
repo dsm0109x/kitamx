@@ -68,8 +68,8 @@ urlpatterns = [
 
     # Email Verification / Verificación de Email
     path('verificar-email/',
-         allauth_views.email_verification_sent,
-         name='account_email_verification_sent'),  # Override allauth
+         custom_views.email_verification_sent,
+         name='account_email_verification_sent'),  # Custom view with smart email sending
 
     path('verificar-email/<key>/',
          custom_views.email_confirm_redirect,

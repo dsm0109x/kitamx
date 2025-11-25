@@ -5,17 +5,12 @@
 
 {% block email_content %}
     <!-- Icono Grande -->
-    <div class="email-icon">🎉</div>
+    <div class="email-icon">👋</div>
 
-    <h1>¡Bienvenido/a a Kita!</h1>
+    <h1>¡Bienvenido{% if user.first_name %}, {{ user.first_name }}{% endif %}!</h1>
 
-    <p class="lead">
-        Hola{% if user.first_name %} {{ user.first_name }}{% endif %},
-    </p>
-
-    <p>
-        Estás a <strong>un solo paso</strong> de comenzar tu prueba gratuita de 30 días.
-        Para completar tu registro, necesitamos que confirmes tu correo electrónico.
+    <p class="lead" style="font-size: 16px; color: #374151; text-align: center; margin: 0 0 24px 0; line-height: 1.6;">
+        Qué bueno que estés aquí. Solo falta un paso para que comiences a usar Kita.
     </p>
 
     <!-- CTA Button -->
@@ -24,43 +19,43 @@
             <tr>
                 <td align="center">
                     <a href="{{ activate_url }}" class="btn-primary" style="text-decoration: none !important;">
-                        Verificar mi Email
+                        Confirmar mi Email →
                     </a>
                 </td>
             </tr>
         </table>
     </div>
 
-    <!-- Link Fallback -->
-    <div class="link-fallback">
-        <p><strong>Si el botón no funciona, copia este enlace en tu navegador:</strong></p>
-        <a href="{{ activate_url }}">{{ activate_url }}</a>
-    </div>
-
-    <!-- Success Box -->
-    <div class="success-box">
-        <p><strong>Una vez confirmado tu email podrás:</strong></p>
-        <p>• Crear tus primeros enlaces de pago ilimitados</p>
-        <p>• Conectar tu cuenta de Mercado Pago</p>
-        <p>• Configurar tu certificado digital (CSD) para facturar</p>
-        <p>• Comenzar a cobrar y facturar sin complicaciones</p>
-    </div>
-
-    <!-- Security Box -->
-    <div class="security-box">
-        <p><strong>Por tu seguridad:</strong></p>
-        <p>• Este enlace expira en <strong>3 días</strong></p>
-        <p>• Solo puede usarse <strong>una vez</strong></p>
-        <p>• Si no creaste esta cuenta, puedes ignorar este email</p>
-    </div>
-
-    <p class="text-muted text-center" style="margin-top: 24px;">
-        ¿Tienes dudas? Escríbenos a
-        <a href="mailto:hola@kita.mx">hola@kita.mx</a>
+    <p style="font-size: 15px; color: #6B7280; text-align: center; margin: 24px 0;">
+        Al confirmar tu email podrás empezar tu prueba gratuita de <strong>30 días</strong>.
     </p>
 
-    <p class="text-center" style="color: #111827; font-weight: 600; margin-top: 16px;">
-        ¡Nos vemos pronto en tu dashboard!
+    <!-- Qué podrás hacer -->
+    <div style="background-color: #F9FAFB; border-radius: 12px; padding: 24px; margin: 24px 0;">
+        <h2 style="font-size: 18px; font-weight: 600; color: #111827; margin: 0 0 16px 0; text-align: center;">
+            Con Kita podrás
+        </h2>
+
+        <p style="margin: 12px 0; color: #374151; font-size: 15px;">
+            ✓ Crear enlaces de pago y compartirlos por WhatsApp<br>
+            ✓ Recibir pagos con tarjeta, transferencia o efectivo<br>
+            ✓ Generar facturas CFDI 4.0 automáticamente<br>
+            ✓ Ver estadísticas de tus cobros en tiempo real
+        </p>
+    </div>
+
+    <p style="font-size: 13px; color: #9CA3AF; text-align: center; margin: 24px 0;">
+        Este enlace expira en 3 días y solo funciona una vez.
+    </p>
+
+    <!-- Link Fallback -->
+    <div class="link-fallback">
+        <p style="font-size: 13px; color: #9CA3AF; margin: 0 0 8px 0;">¿El botón no funciona? Copia este enlace:</p>
+        <a href="{{ activate_url }}" style="font-size: 11px;">{{ activate_url }}</a>
+    </div>
+
+    <p class="text-center" style="color: #374151; margin-top: 24px; font-size: 15px;">
+        Nos vemos del otro lado 👋
     </p>
 {% endblock %}
 

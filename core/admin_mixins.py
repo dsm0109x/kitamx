@@ -41,7 +41,7 @@ class TimestampAdminMixin(BaseKitaAdminMixin):
     date_hierarchy = 'created_at'
     readonly_fields = ['id', 'created_at', 'updated_at']
 
-    def get_list_filter(self):
+    def get_list_filter(self, request: HttpRequest):
         """Agregar filtros de fecha a list_filter existente."""
         base_filters = list(getattr(self, 'list_filter', []))
         return base_filters + ['created_at']
@@ -54,19 +54,19 @@ class TenantScopedAdminMixin(TimestampAdminMixin):
     Proporciona filtrado por tenant y optimizaciones relacionadas.
     """
 
-    def get_list_display(self):
+    def get_list_display(self, request: HttpRequest):
         """Agregar tenant a list_display si no está presente."""
         base_display = list(getattr(self, 'list_display', []))
         if 'tenant' not in base_display:
             base_display.insert(0, 'tenant')
         return base_display
 
-    def get_list_filter(self):
+    def get_list_filter(self, request: HttpRequest):
         """Agregar filtro de tenant."""
-        base_filters = super().get_list_filter()
+        base_filters = super().get_list_filter(request)
         return ['tenant'] + base_filters
 
-    def get_search_fields(self):
+    def get_search_fields(self, request: HttpRequest):
         """Agregar búsqueda por tenant."""
         base_search = list(getattr(self, 'search_fields', []))
         tenant_fields = ['tenant__name', 'tenant__slug', 'tenant__email']
@@ -89,7 +89,7 @@ class StatusAdminMixin(BaseKitaAdminMixin):
     Proporciona filtros y displays comunes para status.
     """
 
-    def get_list_filter(self):
+    def get_list_filter(self, request: HttpRequest):
         """Agregar filtro de status."""
         base_filters = list(getattr(self, 'list_filter', []))
         if 'status' not in base_filters:

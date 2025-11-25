@@ -22,3 +22,5 @@ class AccountsConfig(AppConfig):
         This ensures signal handlers are connected when
         Django starts up.
         """
+        # Import signals to register handlers
+        from . import signals  # noqa: F401

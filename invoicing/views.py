@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 @tenant_required(require_owner=True)
 @csrf_protect
 @require_http_methods(["POST"])
-@rate_limit_with_response(key='user', rate='10/h', method='POST')
+@rate_limit_with_response(key='user', rate='30/h', method='POST')  # ✅ Increased for testing
 def validate_csd_local(request: HttpRequest) -> JsonResponse:
     """
     Validate CSD (Digital Certificate) files locally before storage upload.
@@ -145,7 +145,7 @@ def validate_csd_local(request: HttpRequest) -> JsonResponse:
 @tenant_required(require_owner=True)
 @csrf_protect
 @require_http_methods(["POST"])
-@rate_limit_with_response(key='user', rate='5/h', method='POST')
+@rate_limit_with_response(key='user', rate='30/h', method='POST')  # ✅ Increased for testing
 def save_csd_complete(request: HttpRequest) -> JsonResponse:
     """
     Complete CSD certificate upload and integration with facturapi.io PAC.

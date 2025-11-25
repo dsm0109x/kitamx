@@ -147,10 +147,20 @@ def rate_limit_with_response(
         def wrapper(request, *args, **kwargs):
             # Check if rate limited
             if getattr(request, 'limited', False):
+                # Parse rate to extract time period for message
+                time_period = 'unos minutos'
+                if '/m' in rate:
+                    time_period = 'un minuto'
+                elif '/h' in rate:
+                    time_period = 'una hora'
+                elif '/d' in rate:
+                    time_period = 'unas horas'
+
                 return JsonResponse({
-                    'error': True,
+                    'success': False,
+                    'error': f'Has excedido el límite de intentos. Por favor espera {time_period} antes de intentar de nuevo.',
                     'code': 'rate_limit_exceeded',
-                    'message': 'Rate limit exceeded. Please try again later.'
+                    'rate_limit': rate
                 }, status=429)
             return wrapped(request, *args, **kwargs)
 

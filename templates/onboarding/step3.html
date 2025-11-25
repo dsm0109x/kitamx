@@ -799,6 +799,18 @@ async function validateCSD() {
 
         clearTimeout(timeoutId);
 
+        // Check for rate limiting
+        if (response.status === 429) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Has excedido el límite de intentos. Por favor espera antes de intentar de nuevo.');
+        }
+
+        // Check for other HTTP errors
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Error del servidor (${response.status})`);
+        }
+
         // Stage 2 → 3
         if (typeof loading !== 'undefined' && loading.next) {
             loading.next();
@@ -1003,6 +1015,18 @@ async function saveCSD() {
         });
 
         clearTimeout(timeoutId);
+
+        // Check for rate limiting
+        if (response.status === 429) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Has excedido el límite de intentos. Por favor espera antes de intentar de nuevo.');
+        }
+
+        // Check for other HTTP errors
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Error del servidor (${response.status})`);
+        }
 
         const result = await response.json();
 

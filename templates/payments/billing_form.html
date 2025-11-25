@@ -274,19 +274,47 @@
                         </label>
                         <select class="form-select" id="cfdi_use" name="cfdi_use" required>
                             <option value="">Selecciona el uso</option>
-                            <option value="G01" {% if form_data.cfdi_use == 'G01' %}selected{% elif not form_data and 'G01' == 'G03' %}selected{% endif %}>G01 - Adquisición de mercancías</option>
-                            <option value="G02" {% if form_data.cfdi_use == 'G02' %}selected{% elif not form_data and 'G02' == 'G03' %}selected{% endif %}>G02 - Devoluciones, descuentos</option>
-                            <option value="G03" {% if form_data.cfdi_use == 'G03' %}selected{% elif not form_data %}selected{% endif %}>G03 - Gastos en general</option>
-                            <option value="I01" {% if form_data.cfdi_use == 'I01' %}selected{% elif not form_data and 'I01' == 'G03' %}selected{% endif %}>I01 - Construcciones</option>
-                            <option value="I02" {% if form_data.cfdi_use == 'I02' %}selected{% elif not form_data and 'I02' == 'G03' %}selected{% endif %}>I02 - Mobilario y equipo</option>
-                            <option value="I03" {% if form_data.cfdi_use == 'I03' %}selected{% elif not form_data and 'I03' == 'G03' %}selected{% endif %}>I03 - Equipo de transporte</option>
-                            <option value="P01" {% if form_data.cfdi_use == 'P01' %}selected{% elif not form_data and 'P01' == 'G03' %}selected{% endif %}>P01 - Por definir</option>
-                            <option value="S01" {% if form_data.cfdi_use == 'S01' %}selected{% elif not form_data and 'S01' == 'G03' %}selected{% endif %}>S01 - Sin efectos fiscales</option>
+                            <optgroup label="Gastos (G)">
+                                <option value="G01" {% if form_data.cfdi_use == 'G01' %}selected{% endif %}>G01 - Adquisición de mercancías</option>
+                                <option value="G02" {% if form_data.cfdi_use == 'G02' %}selected{% endif %}>G02 - Devoluciones, descuentos</option>
+                                <option value="G03" {% if form_data.cfdi_use == 'G03' or not form_data %}selected{% endif %}>G03 - Gastos en general (recomendado)</option>
+                            </optgroup>
+                            <optgroup label="Inversiones (I)">
+                                <option value="I01" {% if form_data.cfdi_use == 'I01' %}selected{% endif %}>I01 - Construcciones</option>
+                                <option value="I02" {% if form_data.cfdi_use == 'I02' %}selected{% endif %}>I02 - Mobiliario y equipo de oficina</option>
+                                <option value="I03" {% if form_data.cfdi_use == 'I03' %}selected{% endif %}>I03 - Equipo de transporte</option>
+                                <option value="I04" {% if form_data.cfdi_use == 'I04' %}selected{% endif %}>I04 - Equipo de cómputo</option>
+                                <option value="I05" {% if form_data.cfdi_use == 'I05' %}selected{% endif %}>I05 - Dados, troqueles, moldes</option>
+                                <option value="I06" {% if form_data.cfdi_use == 'I06' %}selected{% endif %}>I06 - Comunicaciones telefónicas</option>
+                                <option value="I07" {% if form_data.cfdi_use == 'I07' %}selected{% endif %}>I07 - Comunicaciones satelitales</option>
+                                <option value="I08" {% if form_data.cfdi_use == 'I08' %}selected{% endif %}>I08 - Otra maquinaria y equipo</option>
+                            </optgroup>
+                            <optgroup label="Deducciones Personales (D) - Solo ciertos regímenes">
+                                <option value="D01" {% if form_data.cfdi_use == 'D01' %}selected{% endif %}>D01 - Honorarios médicos y hospitalarios</option>
+                                <option value="D02" {% if form_data.cfdi_use == 'D02' %}selected{% endif %}>D02 - Gastos médicos por incapacidad</option>
+                                <option value="D03" {% if form_data.cfdi_use == 'D03' %}selected{% endif %}>D03 - Gastos funerales</option>
+                                <option value="D04" {% if form_data.cfdi_use == 'D04' %}selected{% endif %}>D04 - Donativos</option>
+                                <option value="D05" {% if form_data.cfdi_use == 'D05' %}selected{% endif %}>D05 - Intereses hipotecarios</option>
+                                <option value="D06" {% if form_data.cfdi_use == 'D06' %}selected{% endif %}>D06 - Aportaciones SAR</option>
+                                <option value="D07" {% if form_data.cfdi_use == 'D07' %}selected{% endif %}>D07 - Seguros de gastos médicos</option>
+                                <option value="D08" {% if form_data.cfdi_use == 'D08' %}selected{% endif %}>D08 - Transportación escolar</option>
+                                <option value="D09" {% if form_data.cfdi_use == 'D09' %}selected{% endif %}>D09 - Depósitos para ahorro</option>
+                                <option value="D10" {% if form_data.cfdi_use == 'D10' %}selected{% endif %}>D10 - Servicios educativos</option>
+                            </optgroup>
+                            <optgroup label="Otros">
+                                <option value="P01" {% if form_data.cfdi_use == 'P01' %}selected{% endif %}>P01 - Por definir</option>
+                                <option value="S01" {% if form_data.cfdi_use == 'S01' %}selected{% endif %}>S01 - Sin efectos fiscales</option>
+                                <option value="CP01" {% if form_data.cfdi_use == 'CP01' %}selected{% endif %}>CP01 - Pagos</option>
+                            </optgroup>
                         </select>
                         <small class="form-text text-muted">
                             <i class="iconoir-page me-1"></i>
                             Para qué usarás esta factura
                         </small>
+                        <div id="cfdi-use-hint" class="alert alert-info mt-2" style="display: none; font-size: 0.875rem;">
+                            <strong>💡 Opciones recomendadas para tu régimen:</strong>
+                            <div id="cfdi-use-suggestions"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -468,27 +496,119 @@
             showToast('Has rechazado cookies no esenciales. Algunas funciones pueden estar limitadas.', 'info');
         }
 
-        // ✅ Validación de compatibilidad UsoCFDI vs Régimen Fiscal
+        // ✅ Catálogo oficial SAT: UsoCFDI vs Régimen Fiscal
+        const CFDI_USE_COMPATIBILITY = {
+            'G01': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'G02': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'G03': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I01': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I02': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I03': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I04': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I05': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I06': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I07': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'I08': ['601', '603', '606', '612', '620', '621', '622', '623', '624', '625', '626'],
+            'D01': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D02': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D03': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D04': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D05': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D06': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D07': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D08': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D09': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'D10': ['605', '606', '608', '611', '612', '614', '607', '615', '625'],
+            'S01': ['601', '603', '605', '606', '608', '610', '611', '612', '614', '616', '620', '621', '622', '623', '624', '607', '615', '625', '626'],
+            'CP01': ['601', '603', '605', '606', '608', '610', '611', '612', '614', '616', '620', '621', '622', '623', '624', '607', '615', '625', '626'],
+            'CN01': ['605']
+        };
+
         function validateCfdiUseRegime() {
             const regime = document.getElementById('fiscal_regime').value;
             const cfdiUse = document.getElementById('cfdi_use').value;
 
-            // Reglas del SAT para personas físicas (regímenes 6XX)
-            const personaFisicaRegimes = ['605', '606', '608', '610', '611', '612', '614', '616', '621', '626'];
-            const personaFisicaUsos = ['G01', 'G02', 'G03', 'I01', 'I02', 'I03', 'I04', 'I05', 'I06', 'I08', 'D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'D08', 'D09', 'D10', 'P01', 'S01'];
+            if (!regime || !cfdiUse) {
+                return { valid: true };  // Skip if not filled yet
+            }
 
-            if (personaFisicaRegimes.includes(regime)) {
-                // Es persona física
-                if (!personaFisicaUsos.includes(cfdiUse)) {
-                    return {
-                        valid: false,
-                        message: `El uso "${cfdiUse}" no es válido para personas físicas. Usa G03 (Gastos en general) o consulta el catálogo del SAT.`
-                    };
-                }
+            // Check if this combination is valid according to SAT catalog
+            const validRegimes = CFDI_USE_COMPATIBILITY[cfdiUse];
+
+            if (!validRegimes) {
+                return { valid: true };  // Unknown use code, let backend validate
+            }
+
+            if (!validRegimes.includes(regime)) {
+                return {
+                    valid: false,
+                    message: `❌ El uso "${cfdiUse}" NO es compatible con el régimen fiscal "${regime}". ` +
+                             `Usa G03 (Gastos en general) que funciona con tu régimen.`
+                };
             }
 
             return { valid: true };
         }
+
+        // ✅ Mostrar sugerencias cuando selecciona régimen
+        function showCfdiUseSuggestions(regime) {
+            const hintDiv = document.getElementById('cfdi-use-hint');
+            const suggestionsDiv = document.getElementById('cfdi-use-suggestions');
+
+            if (!regime) {
+                hintDiv.style.display = 'none';
+                return;
+            }
+
+            // Encontrar usos compatibles con este régimen
+            const compatibleUses = [];
+            for (const [use, regimes] of Object.entries(CFDI_USE_COMPATIBILITY)) {
+                if (regimes.includes(regime)) {
+                    compatibleUses.push(use);
+                }
+            }
+
+            if (compatibleUses.length > 0) {
+                // Mostrar solo los 5 más comunes
+                const commonUses = ['G03', 'G01', 'G02', 'I01', 'S01'];
+                const suggestions = commonUses.filter(u => compatibleUses.includes(u));
+
+                suggestionsDiv.innerHTML = suggestions.slice(0, 3).map(use =>
+                    `<span class="badge bg-success me-2 mt-1">${use}</span>`
+                ).join('') + ' y otros ' + (compatibleUses.length - 3) + ' más';
+
+                hintDiv.style.display = 'block';
+            } else {
+                hintDiv.style.display = 'none';
+            }
+        }
+
+        // ✅ Validación en tiempo real cuando cambia régimen o uso
+        document.getElementById('fiscal_regime').addEventListener('change', function() {
+            const regime = this.value;
+            showCfdiUseSuggestions(regime);
+
+            const validation = validateCfdiUseRegime();
+            const cfdiUseSelect = document.getElementById('cfdi_use');
+
+            if (!validation.valid) {
+                cfdiUseSelect.classList.add('is-invalid');
+                showToast(validation.message, 'warning');
+            } else {
+                cfdiUseSelect.classList.remove('is-invalid');
+            }
+        });
+
+        document.getElementById('cfdi_use').addEventListener('change', function() {
+            const validation = validateCfdiUseRegime();
+
+            if (!validation.valid) {
+                this.classList.add('is-invalid');
+                showToast(validation.message, 'warning');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
 
         // Form submission
         document.querySelector('form').addEventListener('submit', function(e) {

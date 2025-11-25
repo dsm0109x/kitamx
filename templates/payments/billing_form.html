@@ -540,10 +540,33 @@
             }
 
             if (!validRegimes.includes(regime)) {
+                // ✅ Encontrar un uso compatible con el régimen seleccionado
+                let suggestion = 'G03';  // Default
+
+                // Buscar primer uso compatible con este régimen
+                for (const [use, regimes] of Object.entries(CFDI_USE_COMPATIBILITY)) {
+                    if (regimes.includes(regime)) {
+                        suggestion = use;
+                        break;  // Usar el primero que encontremos
+                    }
+                }
+
+                // Sugerencias específicas por régimen
+                const regimeSuggestions = {
+                    '605': 'D01 (Honorarios médicos), S01 (Sin efectos fiscales) o CP01 (Pagos)',
+                    '608': 'D01 (Honorarios médicos) o S01 (Sin efectos fiscales)',
+                    '610': 'S01 (Sin efectos fiscales)',
+                    '616': 'S01 (Sin efectos fiscales)',
+                    '612': 'G03 (Gastos en general)',
+                    '626': 'G03 (Gastos en general)'
+                };
+
+                const suggestedUses = regimeSuggestions[regime] || `${suggestion} o consulta el catálogo del SAT`;
+
                 return {
                     valid: false,
-                    message: `❌ El uso "${cfdiUse}" NO es compatible con el régimen fiscal "${regime}". ` +
-                             `Usa G03 (Gastos en general) que funciona con tu régimen.`
+                    message: `❌ El uso "${cfdiUse}" NO es compatible con el régimen "${regime}". ` +
+                             `Opciones válidas: ${suggestedUses}`
                 };
             }
 

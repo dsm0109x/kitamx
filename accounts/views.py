@@ -411,9 +411,12 @@ def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
     from django.shortcuts import redirect
     from allauth.account.models import EmailConfirmation, EmailConfirmationHMAC
     from allauth.account.utils import perform_login
-    from django.contrib.auth import get_user_model
+    from django.contrib.auth import get_user_model, login as auth_login
 
     User = get_user_model()
+
+    emailconfirmation = None
+    user = None
 
     try:
         # Try HMAC first (newer allauth versions)
@@ -422,11 +425,16 @@ def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
             if not emailconfirmation:
                 # Try old-style confirmation
                 emailconfirmation = EmailConfirmation.objects.get(key=key.lower())
-        except:
-            emailconfirmation = EmailConfirmation.objects.get(key=key.lower())
+        except EmailConfirmation.DoesNotExist:
+            logger.warning(f"Email confirmation not found for key: {key}")
+            raise
+        except Exception as e:
+            logger.warning(f"Error getting email confirmation: {type(e).__name__}: {str(e)}")
+            raise
 
         # Confirm the email
         emailconfirmation.confirm(request)
+        logger.info(f"Email confirmed successfully for key: {key}")
 
         # Get the user
         user = emailconfirmation.email_address.user
@@ -440,21 +448,29 @@ def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
 
         # If user is not authenticated, log them in automatically
         if not request.user.is_authenticated:
-            # Perform login (allauth helper)
-            perform_login(
-                request,
-                user,
-                email_verification='none',  # Already verified
-                redirect_url=None
-            )
+            try:
+                # Use Django's auth_login directly with backend specification
+                backend = 'allauth.account.auth_backends.AuthenticationBackend'
+                auth_login(request, user, backend=backend)
+                logger.info(f"User logged in successfully after email confirmation: {user.email}")
 
-            messages.success(
-                request,
-                f'¡Email confirmado! Bienvenido/a {user.first_name}, tu cuenta está activa.'
-            )
+                messages.success(
+                    request,
+                    f'¡Email confirmado! Bienvenido/a {user.first_name}, tu cuenta está activa.'
+                )
 
-            # Redirect to onboarding for new users
-            return redirect('onboarding:start')
+                # Redirect to onboarding for new users
+                return redirect('onboarding:start')
+
+            except Exception as login_error:
+                # Login failed but email was confirmed - show success anyway
+                logger.error(f"Login failed after email confirmation for {user.email}: {login_error}")
+
+                messages.success(
+                    request,
+                    '¡Email confirmado exitosamente! Por favor inicia sesión.'
+                )
+                return redirect('account_login')
         else:
             messages.success(
                 request,
@@ -464,8 +480,32 @@ def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
             # Redirect to dashboard if already logged in
             return redirect('dashboard:index')
 
+    except EmailConfirmation.DoesNotExist:
+        # Confirmation key not found or already used
+        logger.warning(f"Email confirmation key not found or already used: {key}")
+        messages.error(
+            request,
+            'El enlace de confirmación es inválido o ya fue utilizado.'
+        )
+        return redirect('account_login')
+
     except Exception as e:
-        # If confirmation fails, show error message
+        # Log the actual error for debugging
+        logger.error(f"Email confirmation error for key {key}: {type(e).__name__}: {str(e)}", exc_info=True)
+
+        # Check if email was actually confirmed despite the error
+        if user and emailconfirmation:
+            email_address = emailconfirmation.email_address
+            if email_address.verified:
+                # Email WAS confirmed but something else failed
+                logger.info(f"Email confirmed but error occurred: {user.email}")
+                messages.success(
+                    request,
+                    '¡Email confirmado exitosamente! Por favor inicia sesión.'
+                )
+                return redirect('account_login')
+
+        # If confirmation actually failed, show error message
         messages.error(
             request,
             'El enlace de confirmación es inválido o ya fue utilizado.'

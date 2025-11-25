@@ -760,6 +760,11 @@ def edit(request: HttpRequest) -> JsonResponse:
                 status=400
             )
 
+        # requires_invoice checkbox (editable desde modal)
+        requires_invoice = data.get('requires_invoice', False)
+        if isinstance(requires_invoice, str):
+            requires_invoice = requires_invoice.lower() in ['true', '1', 'on']
+
         # Store old values for audit
         old_values = {
             'title': link.title,
@@ -771,16 +776,24 @@ def edit(request: HttpRequest) -> JsonResponse:
             'expires_at': link.expires_at.isoformat()
         }
 
-        # Update ONLY editable fields
+        # Log what's being updated
+        logger.info(f"Editing link {link.id} for tenant {tenant.name}")
+        logger.info(f"Old values: title={old_values['title']}, desc={old_values['description'][:50]}, name={old_values['customer_name']}, invoice={old_values['requires_invoice']}")
+        logger.info(f"New values: title={title}, desc={description[:50]}, name={customer_name}, invoice={requires_invoice}")
+
+        # Update editable fields
         link.title = title
         link.description = description
         link.customer_name = customer_name
-        link.customer_email = customer_email
+        link.requires_invoice = requires_invoice  # ✅ Now editable
 
-        # NO editar: amount, requires_invoice, expires_at
-        # Estos campos se mantienen con sus valores originales
+        # Note: customer_email is intentionally NOT editable to prevent
+        # breaking notification configuration
+        # Note: amount and expires_at are NOT editable for business integrity
 
-        link.save()
+        link.save(update_fields=['title', 'description', 'customer_name', 'requires_invoice'])
+
+        logger.info(f"✅ Link {link.id} updated successfully")
 
         # Log audit action
         new_values = {

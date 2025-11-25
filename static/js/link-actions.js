@@ -1156,7 +1156,11 @@ window.KitaLinkActions = {
             const data = Object.fromEntries(formData.entries());
             data.requires_invoice = this.querySelector('[name="requires_invoice"]').checked;
 
-            console.log('Form data:', data);
+            console.log('📝 Form data being sent:', data);
+            console.log('   - title:', data.title);
+            console.log('   - description:', data.description);
+            console.log('   - customer_name:', data.customer_name);
+            console.log('   - requires_invoice:', data.requires_invoice);
 
             // ✅ Usar nueva estructura de botón con loading state
             const submitBtn = editModal.querySelector('#editLinkSubmitBtn');
@@ -1181,10 +1185,10 @@ window.KitaLinkActions = {
                     showToast('Link actualizado exitosamente', 'success');
                     modal.hide();
 
-                    // Refresh dashboard if on dashboard page
-                    if (typeof updateDashboardCounts === 'function') {
-                        updateDashboardCounts();
-                    }
+                    // ✅ Reload page to show updated data
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
                 } else {
                     showToast(data.error || 'Error actualizando link', 'error');
                 }

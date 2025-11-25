@@ -961,5 +961,19 @@ class FacturapiService:
             }
 
 
-# Singleton instance (same pattern as fiscalapi_service)
-facturapi_service = FacturapiService()
+# Lazy singleton to avoid settings initialization issues during import
+class FacturapiServiceLazy:
+    """Lazy wrapper for FacturapiService singleton."""
+
+    _instance = None
+
+    def _get_instance(self):
+        if self._instance is None:
+            self._instance = FacturapiService()
+        return self._instance
+
+    def __getattr__(self, name):
+        return getattr(self._get_instance(), name)
+
+# Singleton instance
+facturapi_service = FacturapiServiceLazy()

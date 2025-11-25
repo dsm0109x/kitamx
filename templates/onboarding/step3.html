@@ -766,7 +766,11 @@ async function validateCSD() {
     const requestData = {
         url: '/facturas/csd/validar-local/',  // 🇪🇸 Migrado
         method: 'POST',
-        headers: { 'X-CSRFToken': getCsrfToken() },
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
         body: formData
     };
 
@@ -961,7 +965,11 @@ async function saveCSD() {
     const requestData = {
         url: '/facturas/csd/guardar-completo/',  // 🇪🇸 Migrado
         method: 'POST',
-        headers: { 'X-CSRFToken': getCsrfToken() },
+        headers: {
+            'X-CSRFToken': getCsrfToken(),
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
         body: formData
     };
 

@@ -76,21 +76,36 @@ def tenant_required(
 
                 if not tenant_user:
                     logger.warning(f"User {user.email} has no tenant access")
-                    if request.headers.get('Accept') == 'application/json':
+                    # Check if AJAX request (multiple methods)
+                    is_ajax = (
+                        request.headers.get('Accept') == 'application/json' or
+                        request.headers.get('X-Requested-With') == 'XMLHttpRequest' or
+                        request.content_type == 'application/json'
+                    )
+
+                    if is_ajax:
                         return JsonResponse(
-                            {'error': _('No tienes acceso a ninguna empresa')},
+                            {'success': False, 'error': _('No tienes acceso a ninguna empresa')},
                             status=403
                         )
                     return redirect('onboarding:start')
 
                 tenant = tenant_user.tenant
 
+            # Helper function to detect AJAX requests
+            def is_ajax_request(req):
+                return (
+                    req.headers.get('Accept') == 'application/json' or
+                    req.headers.get('X-Requested-With') == 'XMLHttpRequest' or
+                    req.content_type == 'application/json'
+                )
+
             # Check tenant is active
             if require_active and not tenant.is_active:
                 logger.warning(f"Access denied to inactive tenant {tenant.id}")
-                if request.headers.get('Accept') == 'application/json':
+                if is_ajax_request(request):
                     return JsonResponse(
-                        {'error': _('Esta empresa está inactiva')},
+                        {'success': False, 'error': _('Esta empresa está inactiva')},
                         status=403
                     )
                 raise PermissionDenied(_('Esta empresa está inactiva'))
@@ -100,9 +115,9 @@ def tenant_required(
                 logger.warning(
                     f"Owner access required for user {user.email} on tenant {tenant.id}"
                 )
-                if request.headers.get('Accept') == 'application/json':
+                if is_ajax_request(request):
                     return JsonResponse(
-                        {'error': _('Solo el propietario puede realizar esta acción')},
+                        {'success': False, 'error': _('Solo el propietario puede realizar esta acción')},
                         status=403
                     )
                 raise PermissionDenied(_('Solo el propietario puede realizar esta acción'))
@@ -112,9 +127,9 @@ def tenant_required(
                 logger.warning(
                     f"Permission {permission} denied for user {user.email} on tenant {tenant.id}"
                 )
-                if request.headers.get('Accept') == 'application/json':
+                if is_ajax_request(request):
                     return JsonResponse(
-                        {'error': _('No tienes permiso para realizar esta acción')},
+                        {'success': False, 'error': _('No tienes permiso para realizar esta acción')},
                         status=403
                     )
                 raise PermissionDenied(_('No tienes permiso para realizar esta acción'))

@@ -47,7 +47,8 @@ def email_confirmed_handler(
             action='email_verified',
             entity_type='User',
             entity_id=str(user.id),
-            details={'email': email_address.email}
+            entity_name=user.get_full_name(),
+            notes=f'Email verified: {email_address.email}'
         )
 
     except User.DoesNotExist:

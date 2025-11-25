@@ -28,7 +28,12 @@ class MercadoPagoIntegrationAdmin(TenantModelAdminMixin, ExternalReferenceAdminM
     list_display = ['tenant', 'user_id', 'is_active', 'last_token_refresh', 'created_at']
     list_filter = ['token_type']  # tenant, is_active, created_at added by mixins
     search_fields = ['user_id', 'scope']  # tenant fields added by TenantModelAdminMixin
-    readonly_fields = ['last_token_refresh', 'webhook_id', 'webhook_secret']  # external fields and base fields added by mixins
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixins."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['last_token_refresh', 'webhook_id', 'webhook_secret']
+        return list(set(base_readonly + additional_readonly))
 
     fieldsets = (
         ('Basic Info', {
@@ -56,7 +61,14 @@ class PaymentLinkAdmin(FullKitaAdminMixin, admin.ModelAdmin):
     list_display = ['title', 'tenant', 'amount', 'currency', 'status_display', 'expires_at', 'uses_count', 'max_uses', 'created_at']
     list_filter = ['currency', 'requires_invoice']  # tenant, status, created_at added by mixins
     search_fields = ['title', 'description', 'customer_name', 'customer_email']  # tenant fields added by mixins
-    readonly_fields = ['token', 'uses_count']  # external fields and base fields added by mixins
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixins."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['uses_count']
+        if obj:  # editing existing object
+            additional_readonly.append('token')
+        return list(set(base_readonly + additional_readonly))
 
     fieldsets = (
         ('Basic Info', {
@@ -97,8 +109,13 @@ class PaymentAdmin(FullKitaAdminMixin, admin.ModelAdmin):
     list_display = ['mp_payment_id', 'tenant', 'payment_link', 'amount', 'currency', 'status_display', 'payer_email', 'processed_at', 'created_at']
     list_filter = ['currency', 'billing_data_provided']  # tenant, status, created_at added by mixins
     search_fields = ['mp_payment_id', 'payer_email', 'payer_name', 'billing_rfc']  # tenant fields added by mixins
-    readonly_fields = ['processed_at', 'mp_created_at', 'mp_updated_at', 'webhook_data']  # external fields and base fields added by mixins
     date_hierarchy = 'processed_at'
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixins."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['processed_at', 'mp_created_at', 'mp_updated_at', 'webhook_data']
+        return list(set(base_readonly + additional_readonly))
 
     fieldsets = (
         ('Basic Info', {

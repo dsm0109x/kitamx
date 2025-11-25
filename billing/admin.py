@@ -18,7 +18,12 @@ class SubscriptionAdmin(TenantModelAdminMixin, ExternalReferenceAdminMixin, admi
     ]
     list_filter = ['plan_name', 'currency']  # tenant, status, created_at added by mixins
     search_fields = ['mp_subscription_id']  # tenant fields added by mixin
-    readonly_fields = ['trial_started_at', 'last_payment_date', 'cancelled_at']  # base fields added by mixin
+
+    def get_readonly_fields(self, request, obj=None):
+        """Extend readonly_fields from mixins."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['trial_started_at', 'last_payment_date', 'cancelled_at']
+        return list(set(base_readonly + additional_readonly))
 
     fieldsets = (
         ('Basic Info', {

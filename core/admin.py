@@ -21,7 +21,13 @@ class TenantAdmin(TimestampAdminMixin, StatusAdminMixin, admin.ModelAdmin):
     list_display = ['name', 'slug', 'rfc', 'email', 'subscription_status', 'is_active', 'created_at']
     list_filter = ['is_active']  # created_at added by TimestampAdminMixin
     search_fields = ['name', 'slug', 'rfc', 'email', 'business_name']
-    readonly_fields = ['subscription_status', 'trial_ends_at', 'is_trial', 'is_subscribed']  # id, created_at, updated_at added by TimestampAdminMixin
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixin."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['subscription_status', 'trial_ends_at', 'is_trial', 'is_subscribed']
+        # Combine and deduplicate
+        return list(set(base_readonly + additional_readonly))
 
     def get_queryset(self, request: HttpRequest) -> QuerySet:
         """Optimize queryset with prefetch."""
@@ -89,6 +95,12 @@ class TenantUserAdmin(TenantScopedAdminMixin, admin.ModelAdmin):
     search_fields = ['email', 'first_name', 'last_name']  # tenant fields added by TenantScopedAdminMixin
     autocomplete_fields = ['tenant']
 
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixin."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['last_login']
+        return list(set(base_readonly + additional_readonly))
+
     fieldsets = (
         ('Basic Info', {
             'fields': ('tenant', 'email', 'first_name', 'last_name')
@@ -116,10 +128,15 @@ class AnalyticsAdmin(TenantScopedAdminMixin, admin.ModelAdmin):
     list_display = ['tenant', 'date', 'period_type', 'links_created', 'payments_successful', 'revenue_gross_pesos', 'created_at']
     list_filter = ['period_type', 'date']  # tenant, created_at added by TenantScopedAdminMixin
     search_fields = []  # tenant fields added by TenantScopedAdminMixin
-    readonly_fields = ['revenue_gross_pesos', 'revenue_net_pesos', 'revenue_fees_pesos']  # id, created_at, updated_at added by TenantScopedAdminMixin
     date_hierarchy = 'date'
     list_per_page = 100
     ordering = ['-date']
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixin."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['revenue_gross_pesos', 'revenue_net_pesos', 'revenue_fees_pesos']
+        return list(set(base_readonly + additional_readonly))
 
     # get_queryset is handled by TenantScopedAdminMixin
 
@@ -159,8 +176,13 @@ class NotificationAdmin(TenantScopedAdminMixin, StatusAdminMixin, admin.ModelAdm
     list_display = ['recipient_email', 'notification_type', 'channel', 'status_display', 'tenant', 'created_at']
     list_filter = ['channel', 'notification_type']  # status, tenant, created_at added by mixins
     search_fields = ['recipient_email', 'recipient_name', 'subject']  # tenant fields added by TenantScopedAdminMixin
-    readonly_fields = ['sent_at', 'delivered_at']  # id, created_at, updated_at added by TenantScopedAdminMixin
     list_per_page = 100
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixin."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['sent_at', 'delivered_at']
+        return list(set(base_readonly + additional_readonly))
 
     # get_queryset is handled by TenantScopedAdminMixin
 

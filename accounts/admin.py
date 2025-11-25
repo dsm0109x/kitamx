@@ -73,7 +73,12 @@ class UserProfileAdmin(TimestampAdminMixin, admin.ModelAdmin):
     list_display = ['user', 'timezone', 'language', 'theme', 'email_notifications', 'last_activity']
     list_filter = ['timezone', 'language', 'theme', 'email_notifications', 'push_notifications']  # created_at added by TimestampAdminMixin
     search_fields = ['user__email', 'user__first_name', 'user__last_name', 'location']
-    readonly_fields = ['last_activity', 'login_count']  # id, created_at, updated_at added by TimestampAdminMixin
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixin."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['last_activity', 'login_count']
+        return list(set(base_readonly + additional_readonly))
 
     fieldsets = (
         ('Basic Info', {
@@ -103,7 +108,12 @@ class UserSessionAdmin(TimestampAdminMixin, admin.ModelAdmin):
     list_display = ['user', 'ip_address', 'country', 'city', 'created_at', 'last_activity', 'is_active']
     list_filter = ['is_active', 'country', 'last_activity']  # created_at added by TimestampAdminMixin
     search_fields = ['user__email', 'ip_address', 'country', 'city']
-    readonly_fields = ['session_key', 'last_activity']  # id, created_at, updated_at added by TimestampAdminMixin
+
+    def get_readonly_fields(self, request: HttpRequest, obj=None):
+        """Extend readonly_fields from mixin."""
+        base_readonly = list(super().get_readonly_fields(request, obj))
+        additional_readonly = ['session_key', 'last_activity']
+        return list(set(base_readonly + additional_readonly))
 
     fieldsets = (
         ('Session Info', {

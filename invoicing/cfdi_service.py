@@ -52,12 +52,13 @@ class InvoiceGenerationService:
                 # Create invoice record
                 invoice = self._create_invoice_record(payment, fiscal_data, pac_result)
 
-                # Send notification
+                # Send notification to customer email (from form)
                 try:
                     from core.notifications import notification_service
-                    notification_service.send_invoice_generated(invoice, fiscal_data['email'])
+                    notification_service.send_invoice_to_customer(invoice, fiscal_data['email'])
+                    logger.info(f"✅ Invoice notification sent to {fiscal_data['email']}")
                 except Exception as e:
-                    logger.error(f"Failed to send invoice notification: {e}")
+                    logger.error(f"Failed to send invoice notification to {fiscal_data['email']}: {e}")
 
                 return invoice
             else:

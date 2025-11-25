@@ -392,8 +392,10 @@ def password_reset_done_redirect(request: HttpRequest) -> HttpResponse:
     return redirect('account_login')
 
 
-@require_http_methods(["GET"])
-def email_confirm_redirect(request: HttpRequest, key: str) -> HttpResponse:
+# ✅ DEPRECATED: Vista custom eliminada en favor de allauth nativa
+# Mantener comentado por si necesitamos revertir
+# @require_http_methods(["GET"])
+def email_confirm_redirect_DEPRECATED(request: HttpRequest, key: str) -> HttpResponse:
     """
     Custom view for email confirmation with redirect.
 
@@ -682,7 +684,7 @@ __all__ = [
     'user_sessions',
     'revoke_session',
     'password_reset_done_redirect',  # Custom password reset flow
-    'email_confirm_redirect',  # Custom email confirmation flow
+    # 'email_confirm_redirect',  # ✅ DEPRECATED - usando allauth nativa
     'email_verification_sent',  # Custom email verification page
     'resend_verification_email',  # Resend verification endpoint
 ]

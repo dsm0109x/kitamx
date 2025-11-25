@@ -72,8 +72,8 @@ urlpatterns = [
          name='account_email_verification_sent'),  # Custom view with smart email sending
 
     path('verificar-email/<key>/',
-         custom_views.email_confirm_redirect,
-         name='account_confirm_email'),  # Override con redirect + toast
+         allauth_views.confirm_email,
+         name='account_confirm_email'),  # ✅ Simplified: Use allauth native view
 
     # Password Management (Usuario Autenticado) / Gestión de Contraseñas
     path('cuenta/cambiar-contrasena/',

@@ -16,31 +16,14 @@ logger = logging.getLogger(__name__)
 
 class NoMessagesAccountAdapter(DefaultAccountAdapter):
     """
-    Custom allauth adapter that suppresses automatic messages
-    to prevent duplication with our custom toast system
+    Custom allauth adapter with Spanish messages and custom behavior.
+
+    SIMPLIFIED: Let allauth handle most functionality, only customize
+    specific messages and behaviors where needed.
     """
 
-    def add_message(
-        self,
-        request: HttpRequest,
-        level: int,
-        message_template: str,
-        message_context: Optional[dict] = None,
-        extra_tags: str = ""
-    ) -> None:
-        """
-        Override to suppress allauth automatic messages.
-
-        We handle all notifications through our custom toast system.
-
-        Args:
-            request: HTTP request object
-            level: Django message level
-            message_template: Message template string
-            message_context: Optional context for template
-            extra_tags: Additional message tags
-        """
-        pass
+    # ✅ Removed add_message() override - let allauth messages through
+    # This prevents message duplication issues and simplifies the flow
 
     def send_mail(self, template_prefix, email, context):
         """
@@ -168,13 +151,30 @@ class NoMessagesAccountAdapter(DefaultAccountAdapter):
 
     def confirm_email(self, request: HttpRequest, email_address: EmailAddress) -> None:
         """
-        Override email confirmation to prevent automatic message.
+        Override email confirmation to add custom Spanish success message.
 
         Args:
             request: HTTP request object
             email_address: EmailAddress instance being confirmed
         """
+        # Call parent to handle actual confirmation
         super().confirm_email(request, email_address)
+
+        # Add custom success message in Spanish
+        from django.contrib import messages
+        user = email_address.user
+
+        # Clear any existing messages from allauth
+        storage = messages.get_messages(request)
+        storage.used = True  # Mark all as read to clear them
+
+        # Add our custom Spanish message
+        messages.success(
+            request,
+            f'¡Email confirmado! Bienvenido/a {user.first_name}, tu cuenta está activa.'
+        )
+
+        logger.info(f"Email confirmed via adapter for user: {user.email}")
 
 
 class KitaSocialAccountAdapter(DefaultSocialAccountAdapter):

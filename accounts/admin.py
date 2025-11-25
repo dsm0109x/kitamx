@@ -103,17 +103,15 @@ class UserProfileAdmin(TimestampAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(UserSession)
-class UserSessionAdmin(TimestampAdminMixin, admin.ModelAdmin):
+class UserSessionAdmin(admin.ModelAdmin):
     """Admin interface for UserSession model."""
     list_display = ['user', 'ip_address', 'country', 'city', 'created_at', 'last_activity', 'is_active']
-    list_filter = ['is_active', 'country', 'last_activity']  # created_at added by TimestampAdminMixin
+    list_filter = ['is_active', 'country', 'last_activity', 'created_at']
     search_fields = ['user__email', 'ip_address', 'country', 'city']
-
-    def get_readonly_fields(self, request: HttpRequest, obj=None):
-        """Extend readonly_fields from mixin."""
-        base_readonly = list(super().get_readonly_fields(request, obj))
-        additional_readonly = ['session_key', 'last_activity']
-        return list(set(base_readonly + additional_readonly))
+    readonly_fields = ['id', 'session_key', 'last_activity', 'created_at', 'expires_at']
+    date_hierarchy = 'created_at'
+    list_per_page = 50
+    ordering = ['-created_at']
 
     fieldsets = (
         ('Session Info', {

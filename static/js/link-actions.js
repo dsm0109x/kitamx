@@ -968,30 +968,22 @@ window.KitaLinkActions = {
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label for="edit-amount" class="form-label">
-                                            Monto <span class="text-danger">*</span>
+                                        <label class="form-label d-flex align-items-center gap-2">
+                                            <i class="iconoir-lock text-muted"></i>
+                                            Monto
                                         </label>
-                                        <div class="input-group">
-                                            <span class="input-group-text">$</span>
-                                            <input type="number"
-                                                   class="form-control"
-                                                   id="edit-amount"
-                                                   name="amount"
-                                                   value="${linkData.amount}"
-                                                   step="0.01"
-                                                   min="1"
-                                                   max="999999"
-                                                   required
-                                                   placeholder="0.00"
-                                                   aria-required="true"
-                                                   aria-invalid="false"
-                                                   aria-describedby="edit-amount-error edit-amount-help">
-                                            <span class="input-group-text">MXN</span>
+                                        <div class="alert alert-light border d-flex align-items-center gap-2 mb-0">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="text-muted">$</span>
+                                                    <strong class="fs-5">${parseFloat(linkData.amount).toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</strong>
+                                                    <span class="text-muted">MXN</span>
+                                                </div>
+                                                <p class="mb-0 small text-muted mt-1">
+                                                    No editable (preferencia de MP ya creada)
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div id="edit-amount-error" class="invalid-feedback" role="alert"></div>
-                                        <small id="edit-amount-help" class="form-text text-muted">
-                                            Mínimo $1, máximo $999,999 MXN
-                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -1036,7 +1028,7 @@ window.KitaLinkActions = {
                                             <i class="iconoir-mail text-muted"></i>
                                             Email del cliente
                                         </label>
-                                        ${linkData.customer_email ? `
+                                        ${(linkData.customer_email && linkData.customer_email.trim()) ? `
                                             <div class="alert alert-light border d-flex align-items-start gap-2 mb-0">
                                                 <i class="iconoir-lock text-muted" style="margin-top: 2px;"></i>
                                                 <div class="flex-grow-1">

@@ -25,7 +25,11 @@ class TenantAdmin(TimestampAdminMixin, StatusAdminMixin, admin.ModelAdmin):
     def get_readonly_fields(self, request: HttpRequest, obj=None):
         """Extend readonly_fields from mixin."""
         base_readonly = list(super().get_readonly_fields(request, obj))
-        additional_readonly = ['subscription_status', 'trial_ends_at', 'is_trial', 'is_subscribed']
+        additional_readonly = [
+            'subscription_status', 'trial_ends_at', 'is_trial', 'is_subscribed',
+            'mercadopago_access_token', 'mercadopago_refresh_token',
+            'csd_serial_number', 'csd_valid_from', 'csd_valid_to'
+        ]
         # Combine and deduplicate
         return list(set(base_readonly + additional_readonly))
 
@@ -62,17 +66,21 @@ class TenantAdmin(TimestampAdminMixin, StatusAdminMixin, admin.ModelAdmin):
             'fields': ('name', 'slug', 'domain', 'business_name', 'rfc')
         }),
         ('Contact', {
-            'fields': ('email', 'phone', 'address')
+            'fields': ('email', 'phone')
+        }),
+        ('Domicilio Fiscal', {
+            'fields': ('calle', 'numero_exterior', 'numero_interior', 'colonia', 'codigo_postal', 'municipio', 'estado', 'pais'),
+            'classes': ('collapse',)
         }),
         ('Status', {
             'fields': ('is_active', 'subscription_status', 'trial_ends_at', 'is_trial', 'is_subscribed')
         }),
         ('Fiscal Settings', {
-            'fields': ('fiscal_regime', 'postal_code'),
+            'fields': ('fiscal_regime',),
             'classes': ('collapse',)
         }),
         ('Mercado Pago Integration', {
-            'fields': ('mercadopago_user_id',),
+            'fields': ('mercadopago_user_id', 'mercadopago_access_token', 'mercadopago_refresh_token'),
             'classes': ('collapse',)
         }),
         ('CSD Info', {

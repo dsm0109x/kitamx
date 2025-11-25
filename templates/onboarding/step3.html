@@ -194,6 +194,65 @@
                         <!-- Step Progress (Mobile) - COMPONENT -->
                         {% include 'onboarding/components/mobile_progress_indicator.html' %}
 
+                        {% if has_csd %}
+                        <!-- ✅ CSD YA EXISTE - Mostrar información -->
+                        <div class="alert alert-success border-success mb-4">
+                            <h6 class="fw-bold mb-3">
+                                <span class="iconoir-check-circle me-2"></span>
+                                ✅ Certificado CSD Configurado
+                            </h6>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <strong class="text-muted d-block mb-1">Número de Serie:</strong>
+                                    <code class="cert-serial">{{ csd.serial_number }}</code>
+                                </div>
+                                <div class="col-md-6">
+                                    <strong class="text-muted d-block mb-1">Válido hasta:</strong>
+                                    <span>{{ csd.valid_to|date:"d/m/Y" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong class="text-muted d-block mb-1">Titular:</strong>
+                                <span>{{ csd.subject_name }}</span>
+                            </div>
+
+                            <div class="mb-0">
+                                <strong class="text-muted d-block mb-1">Estado:</strong>
+                                {% if csd.pac_uploaded %}
+                                    <span class="badge bg-success">✓ Subido a facturapi.io</span>
+                                {% else %}
+                                    <span class="badge bg-warning">⏳ Pendiente de subir a PAC</span>
+                                    <small class="text-muted d-block mt-1">Se subirá al activar tu trial en el siguiente paso</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botón para continuar -->
+                        <div class="d-grid gap-2 mb-5">
+                            <a href="{% url 'onboarding:step4' %}" class="btn btn-primary btn-lg">
+                                <span class="iconoir-arrow-right me-2"></span>
+                                Continuar al Siguiente Paso
+                            </a>
+                        </div>
+
+                        <div class="alert alert-warning border-warning">
+                            <h6 class="fw-bold mb-2">
+                                <span class="iconoir-warning-triangle me-2"></span>
+                                ¿Necesitas cambiar tu CSD?
+                            </h6>
+                            <p class="mb-2">Si necesitas subir un certificado diferente, contacta a soporte.</p>
+                            <p class="mb-0">
+                                <small class="text-muted">
+                                    Email: <a href="mailto:soporte@kita.mx">soporte@kita.mx</a>
+                                </small>
+                            </p>
+                        </div>
+
+                        {% else %}
+                        <!-- ❌ NO HAY CSD - Mostrar formulario de upload -->
+
                         <!-- Info Card: ¿Qué es el CSD? -->
                         <div class="alert alert-info border-info mb-4">
                             <h6 class="fw-bold mb-2">
@@ -397,6 +456,9 @@
                                 <span class="iconoir-arrow-right"></span>
                             </button>
                         </div>
+
+                        {% endif %}
+                        {# End of has_csd conditional #}
 
                         <!-- Footer -->
                         <div class="mt-5 pt-4 border-top">

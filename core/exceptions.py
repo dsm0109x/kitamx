@@ -289,9 +289,10 @@ class ErrorResponseBuilder:
             JsonResponse with error
         """
         error_data = {
-            "error": True,
+            "success": False,  # ✅ Changed from "error": True for API consistency
+            "error": message,   # ✅ Message in 'error' field for frontend compatibility
             "code": code,
-            "message": message
+            "message": message  # ✅ Keep 'message' for backward compatibility
         }
 
         if details:
@@ -315,7 +316,8 @@ class ErrorResponseBuilder:
             JsonResponse with validation errors
         """
         return JsonResponse({
-            "error": True,
+            "success": False,  # ✅ Changed for consistency
+            "error": message,   # ✅ Message in 'error' field
             "code": "validation_error",
             "message": message,
             "errors": errors

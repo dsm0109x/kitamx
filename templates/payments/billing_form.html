@@ -135,6 +135,7 @@
                                    class="form-control text-uppercase"
                                    id="rfc"
                                    name="rfc"
+                                   value="{{ form_data.rfc|default:'' }}"
                                    placeholder="XAXX010101000"
                                    minlength="12"
                                    maxlength="13"
@@ -160,14 +161,14 @@
                             </label>
                             <select class="form-select" id="fiscal_regime" name="fiscal_regime" required>
                                 <option value="">Selecciona tu régimen fiscal</option>
-                                <option value="612">612 - Actividades Empresariales y Profesionales</option>
-                                <option value="626">626 - Régimen Simplificado de Confianza</option>
-                                <option value="621">621 - Incorporación Fiscal</option>
-                                <option value="605">605 - Sueldos y Salarios</option>
-                                <option value="606">606 - Arrendamiento</option>
-                                <option value="608">608 - Demás ingresos</option>
-                                <option value="610">610 - Residentes en el Extranjero</option>
-                                <option value="616">616 - Sin obligaciones fiscales</option>
+                                <option value="612" {% if form_data.fiscal_regime == '612' %}selected{% endif %}>612 - Actividades Empresariales y Profesionales</option>
+                                <option value="626" {% if form_data.fiscal_regime == '626' %}selected{% endif %}>626 - Régimen Simplificado de Confianza</option>
+                                <option value="621" {% if form_data.fiscal_regime == '621' %}selected{% endif %}>621 - Incorporación Fiscal</option>
+                                <option value="605" {% if form_data.fiscal_regime == '605' %}selected{% endif %}>605 - Sueldos y Salarios</option>
+                                <option value="606" {% if form_data.fiscal_regime == '606' %}selected{% endif %}>606 - Arrendamiento</option>
+                                <option value="608" {% if form_data.fiscal_regime == '608' %}selected{% endif %}>608 - Demás ingresos</option>
+                                <option value="610" {% if form_data.fiscal_regime == '610' %}selected{% endif %}>610 - Residentes en el Extranjero</option>
+                                <option value="616" {% if form_data.fiscal_regime == '616' %}selected{% endif %}>616 - Sin obligaciones fiscales</option>
                             </select>
                             <small class="form-text text-muted">
                                 <i class="iconoir-list me-1"></i>
@@ -194,6 +195,7 @@
                                class="form-control"
                                id="business_name"
                                name="business_name"
+                               value="{{ form_data.business_name|default:'' }}"
                                placeholder="Nombre completo o razón social"
                                minlength="3"
                                maxlength="255"
@@ -216,6 +218,7 @@
                                    class="form-control"
                                    id="email"
                                    name="email"
+                                   value="{{ form_data.email|default:'' }}"
                                    placeholder="tu@email.com"
                                    required>
                             <div class="invalid-feedback">Email inválido</div>
@@ -240,6 +243,7 @@
                                    class="form-control"
                                    id="postal_code"
                                    name="postal_code"
+                                   value="{{ form_data.postal_code|default:'' }}"
                                    placeholder="01234"
                                    pattern="[0-9]{5}"
                                    maxlength="5"
@@ -270,14 +274,14 @@
                         </label>
                         <select class="form-select" id="cfdi_use" name="cfdi_use" required>
                             <option value="">Selecciona el uso</option>
-                            <option value="G01">G01 - Adquisición de mercancías</option>
-                            <option value="G02">G02 - Devoluciones, descuentos</option>
-                            <option value="G03" selected>G03 - Gastos en general</option>
-                            <option value="I01">I01 - Construcciones</option>
-                            <option value="I02">I02 - Mobilario y equipo</option>
-                            <option value="I03">I03 - Equipo de transporte</option>
-                            <option value="P01">P01 - Por definir</option>
-                            <option value="S01">S01 - Sin efectos fiscales</option>
+                            <option value="G01" {% if form_data.cfdi_use == 'G01' %}selected{% elif not form_data and 'G01' == 'G03' %}selected{% endif %}>G01 - Adquisición de mercancías</option>
+                            <option value="G02" {% if form_data.cfdi_use == 'G02' %}selected{% elif not form_data and 'G02' == 'G03' %}selected{% endif %}>G02 - Devoluciones, descuentos</option>
+                            <option value="G03" {% if form_data.cfdi_use == 'G03' %}selected{% elif not form_data %}selected{% endif %}>G03 - Gastos en general</option>
+                            <option value="I01" {% if form_data.cfdi_use == 'I01' %}selected{% elif not form_data and 'I01' == 'G03' %}selected{% endif %}>I01 - Construcciones</option>
+                            <option value="I02" {% if form_data.cfdi_use == 'I02' %}selected{% elif not form_data and 'I02' == 'G03' %}selected{% endif %}>I02 - Mobilario y equipo</option>
+                            <option value="I03" {% if form_data.cfdi_use == 'I03' %}selected{% elif not form_data and 'I03' == 'G03' %}selected{% endif %}>I03 - Equipo de transporte</option>
+                            <option value="P01" {% if form_data.cfdi_use == 'P01' %}selected{% elif not form_data and 'P01' == 'G03' %}selected{% endif %}>P01 - Por definir</option>
+                            <option value="S01" {% if form_data.cfdi_use == 'S01' %}selected{% elif not form_data and 'S01' == 'G03' %}selected{% endif %}>S01 - Sin efectos fiscales</option>
                         </select>
                         <small class="form-text text-muted">
                             <i class="iconoir-page me-1"></i>
@@ -464,6 +468,28 @@
             showToast('Has rechazado cookies no esenciales. Algunas funciones pueden estar limitadas.', 'info');
         }
 
+        // ✅ Validación de compatibilidad UsoCFDI vs Régimen Fiscal
+        function validateCfdiUseRegime() {
+            const regime = document.getElementById('fiscal_regime').value;
+            const cfdiUse = document.getElementById('cfdi_use').value;
+
+            // Reglas del SAT para personas físicas (regímenes 6XX)
+            const personaFisicaRegimes = ['605', '606', '608', '610', '611', '612', '614', '616', '621', '626'];
+            const personaFisicaUsos = ['G01', 'G02', 'G03', 'I01', 'I02', 'I03', 'I04', 'I05', 'I06', 'I08', 'D01', 'D02', 'D03', 'D04', 'D05', 'D06', 'D07', 'D08', 'D09', 'D10', 'P01', 'S01'];
+
+            if (personaFisicaRegimes.includes(regime)) {
+                // Es persona física
+                if (!personaFisicaUsos.includes(cfdiUse)) {
+                    return {
+                        valid: false,
+                        message: `El uso "${cfdiUse}" no es válido para personas físicas. Usa G03 (Gastos en general) o consulta el catálogo del SAT.`
+                    };
+                }
+            }
+
+            return { valid: true };
+        }
+
         // Form submission
         document.querySelector('form').addEventListener('submit', function(e) {
             const form = this;
@@ -481,6 +507,17 @@
                 e.stopPropagation();
                 form.classList.add('was-validated');
                 showToast('Completa todos los campos correctamente', 'error');
+                return false;
+            }
+
+            // ✅ Validar compatibilidad UsoCFDI vs Régimen
+            const cfdiValidation = validateCfdiUseRegime();
+            if (!cfdiValidation.valid) {
+                e.preventDefault();
+                showToast(cfdiValidation.message, 'error');
+                // Highlight fields
+                document.getElementById('cfdi_use').classList.add('is-invalid');
+                document.getElementById('fiscal_regime').classList.add('is-invalid');
                 return false;
             }
 

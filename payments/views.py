@@ -355,13 +355,48 @@ def billing_form(request: HttpRequest, token: str) -> HttpResponse:
             return redirect('payments:public_link', token=token)
 
         except DjangoValidationError as e:
-            # Error de validación - mostrar mensaje específico
+            # Error de validación - mostrar mensaje específico y preservar datos
             logger.warning(f"Validation error in billing form for payment {successful_payment.id}: {e}")
             context = {
                 'payment_link': payment_link,
                 'tenant': payment_link.tenant,
                 'payment': successful_payment,
-                'error_message': str(e) if len(str(e)) < 200 else 'Error de validación. Verifica tus datos.'
+                'error_message': str(e) if len(str(e)) < 200 else 'Error de validación. Verifica tus datos.',
+                'form_data': request.POST  # ✅ Preservar datos del formulario
+            }
+            return render(request, 'payments/billing_form.html', context)
+        except ValueError as e:
+            # Error de negocio (CFDI, validación SAT, etc.)
+            error_str = str(e)
+            logger.error(f"Business error generating invoice for payment {successful_payment.id}: {e}", exc_info=True)
+
+            # Mensaje más claro para errores comunes
+            user_message = error_str
+
+            # UsoCFDI incompatible con régimen
+            if 'UsoCFDI' in error_str and 'régimen' in error_str:
+                user_message = (
+                    '⚠️ El "Uso del CFDI" seleccionado no es compatible con tu "Régimen Fiscal". '
+                    'Por favor verifica: Si eres persona física con régimen 612 o 626, usa G03 (Gastos en general). '
+                    'Si tienes otro régimen, consulta el catálogo del SAT.'
+                )
+            elif 'Organization not configured' in error_str or 'Upload CSD' in error_str:
+                user_message = (
+                    '❌ Tu empresa aún no tiene certificado CSD configurado. '
+                    'Por favor completa el onboarding (paso 3 y 4) antes de facturar.'
+                )
+            elif 'Could not obtain Live API Key' in error_str:
+                user_message = (
+                    '❌ Error de configuración con facturapi.io. '
+                    'Por favor contacta a soporte@kita.mx con el código de error.'
+                )
+
+            context = {
+                'payment_link': payment_link,
+                'tenant': payment_link.tenant,
+                'payment': successful_payment,
+                'error_message': user_message,
+                'form_data': request.POST  # ✅ Preservar datos del formulario
             }
             return render(request, 'payments/billing_form.html', context)
         except Exception as e:
@@ -371,7 +406,8 @@ def billing_form(request: HttpRequest, token: str) -> HttpResponse:
                 'payment_link': payment_link,
                 'tenant': payment_link.tenant,
                 'payment': successful_payment,
-                'error_message': 'Error al generar la factura. Por favor intenta nuevamente en unos minutos o contacta a soporte.'
+                'error_message': 'Error al generar la factura. Por favor intenta nuevamente en unos minutos o contacta a soporte.',
+                'form_data': request.POST  # ✅ Preservar datos del formulario
             }
             return render(request, 'payments/billing_form.html', context)
 

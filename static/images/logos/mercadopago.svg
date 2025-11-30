@@ -1,4 +1,1 @@
-<svg width="160" height="50" viewBox="0 0 160 50" xmlns="http://www.w3.org/2000/svg">
-  <rect width="160" height="50" fill="#009ee3" rx="4"/>
-  <text x="80" y="30" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="white" text-anchor="middle">MercadoPago</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="160" height="50" viewBox="0 0 160 50"><rect width="160" height="50" fill="#009ee3" rx="4"/><text x="80" y="30" fill="#fff" font-family="Inter, sans-serif" font-size="16" font-weight="600" text-anchor="middle">MercadoPago</text></svg>

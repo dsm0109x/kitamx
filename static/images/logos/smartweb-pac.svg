@@ -1,4 +1,1 @@
-<svg width="140" height="50" viewBox="0 0 140 50" xmlns="http://www.w3.org/2000/svg">
-  <rect width="140" height="50" fill="#059669" rx="4"/>
-  <text x="70" y="30" font-family="Inter, sans-serif" font-size="16" font-weight="600" fill="white" text-anchor="middle">SmartWeb</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="140" height="50" viewBox="0 0 140 50"><rect width="140" height="50" fill="#059669" rx="4"/><text x="70" y="30" fill="#fff" font-family="Inter, sans-serif" font-size="16" font-weight="600" text-anchor="middle">SmartWeb</text></svg>
